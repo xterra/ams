@@ -1,6 +1,7 @@
 var http = require('http'),
     fs = require('fs'),
-    ini = require('ini');
+    ini = require('ini'),
+    router = require("./router.js");
 
 console.info("Booting AMSP application");
 
@@ -52,29 +53,16 @@ var initDb = function(callback) {
     });
 };
 
-function echo(data, response) {
-    response.end("Application is running!\nThis page viewed " + data.pageCountMessage + " times\n\nPORT: " + port + "\nIP: " + ip + "\nmongoURL: " + mongoURL + "\nmongoURLLabel: " + mongoURLLabel + "\nmongoServiceName: " + mongoServiceName + "\nmongoHost: " + mongoHost + "\nmongoPort: " + mongoPort + "\nmongoDatabase: " + mongoDatabase + "\nmongoPassword: " + mongoPassword + "\nmongoUser: " + mongoUser);
-}
+var server = http.createServer(function (request, response) {
 
-function handler (request, response) {
-    console.log(request.url);
+    /* TODO: some logs & statistics */
 
     if (!db) {
         initDb(function(err){});
     }
-    if (db) {
-        var col = db.collection('counts');
-        // Create a document with request IP and current time of request
-        col.insert({ip: request.ip, date: Date.now()});
-        col.count(function(err, count){
-            if (err) {
-                console.log('Error running count. Message:\n'+err);
-            }
-            echo({pageCountMessage: count, dbInfo: dbDetails}, response);
-        });
-    } else {
-        echo({pageCountMessage: null}, response);
-    }
-}
+    router.parse(request, response);
 
-var server = http.createServer(handler).listen(port, ip);
+}).listen(port, ip);
+
+initDb(function (err) {
+});
