@@ -2,14 +2,7 @@ var fs = require("fs"),
     path = require("path"),
     pug = require('pug');
 
-var supportedFileTypes = {
-    "png": "image/png",
-    "jpg": "image/jpeg",
-    "jpeg": "image/jpeg",
-    "txt": "text/raw",
-    "js": "text/javascript",
-    "pdf": "application/pdf"
-};
+var supportedFileTypes;
 
 var responseErrorMessages = {
     0: ["Unknown error", "Something wrong happened, but we do not know what exactly it was."],
@@ -40,6 +33,19 @@ var PATHS_templatePreprocessorsDir = path.join(PATHS_templateDir, "preprocessors
 var PATHS_dataDir = path.join(__dirname, "data");
 var PATHS_dataPublicDir = path.join(PATHS_dataDir, "public");
 var PATHS_dataPrivateDir = path.join(PATHS_dataDir, "private");
+
+
+function reloadMIMEs() {
+    var oldSupportedFileTypes = supportedFileTypes;
+    try {
+        supportedFileTypes = JSON.parse(fs.readFileSync(path.join(__dirname, "configurations", "MIMETypes.json")));
+    } catch (e) {
+        console.error("An error occurred while reloading MIME types from disk. Changes reverted!");
+        supportedFileTypes = oldSupportedFileTypes;
+    }
+}
+
+reloadMIMEs();
 
 function route(request, response) {
     var match = null;
@@ -141,5 +147,6 @@ function draw(pageProcessorName, request, response) {
 module.exports = {
     route: route,
     bleed: bleed,
-    stream: stream
+    stream: stream,
+    reloadMIMEs: reloadMIMEs
 };
