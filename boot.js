@@ -55,12 +55,12 @@ var initDb = function(callback) {
 
 var server = http.createServer(function (request, response) {
 
-    /* TODO: some logs & statistics */
+    /* TODO: capture some logs & statistics */
 
     if (!db) {
         initDb(function(err){});
     }
-    router.parse(request, response);
+    router.route(request, response);
 
 }).listen(port, ip);
 

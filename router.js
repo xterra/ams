@@ -20,6 +20,7 @@ var responseErrorMessages = {
 };
 
 var registeredRoutes = []; // TODO: load routes from file
+registeredRoutes.push([new RegExp('\/$', 'g'), "home"]);
 registeredRoutes.push([new RegExp('\/люди\/$', 'g'), "people"]);
 registeredRoutes.push([new RegExp('\/люди\\/\\d{6,}\/$', 'g'), "profile"]);
 

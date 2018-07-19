@@ -6,7 +6,8 @@
   "main": "boot.js",
   "dependencies": {
     "ini": "^1.3.5",
-    "mongodb": "^2.1.16"
+    "mongodb": "^2.1.16",
+    "pug": "^2.0.3"
   },
   "engine": {
     "node": "*",
