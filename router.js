@@ -1,5 +1,6 @@
 var fs = require("fs"),
-    path = require("path");
+    path = require("path"),
+    pug = require('pug');
 
 var supportedFileTypes = {
     "png": "image/png",
@@ -19,6 +20,12 @@ var responseErrorMessages = {
     503: ["Service Unavailable", "Seems to be server is broken. It will be cured, but actually we do not know when!"]
 };
 
+// TODO: add function to reset precompiledPugs!
+var precompiledPugs = {};
+var pugCompilerOptions = {
+    pretty: true
+};
+
 var registeredRoutes = []; // TODO: load routes from file
 registeredRoutes.push([new RegExp('\/$', 'g'), "home"]);
 registeredRoutes.push([new RegExp('\/люди\/$', 'g'), "people"]);
@@ -28,8 +35,11 @@ var currentTemplateName = "test";
 
 var PATHS_templateDir = path.join(__dirname, "templates", currentTemplateName);
 var PATHS_templateResourcesDir = path.join(PATHS_templateDir, "resources");
+var PATHS_templateSheathDir = path.join(PATHS_templateDir, "sheath");
+var PATHS_templatePreprocessorsDir = path.join(PATHS_templateDir, "preprocessors");
 var PATHS_dataDir = path.join(__dirname, "data");
-
+var PATHS_dataPublicDir = path.join(PATHS_dataDir, "public");
+var PATHS_dataPrivateDir = path.join(PATHS_dataDir, "private");
 
 function route(request, response) {
     var match = null;
@@ -43,10 +53,8 @@ function route(request, response) {
         i++;
     }
     if (match) {
-        response.end("Hook used from registered path: " + match);
+        return draw(match, request, response);
     }
-
-    console.log("An unknown hook used, may be this is a template resource file?");
 
     var stat;
 
@@ -60,9 +68,7 @@ function route(request, response) {
         }
     }
 
-    console.log("May be this is a file in data dir?");
-
-    var filePathInData = path.join(PATHS_dataDir, request.url);
+    var filePathInData = path.join(PATHS_dataPublicDir, request.url);
     if (fs.existsSync(filePathInData)) {
         stat = fs.statSync(filePathInData);
         if (stat.isFile()) {
@@ -111,6 +117,25 @@ function stream(filePath, fileStatistics, request, response) {
     });
     response.write(fs.readFileSync(filePath)); // TODO: fix it - This is super bad shit: rewrite - do as REAL stream!
     response.end();
+}
+
+function draw(pageProcessorName, request, response) {
+    require("./templates/test/preprocessors/" + pageProcessorName)(request, response, function (processedData, useSheath, cacheTime) {
+        if (useSheath) {
+
+            if (typeof precompiledPugs[useSheath] === "undefined") {
+                precompiledPugs[useSheath] = pug.compileFile(path.join(PATHS_templateSheathDir, useSheath + ".pug"), pugCompilerOptions);
+            }
+
+            var html = precompiledPugs[useSheath](processedData);
+            // TODO: cache support
+            response.writeHead(200, {
+                "Content-Type": "text/html",
+                "Content-Length": html.length
+            });
+            response.end(html);
+        }
+    });
 }
 
 module.exports = {
