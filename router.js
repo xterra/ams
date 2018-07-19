@@ -2,7 +2,6 @@ var fs = require("fs"),
     templator = require("./templator.js"),
     path = require("path");
 
-
 var types = {
     "png": "image/png",
     "jpg": "image/jpg",
@@ -14,16 +13,42 @@ var types = {
 
 var routes = [];
 
-routes.push([new RegExp('\/people\/$', 'g'), "people"]);
-routes.push([new RegExp('\/people\\/\\d{6,}\/$', 'g'), "profile"]);
+routes.push([new RegExp('\/профиль\/?$', 'g'), "people"]);
+routes.push([new RegExp('\/профиль\\/\\d{6,}\/?$', 'g'), "profile"]);
+routes.push([new RegExp('\/преподаватели\/$', 'g'), "teachers"]);
+routes.push([new RegExp('\/книги\/$', 'g'), "books"]);
+routes.push([new RegExp('\\/книги\\/монографии\\/$', 'g'), "monographs"]);
+routes.push([new RegExp('\\/книги\\/учебники\\/$', 'g'), "textbooks"]);
+routes.push([new RegExp('\\/книги\\/учебные_пособия\\/$', 'g'), "training_aids"]);
+routes.push([new RegExp('\\/материалы\/$', 'g'), "materials"]);
+//....
+routes.push([new RegExp('\/$', 'g'), "home"]);
+routes.push([new RegExp('\/логин\/$', 'g'), "login"]);
+routes.push([new RegExp('\/книги\/$', 'g'), "books"]);
+routes.push([new RegExp('\/лецкий\/$', 'g'), "teacher_landing"]);
+routes.push([new RegExp('\/варфоломеев\/$', 'g'), "teacher_landing"]);
+routes.push([new RegExp('\/семин\/$', 'g'), "teacher_landing"]);
+routes.push([new RegExp('\/маркова\/$', 'g'), "teacher_landing"]);
+routes.push([new RegExp('\/соймина\/$', 'g'), "teacher_landing"]);
+routes.push([new RegExp('\/костюковская\/$', 'g'), "teacher_landing"]);
+routes.push([new RegExp('\/ивницкий\/$', 'g'), "teacher_landing"]);
+routes.push([new RegExp('\/павлов\/$', 'g'), "teacher_landing"]);
+routes.push([new RegExp('\/дружинин\/$', 'g'), "teacher_landing"]);
+routes.push([new RegExp('\/нуждин\/$', 'g'), "teacher_landing"]);
+//....
+routes.push([new RegExp('\/карта\/$', 'g'), "map"]);
+routes.push([new RegExp('\/контакты\/$', 'g'), "contacts"]);
+routes.push([new RegExp('\/новости\/$', 'g'), "news"]);
+routes.push([new RegExp('\/новости\/$', 'g'), "news"]);
 
 module.exports = {
     parse: function (request, response) {
         var match = null;
+        var clientURL=decodeURI(request.url);
         console.log("Starting parsing..");
         routes.forEach(function (regexp) { // # TODO: rewrite to while to increase perfomance
-            console.log(request.url + " == " + regexp[0]);
-            if (!match && request.url.match(regexp[0])) {
+            console.log(clientURL + " == " + regexp[0]);
+            if (!match && clientURL.match(regexp[0])) {
                 match = regexp[1];
             }
         });
@@ -31,7 +56,7 @@ module.exports = {
             return templator.proceed(match, request, response);
         }
 
-        var filePath = path.join(__dirname, "templates/test", request.url);
+        var filePath = path.join(__dirname, "templates/test", clientURL);
 
         if (fs.existsSync(filePath)) { // TODO: filesystem vulnarability! - non restricted access to nearby hidden-files
 
@@ -41,7 +66,7 @@ module.exports = {
 
             if (stat.isFile()) {
 
-                var elements = request.url.split(".");
+                var elements = clientURL.split(".");
                 var extension = elements[elements.length - 1].toLowerCase();
                 var content_type = null;
 
@@ -64,7 +89,7 @@ module.exports = {
                 response.end();
             } else {
                 response.writeHead(403, {'Content-Type': 'text/html '});
-                response.end("<h1>403 Forbidden</h1><p>You do not have access to dir " + path.normalize(request.url) + "</p>");
+                response.end("<h1>403 Forbidden</h1><p>You do not have access to dir " + path.normalize(clientURL) + "</p>");
             }
 
 
