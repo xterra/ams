@@ -2,7 +2,6 @@ var fs = require("fs"),
     path = require("path"),
     pug = require('pug');
 
-var supportedFileTypes;
 
 var responseErrorMessages = {
     0: ["Unknown error", "Something wrong happened, but we do not know what exactly it was."],
@@ -13,78 +12,101 @@ var responseErrorMessages = {
     503: ["Service Unavailable", "Seems to be server is broken. It will be cured, but actually we do not know when!"]
 };
 
-// TODO: add function to reset precompiledPugs!
-var precompiledPugs = {};
+// TODO: add function to reset precompiledPugPages!
+var supportedFileTypes = {};
+var pageProcessors = {};
+var precompiledPugPages = {};
+var cachedRenderedPages = {};
 var pugCompilerOptions = {
     pretty: true
 };
-
-var registeredRoutes = []; // TODO: load routes from file
-registeredRoutes.push([new RegExp('\/$', 'g'), "home"]);
-registeredRoutes.push([new RegExp('\/люди\/$', 'g'), "people"]);
-registeredRoutes.push([new RegExp('\/люди\\/\\d{6,}\/$', 'g'), "profile"]);
 
 var currentTemplateName = "test";
 
 var PATHS_templateDir = path.join(__dirname, "templates", currentTemplateName);
 var PATHS_templateResourcesDir = path.join(PATHS_templateDir, "resources");
 var PATHS_templateSheathDir = path.join(PATHS_templateDir, "sheath");
-var PATHS_templatePreprocessorsDir = path.join(PATHS_templateDir, "preprocessors");
+var PATHS_templatePreprocessorsDir = path.join(PATHS_templateDir, "processors");
 var PATHS_dataDir = path.join(__dirname, "data");
 var PATHS_dataPublicDir = path.join(PATHS_dataDir, "public");
 var PATHS_dataPrivateDir = path.join(PATHS_dataDir, "private");
 
-
 function reloadMIMEs() {
     var oldSupportedFileTypes = supportedFileTypes;
     try {
-        supportedFileTypes = JSON.parse(fs.readFileSync(path.join(__dirname, "configurations", "MIMETypes.json")));
+        supportedFileTypes = JSON.parse(fs.readFileSync(path.join(__dirname, "configurations", "mimeTypes.json")));
     } catch (e) {
         console.error("An error occurred while reloading MIME types from disk. Changes reverted!");
         supportedFileTypes = oldSupportedFileTypes;
     }
 }
 
-reloadMIMEs();
+function rebootProcessors(callback) {
+    var newPageProcessors = [];
+    fs.readdir(PATHS_templatePreprocessorsDir, function (err, filesList) {
+        var booted = 0;
+        filesList.forEach(function (fileName) {
+            try {
+                newPageProcessors.push(require(path.join(PATHS_templatePreprocessorsDir, fileName)));
+                console.log("Booted \"" + fileName + "\" processor");
+            } catch (e) {
+                console.error("Can't boot \"" + fileName + "\" processor!", e);
+            }
+            if (++booted === filesList.length) {
+                pageProcessors = newPageProcessors;
+                callback(booted);
+            }
+        });
+    });
+}
 
 function route(request, response) {
-    var match = null;
+    var matchedProcessor = null;
+    var requestedURL = decodeURI(request.url);
+
+    console.log("Requested page ", requestedURL);
+
+    if (request.method === "GET" && typeof cachedRenderedPages[requestedURL] !== "undefined" && cachedRenderedPages[requestedURL][0].getTime() > (new Date().getTime())) {
+        console.log("Using page from cache");
+        response.writeHead(200, cachedRenderedPages[requestedURL][1]);
+        return response.end(cachedRenderedPages[requestedURL][2]);
+    }
 
     var i = 0;
-    while (!match && i < registeredRoutes.length) {
-        var routeCondition = registeredRoutes[i];
-        if (!match && request.url.match(routeCondition[0])) {
-            match = routeCondition[1];
+    while (!matchedProcessor && i < pageProcessors.length) {
+        var routeCondition = pageProcessors[i].path;
+        if (!matchedProcessor && requestedURL.match(routeCondition)) {
+            matchedProcessor = pageProcessors[i].processor;
         }
         i++;
     }
-    if (match) {
-        return draw(match, request, response);
+    if (matchedProcessor) {
+        return render(matchedProcessor, request, requestedURL, response);
     }
 
     var stat;
 
-    var filePathInTemplateResources = path.join(PATHS_templateResourcesDir, request.url);
+    var filePathInTemplateResources = path.join(PATHS_templateResourcesDir, requestedURL);
     if (fs.existsSync(filePathInTemplateResources)) { // TODO: filesystem vulnarability! - non restricted access to nearby hidden-files
         stat = fs.statSync(filePathInTemplateResources);
         if (stat.isFile()) {
             return stream(filePathInTemplateResources, stat, request, response);
         } else {
-            return bleed(403, request.url, response);
+            return bleed(403, requestedURL, response);
         }
     }
 
-    var filePathInData = path.join(PATHS_dataPublicDir, request.url);
+    var filePathInData = path.join(PATHS_dataPublicDir, requestedURL);
     if (fs.existsSync(filePathInData)) {
         stat = fs.statSync(filePathInData);
         if (stat.isFile()) {
             return stream(filePathInData, stat, request, response);
         } else {
-            return bleed(403, request.url, response);
+            return bleed(403, requestedURL, response);
         }
     }
 
-    bleed(404, request.url, response);
+    bleed(404, requestedURL, response);
 }
 
 function bleed(errorCode, retrievedAddress, response) {
@@ -125,28 +147,46 @@ function stream(filePath, fileStatistics, request, response) {
     response.end();
 }
 
-function draw(pageProcessorName, request, response) {
-    require("./templates/test/preprocessors/" + pageProcessorName)(request, response, function (processedData, useSheath, cacheTime) {
+function render(pageProcessor, requestedURL, request, response) {
+    return pageProcessor(request, response, function (processedData, useSheath, serverCacheTime, clientCacheTime) {
+        if (typeof serverCacheTime !== "number" || serverCacheTime == null || !serverCacheTime) {
+            serverCacheTime = 0;
+        }
+        if (typeof clientCacheTime === "undefined" || clientCacheTime == null || !clientCacheTime) {
+            clientCacheTime = "no-cache";
+        } else {
+            clientCacheTime = "max-age=" + clientCacheTime
+        }
         if (useSheath) {
-
-            if (typeof precompiledPugs[useSheath] === "undefined") {
-                precompiledPugs[useSheath] = pug.compileFile(path.join(PATHS_templateSheathDir, useSheath + ".pug"), pugCompilerOptions);
+            if (typeof useSheath !== "string") {
+                throw new Error("Incorrect sheath variable type used! Can be only String.");
             }
-
-            var html = precompiledPugs[useSheath](processedData);
-            // TODO: cache support
-            response.writeHead(200, {
+            if (typeof precompiledPugPages[useSheath] === "undefined") {
+                precompiledPugPages[useSheath] = pug.compileFile(path.join(PATHS_templateSheathDir, useSheath + ".pug"), pugCompilerOptions);
+            }
+            var html = precompiledPugPages[useSheath](processedData);
+            var head = {
+                "Cache-Control": clientCacheTime,
                 "Content-Type": "text/html",
                 "Content-Length": html.length
-            });
+            };
+            response.writeHead(200, head);
             response.end(html);
+            if (serverCacheTime > 0) cachedRenderedPages[requestedURL] = [new Date().getTime() + (serverCacheTime * 1000), html, head];
         }
     });
 }
 
 module.exports = {
+    prepare: function (callback) {
+        return rebootProcessors(function (booted) {
+            reloadMIMEs();
+            callback(booted);
+        });
+    },
     route: route,
     bleed: bleed,
     stream: stream,
-    reloadMIMEs: reloadMIMEs
+    reloadMIMEs: reloadMIMEs,
+    rebootProcessors: rebootProcessors
 };
