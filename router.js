@@ -66,10 +66,11 @@ function route(request, response) {
 
     console.log("Requested page ", requestedURL);
 
-    if (request.method === "GET" && typeof cachedRenderedPages[requestedURL] !== "undefined" && cachedRenderedPages[requestedURL][0].getTime() > (new Date().getTime())) {
+    if (request.method === "GET" && typeof cachedRenderedPages[requestedURL] !== "undefined" && cachedRenderedPages[requestedURL][0] > (new Date().getTime())) {
+
         console.log("Using page from cache");
-        response.writeHead(200, cachedRenderedPages[requestedURL][1]);
-        return response.end(cachedRenderedPages[requestedURL][2]);
+        response.writeHead(200, cachedRenderedPages[requestedURL][2]);
+        return response.end(cachedRenderedPages[requestedURL][1]);
     }
 
     var i = 0;
@@ -81,7 +82,7 @@ function route(request, response) {
         i++;
     }
     if (matchedProcessor) {
-        return render(matchedProcessor, request, requestedURL, response);
+        return render(matchedProcessor, requestedURL, request, response);
     }
 
     var stat;

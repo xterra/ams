@@ -1,5 +1,5 @@
 module.exports = {
-    path: new RegExp("/$"),
+    path: new RegExp("^\/$"),
     processor: function (request, response, callback) {
 
 
