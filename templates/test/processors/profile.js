@@ -1,5 +1,5 @@
 module.exports = {
-    path: /^\/профиль\/\d{6,}\/$/u,
+    path: new RegExp(/^\/профиль\/\d{6,}\/$/u),
     processor: function (request, response, callback) {
 
         var urlPath = decodeURI(request.url);

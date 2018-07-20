@@ -6,6 +6,6 @@ module.exports = {
         callback({
             pageTitle: "Test page title",
             youAreUsingPug: true
-        }, "home", 6400);
+        }, "home", 5, 5);
     }
 };
