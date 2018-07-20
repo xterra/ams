@@ -3,9 +3,6 @@ var http = require('http'),
     ini = require('ini'),
     router = require("./router.js");
 
-console.info("Booting AMSP application");
-
-console.log("Loading configs");
 var port = process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8080,
     ip   = process.env.IP   || process.env.OPENSHIFT_NODEJS_IP || '0.0.0.0',
     mongoURL = process.env.OPENSHIFT_MONGODB_DB_URL || process.env.MONGO_URL,
@@ -33,12 +30,12 @@ var db = null,
     dbDetails = new Object();
 
 var initDb = function(callback) {
-    if (mongoURL == null) return;
+    if (mongoURL == null) return callback(new Error("Mongo URL is not specified!"));
 
     var mongodb = require('mongodb');
-    if (mongodb == null) return;
+    if (mongodb == null) return callback(new Error("Mongo module is not connected!"));
 
-    mongodb.connect(mongoURL, function(err, conn) {
+    return mongodb.connect(mongoURL, function (err, conn) {
         if (err) {
             callback(err);
             return;
@@ -49,20 +46,34 @@ var initDb = function(callback) {
         dbDetails.url = mongoURLLabel;
         dbDetails.type = 'MongoDB';
 
-        console.log('Connected to MongoDB at: %s', mongoURL);
+        callback(null);
     });
 };
 
-var server = http.createServer(function (request, response) {
+console.log("IP: ", ip);
+console.log("Port: ", port);
+console.log("Mongo URL: ", mongoURL);
 
-    /* TODO: capture some logs & statistics */
-
-    if (!db) {
-        initDb(function(err){});
-    }
-    router.route(request, response);
-
-}).listen(port, ip);
-
-initDb(function (err) {
+var server;
+console.log("Preparing router...");
+router.prepare(function () {
+    console.info("Router is ready.");
+    initDb(function (err) {
+        if (err) {
+            console.error("Can't establish connection to DB");
+        } else {
+            console.info("DB connected.");
+        }
+        console.log("Running http server...");
+        server = http.createServer(function (request, response) {
+            var timeStart = new Date().getTime();
+            console.log();
+            /* TODO: capture some logs & statistics */
+            router.route(request, response);
+            console.log("Page rendered in " + ((new Date().getTime()) - timeStart) + "ms");
+        }).listen(port, ip);
+    });
 });
+
+
+
