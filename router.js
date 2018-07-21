@@ -7,6 +7,7 @@ var fs = require("fs"),
 var responseErrorMessages = {
     306: ["Unknown error", "Something wrong happened, but we do not know what exactly it was."],
 
+    400: ["Bad Request", "It's not our fault: your browser did not deliver correct data."],
     401: ["Unauthorized", "You are not authorized to view this content."],
     403: ["Forbidden", "You are not permitted to view this content."],
     404: ["File not found", "Oh, no! Space invaders destroyed this page! Take revenge of them!"],
@@ -147,7 +148,6 @@ function bleed(errorCode, retrievedAddress, response, error) {
     // Prepare data for bleed
     var errorMessage = responseErrorMessages[errorCode];
     var timestamp = new Date().toString();
-    var retrievedAddressNoXSS = xss(retrievedAddress);
 
     // Search for custom error template
     var sheathName = "$httpErr" + errorCode;
@@ -163,11 +163,12 @@ function bleed(errorCode, retrievedAddress, response, error) {
             title: errorMessage[0],
             description: errorMessage[1],
             timestamp: timestamp,
-            url: retrievedAddressNoXSS
+            url: typeof retrievedAddress === "string" ? retrievedAddress : null
         });
     } else {
         responseData = "<h1>" + errorCode + " " + errorMessage[0] + "</h1>" + errorMessage[1] + "<br/><br/><i>AMS Portal Framework @ 2018, by iLeonidze, Swenkal, Spartedo</i>";
-        responseData += "<br/><i>Requested address: " + retrievedAddressNoXSS + "</i>" + "<br><i>Time: " + timestamp + "</i>";
+        if (typeof retrievedAddress === "string" && retrievedAddress !== null) responseData += "<br/><i>Requested address: " + xss(retrievedAddress) + "</i>";
+        responseData += "<br/><i>Time: " + timestamp + "</i>";
         if (errorTrace !== null) {
             responseData += "<br/><br/><p style='color:red;font-family: Consolas, sans-serif;'>Error: " + errorTrace.replace(/\n/g, "<br/>") + "</p>";
         }
@@ -213,7 +214,7 @@ function render(pageProcessor, requestedURL, request, response) {
         return pageProcessor(request, response, function (processedData, useSheathName, serverCacheTime, clientCacheTime, contentType) {
             if (!timeoutBleeded) {
                 clearTimeout(processorTimeout);
-                if (typeof processedData !== "undefined" && processedData !== null) {
+                if (!response.finished && typeof processedData !== "undefined" && processedData !== null) {
                     try {
                         if (typeof serverCacheTime !== "number" || serverCacheTime == null || !serverCacheTime) {
                             serverCacheTime = 0;
@@ -246,7 +247,7 @@ function render(pageProcessor, requestedURL, request, response) {
                         response.writeHead(200, head);
                         response.write(responseData);
                         response.end();
-                        if (serverCacheTime > 0) cachedRenderedPages[requestedURL] = [new Date().getTime() + (serverCacheTime * 1000), responseData, head];
+                        if (request.method === "GET" && serverCacheTime > 0) cachedRenderedPages[requestedURL] = [new Date().getTime() + (serverCacheTime * 1000), responseData, head];
                     } catch (e) {
                         bleed(500, null, response, e);
                         console.error("An error occurred in router -> renderer (after processor)", e);
@@ -286,6 +287,25 @@ function reloadConfigurations() {
 
 }
 
+function downloadClientPostData(request, callback, awaitingDataLength) {
+    if (typeof awaitingDataLength !== "number") {
+        // 1e6 === 1 * Math.pow(10, 6) === 1 * 1000000 ~~~ 1MB
+        awaitingDataLength = 1e6;
+    }
+    var body = "";
+    request.on("data", function (data) {
+        body += data;
+        // Too much POST data, kill the connection!
+        if (body.length > awaitingDataLength) request.connection.destroy();
+    });
+    request.on("error", function (e) {
+        callback(e, body);
+    });
+    request.on("end", function () {
+        callback(null, body);
+    });
+}
+
 module.exports = {
     prepare: function (callback) {
         reloadConfigurations();
@@ -301,5 +321,6 @@ module.exports = {
     rebootProcessors: rebootProcessors,
     resetPrecompiledPugs: resetPrecompiledPugs,
     resetCachedRenderedPages: resetCachedRenderedPages,
-    reloadConfigurations: reloadConfigurations
+    reloadConfigurations: reloadConfigurations,
+    downloadClientPostData: downloadClientPostData
 };
