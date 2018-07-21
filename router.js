@@ -1,10 +1,12 @@
 var fs = require("fs"),
     path = require("path"),
     pug = require("pug"),
-    xss = require("xss");
+    xss = require("xss"),
+    ini = require("ini");
 
 var responseErrorMessages = {
-    0: ["Unknown error", "Something wrong happened, but we do not know what exactly it was."],
+    306: ["Unknown error", "Something wrong happened, but we do not know what exactly it was."],
+
     401: ["Unauthorized", "You are not authorized to view this content."],
     403: ["Forbidden", "You are not permitted to view this content."],
     404: ["File not found", "Oh, no! Space invaders destroyed this page! Take revenge of them!"],
@@ -17,12 +19,11 @@ var pageProcessors = {};
 var precompiledPugPages = {};
 var cachedRenderedPages = {};
 var pugCompilerOptions = {
-    pretty: true
+    pretty: false
 };
 
-// TODO: load this variables from configs
 var renderTimeout = 5000;
-var bleedStacktraceAllowed = true;
+var bleedStacktraceAllowed = false;
 var currentTemplateName = "test";
 
 var PATHS_templateDir = path.join(__dirname, "templates", currentTemplateName);
@@ -36,7 +37,7 @@ var PATHS_dataPrivateDir = path.join(PATHS_dataDir, "private");
 function reloadMIMEs() {
     var oldSupportedFileTypes = supportedFileTypes;
     try {
-        supportedFileTypes = JSON.parse(fs.readFileSync(path.join(__dirname, "configurations", "mimeTypes.json")));
+        supportedFileTypes = JSON.parse(fs.readFileSync(path.join(__dirname, "configurations", "mimeTypes.json"), "utf-8"));
     } catch (e) {
         console.error("An error occurred while reloading MIME types from disk. Changes reverted!");
         supportedFileTypes = oldSupportedFileTypes;
@@ -55,7 +56,7 @@ function rebootProcessors(callback) {
             if (stat.isFile()) {
                 try {
                     newPageProcessors.push(require(fileFullPath));
-                    console.log("Booted \"" + fileName + "\" processor");
+                    console.log("Booted processor " + fileName);
                 } catch (e) {
                     console.error("Can't boot \"" + fileName + "\" processor!", e);
                 }
@@ -124,26 +125,60 @@ function route(request, response) {
 }
 
 function bleed(errorCode, retrievedAddress, response, error) {
+
+    if (response.finished) return;
+
+    if (errorCode === 301 || errorCode === 302) {
+        console.log("Redirecting " + errorCode + " to " + retrievedAddress);
+        response.writeHead(errorCode, {
+            "Cache-Control": "no-cache",
+            "Location": retrievedAddress
+        });
+        response.end();
+        return;
+    }
+
     console.warn("Bleeding an error", errorCode);
-    // TODO: show retrievedAddress for some pages, but avoid XSS-attack
     if (typeof responseErrorMessages[errorCode] !== "object") {
         console.error("Unknown error code " + errorCode + " used!");
-        errorCode = 0;
+        errorCode = 306;
     }
+
+    // Prepare data for bleed
     var errorMessage = responseErrorMessages[errorCode];
-    var outputMessage = "<h1>" + errorCode + " " + errorMessage[0] + "</h1>" + errorMessage[1] + "<br/><br/><i>AMS Portal Framework @ 2018, by iLeonidze, Swenkal, Spartedo</i>";
-    if (retrievedAddress !== null) {
-        outputMessage += "<br/><i>Requested address: " + xss(retrievedAddress + "</i>") + "<br><i>Time: " + (new Date().toString()) + "</i>";
+    var timestamp = new Date().toString();
+    var retrievedAddressNoXSS = xss(retrievedAddress);
+
+    // Search for custom error template
+    var sheathName = "$httpErr" + errorCode;
+    var sheathPath = path.join(PATHS_templateSheathDir, "errors", errorCode + ".pug");
+    var errorTrace = (typeof error !== "undefined" && error !== null && bleedStacktraceAllowed) ? error.stack : null
+    var responseData;
+    if (fs.existsSync(sheathPath)) {
+        if (typeof precompiledPugPages[sheathName] === "undefined") {
+            precompiledPugPages[sheathName] = pug.compileFile(sheathPath, pugCompilerOptions);
+        }
+        responseData = precompiledPugPages[sheathName]({
+            code: errorCode,
+            title: errorMessage[0],
+            description: errorMessage[1],
+            timestamp: timestamp,
+            url: retrievedAddressNoXSS
+        });
+    } else {
+        responseData = "<h1>" + errorCode + " " + errorMessage[0] + "</h1>" + errorMessage[1] + "<br/><br/><i>AMS Portal Framework @ 2018, by iLeonidze, Swenkal, Spartedo</i>";
+        responseData += "<br/><i>Requested address: " + retrievedAddressNoXSS + "</i>" + "<br><i>Time: " + timestamp + "</i>";
+        if (errorTrace !== null) {
+            responseData += "<br/><br/><p style='color:red;font-family: Consolas, sans-serif;'>Error: " + errorTrace.replace(/\n/g, "<br/>") + "</p>";
+        }
     }
-    if (typeof error !== "undefined" && error !== null && bleedStacktraceAllowed) {
-        outputMessage += "<br/><br/><i style='color:red;'>Error: " + error.stack.replace(/\n/g, "<br/>") + "</i>";
-    }
+
     response.writeHead(errorCode, {
         "Cache-Control": "no-cache",
         "Content-Type": "text/html; charset=utf-8",
-        "Content-Size": outputMessage.length
+        "Content-Size": responseData.length
     });
-    response.write(outputMessage, "utf-8");
+    response.write(responseData, "utf-8");
     return response.end();
 }
 
@@ -160,55 +195,69 @@ function stream(filePath, fileStatistics, request, response) {
         contentType = "application/octet-stream"
     }
     console.log("Desired content type: ", contentType);
-    response.writeHead(200, { // TODO: some caching for specific filetypes
+    response.writeHead(200, { // TODO: some client caching policies for specific filetypes
         "Content-Type": contentType,
         "Content-Length": fileStatistics.size
     });
-    response.write(fs.readFileSync(filePath)); // TODO: fix it - This is super bad shit: rewrite - do as REAL stream!
-    response.end();
+
+    var readStream = fs.createReadStream(filePath);
+    readStream.pipe(response);
 }
 
 function render(pageProcessor, requestedURL, request, response) {
-    var timeoutBleeded = false;
-    var processorTimeout = setTimeout(function () {
-        bleed(503, null, response, new Error("Processor reached timeout"));
-    }, renderTimeout);
-    return pageProcessor(request, response, function (processedData, useSheath, serverCacheTime, clientCacheTime) {
-        if (!timeoutBleeded) {
-            clearTimeout(processorTimeout);
-            try {
-                if (typeof serverCacheTime !== "number" || serverCacheTime == null || !serverCacheTime) {
-                    serverCacheTime = 0;
-                }
-                if (typeof clientCacheTime === "undefined" || clientCacheTime == null || !clientCacheTime) {
-                    clientCacheTime = "no-cache";
-                } else {
-                    clientCacheTime = "max-age=" + clientCacheTime
-                }
-                if (useSheath) {
-                    if (typeof useSheath !== "string") {
-                        throw new Error("Incorrect sheath variable type used! Can be only String.");
+    try {
+        var timeoutBleeded = false;
+        var processorTimeout = setTimeout(function () {
+            if (!response.finished) bleed(503, null, response, new Error("Processor reached timeout"));
+        }, renderTimeout);
+        return pageProcessor(request, response, function (processedData, useSheathName, serverCacheTime, clientCacheTime, contentType) {
+            if (!timeoutBleeded) {
+                clearTimeout(processorTimeout);
+                if (typeof processedData !== "undefined" && processedData !== null) {
+                    try {
+                        if (typeof serverCacheTime !== "number" || serverCacheTime == null || !serverCacheTime) {
+                            serverCacheTime = 0;
+                        }
+                        if (typeof clientCacheTime === "undefined" || clientCacheTime == null || !clientCacheTime) {
+                            clientCacheTime = "no-cache";
+                        } else {
+                            clientCacheTime = "max-age=" + clientCacheTime
+                        }
+                        if (useSheathName) {
+                            contentType = "text/html; charset=utf-8";
+                            if (typeof useSheathName !== "string") {
+                                throw new Error("Incorrect sheath variable type used! Can be only String.");
+                            }
+                            if (typeof precompiledPugPages[useSheathName] === "undefined") {
+                                precompiledPugPages[useSheathName] = pug.compileFile(path.join(PATHS_templateSheathDir, useSheathName + ".pug"), pugCompilerOptions);
+                            }
+                            var responseData = precompiledPugPages[useSheathName](processedData);
+                        } else {
+                            if (typeof contentType === "undefined" || contentType == null) {
+                                contentType = "text/plain; charset=utf-8";
+                            }
+                            responseData = processedData;
+                        }
+                        var head = {
+                            "Cache-Control": clientCacheTime,
+                            "Content-Type": contentType,
+                            "Content-Length": responseData.length
+                        };
+                        response.writeHead(200, head);
+                        response.write(responseData);
+                        response.end();
+                        if (serverCacheTime > 0) cachedRenderedPages[requestedURL] = [new Date().getTime() + (serverCacheTime * 1000), responseData, head];
+                    } catch (e) {
+                        bleed(500, null, response, e);
+                        console.error("An error occurred in router -> renderer (after processor)", e);
                     }
-                    if (typeof precompiledPugPages[useSheath] === "undefined") {
-                        precompiledPugPages[useSheath] = pug.compileFile(path.join(PATHS_templateSheathDir, useSheath + ".pug"), pugCompilerOptions);
-                    }
-                    var html = precompiledPugPages[useSheath](processedData);
-                    var head = {
-                        "Cache-Control": clientCacheTime,
-                        "Content-Type": "text/html; charset=utf-8",
-                        "Content-Length": html.length
-                    };
-                    response.writeHead(200, head);
-                    response.write(html, "utf-8");
-                    response.end();
-                    if (serverCacheTime > 0) cachedRenderedPages[requestedURL] = [new Date().getTime() + (serverCacheTime * 1000), html, head];
                 }
-            } catch (e) {
-                bleed(500, null, response, e);
-                console.error("An error occurred in router -> renderer", e);
             }
-        }
-    });
+        });
+    } catch (e) {
+        bleed(500, null, response, e);
+        console.error("An error occurred in router -> renderer (on processor)", e);
+    }
 }
 
 function resetPrecompiledPugs() {
@@ -219,8 +268,27 @@ function resetCachedRenderedPages() {
     cachedRenderedPages = {};
 }
 
+function reloadConfigurations() {
+
+    currentTemplateName = fs.readFileSync(path.join(__dirname, "configurations", "template.txt"), "utf-8");
+    console.log("Configs, current template:\t\t", currentTemplateName);
+    var routerConfigurations = ini.parse(fs.readFileSync(path.join(__dirname, "configurations", "router.ini"), "utf-8"));
+
+    // PUG
+    pugCompilerOptions.pretty = routerConfigurations["pug"]["pretty"];
+    console.log("Configs, pug pretty html:\t\t", pugCompilerOptions.pretty);
+
+    // ROUTER
+    renderTimeout = routerConfigurations["main"]["renderTimeout"];
+    console.log("Configs, rendering timeout:\t\t", renderTimeout);
+    bleedStacktraceAllowed = routerConfigurations["bleed"]["printStacktrace"];
+    console.log("Configs, on bleed print stack:\t", bleedStacktraceAllowed);
+
+}
+
 module.exports = {
     prepare: function (callback) {
+        reloadConfigurations();
         return rebootProcessors(function (booted) {
             reloadMIMEs();
             callback(booted);
@@ -232,5 +300,6 @@ module.exports = {
     reloadMIMEs: reloadMIMEs,
     rebootProcessors: rebootProcessors,
     resetPrecompiledPugs: resetPrecompiledPugs,
-    resetCachedRenderedPages: resetCachedRenderedPages
+    resetCachedRenderedPages: resetCachedRenderedPages,
+    reloadConfigurations: reloadConfigurations
 };

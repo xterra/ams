@@ -50,9 +50,9 @@ var initDb = function(callback) {
     });
 };
 
-console.log("IP: ", ip);
-console.log("Port: ", port);
-console.log("Mongo URL: ", mongoURL);
+console.log("IP:\t\t\t", ip);
+console.log("Port:\t\t", port);
+console.log("Mongo URL:\t", mongoURL);
 
 var server;
 console.log("Preparing router...");
