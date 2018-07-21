@@ -27,17 +27,28 @@ module.exports = {
 
                     if (login.length < 5 || password.length < 8) {
                         return callback({
-                            errorMessage: "Login or password do not require minimal length!"
+                            errorMessage: "Логин и пароль слишном короткие!"
                         }, "login", 0, 0);
                     }
 
-                    response.write("Login: " + post["login"] + "\n");
-                    response.write("Password: " + post["password"]);
-                    response.end();
+                    if (login.length > 16 || password.length > 64) {
+                        return callback({
+                            errorMessage: "Login or password are too long!"
+                        }, "login", 0, 0);
+                    }
+
+                    var out = "Login: " + post["login"] + "\nPassword: " + post["password"];
+
+                    response.writeHead(200, {
+                        "Cache-Control": "no-cache",
+                        "Content-Type": "text/html; charset=utf-8",
+                        "Content-Size": out.length
+                    });
+                    response.end(out);
                 } catch (e) {
                     router.bleed(500, null, response, e);
                 }
-            }, 128);
+            }, 256);
             return callback();
         }
 
