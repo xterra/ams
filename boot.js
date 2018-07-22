@@ -1,7 +1,6 @@
 var http = require('http'),
-    fs = require('fs'),
-    ini = require('ini'),
     router = require("./router.js");
+security = require("./security.js");
 
 var port = process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8080,
     ip   = process.env.IP   || process.env.OPENSHIFT_NODEJS_IP || '0.0.0.0',
@@ -58,22 +57,32 @@ var server;
 console.log("Preparing router...");
 router.prepare(function () {
     console.info("Router is ready.");
-    initDb(function (err) {
-        if (err) {
-            console.error("Can't establish connection to DB");
-        } else {
-            console.info("DB connected.");
-        }
-        console.log("Running http server...");
-        server = http.createServer(function (request, response) {
-            var timeStart = new Date().getTime();
-            console.log();
-            /* TODO: capture some logs & statistics */
-            router.route(request, response);
-            console.log("Page rendered in " + ((new Date().getTime()) - timeStart) + "ms");
-        }).listen(port, ip);
+    console.log("Preparing security...");
+    security.prepare(function () {
+        console.info("Security is ready.");
+        initDb(function (err) {
+            if (err) {
+                console.error("Can't establish connection to DB");
+            } else {
+                console.info("DB connected.");
+            }
+            console.log("Running http server...");
+            server = http.createServer(function (request, response) {
+                var timeStart = new Date().getTime();
+                console.log();
+                /* TODO: capture some logs & statistics */
+                router.route(request, response);
+                console.log("Page rendered in " + ((new Date().getTime()) - timeStart) + "ms");
+            }).listen(port, ip);
+        });
     });
 });
 
-
-
+module.exports = {
+    getDB: function () {
+        return db;
+    },
+    isDBConnected: function () {
+        return db !== null;
+    }
+};

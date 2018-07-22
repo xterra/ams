@@ -2,7 +2,8 @@ var fs = require("fs"),
     path = require("path"),
     pug = require("pug"),
     xss = require("xss"),
-    ini = require("ini");
+    ini = require("ini"),
+    security = require("./security");
 
 var responseErrorMessages = {
     306: ["Unknown error", "Something wrong happened, but we do not know what exactly it was."],
@@ -211,49 +212,51 @@ function render(pageProcessor, requestedURL, request, response) {
         var processorTimeout = setTimeout(function () {
             if (!response.finished) bleed(503, null, response, new Error("Processor reached timeout"));
         }, renderTimeout);
-        return pageProcessor(request, response, function (processedData, useSheathName, serverCacheTime, clientCacheTime, contentType) {
-            if (!timeoutBleeded) {
-                clearTimeout(processorTimeout);
-                if (!response.finished && typeof processedData !== "undefined" && processedData !== null) {
-                    try {
-                        if (typeof serverCacheTime !== "number" || serverCacheTime == null || !serverCacheTime) {
-                            serverCacheTime = 0;
-                        }
-                        if (typeof clientCacheTime === "undefined" || clientCacheTime == null || !clientCacheTime) {
-                            clientCacheTime = "no-cache";
-                        } else {
-                            clientCacheTime = "max-age=" + clientCacheTime
-                        }
-                        if (useSheathName) {
-                            contentType = "text/html; charset=utf-8";
-                            if (typeof useSheathName !== "string") {
-                                throw new Error("Incorrect sheath variable type used! Can be only String.");
+        return security.getSessionFromRequest(request, response, function (sessionToken, sessionData) {
+            pageProcessor(request, response, function (processedData, useSheathName, serverCacheTime, clientCacheTime, contentType) {
+                if (!timeoutBleeded) {
+                    clearTimeout(processorTimeout);
+                    if (!response.finished && typeof processedData !== "undefined" && processedData !== null) {
+                        try {
+                            if (typeof serverCacheTime !== "number" || serverCacheTime == null || !serverCacheTime) {
+                                serverCacheTime = 0;
                             }
-                            if (typeof precompiledPugPages[useSheathName] === "undefined") {
-                                precompiledPugPages[useSheathName] = pug.compileFile(path.join(PATHS_templateSheathDir, useSheathName + ".pug"), pugCompilerOptions);
+                            if (typeof clientCacheTime === "undefined" || clientCacheTime == null || !clientCacheTime) {
+                                clientCacheTime = "no-cache";
+                            } else {
+                                clientCacheTime = "max-age=" + clientCacheTime
                             }
-                            var responseData = precompiledPugPages[useSheathName](processedData);
-                        } else {
-                            if (typeof contentType === "undefined" || contentType == null) {
-                                contentType = "text/plain; charset=utf-8";
+                            if (useSheathName) {
+                                contentType = "text/html; charset=utf-8";
+                                if (typeof useSheathName !== "string") {
+                                    throw new Error("Incorrect sheath variable type used! Can be only String.");
+                                }
+                                if (typeof precompiledPugPages[useSheathName] === "undefined") {
+                                    precompiledPugPages[useSheathName] = pug.compileFile(path.join(PATHS_templateSheathDir, useSheathName + ".pug"), pugCompilerOptions);
+                                }
+                                var responseData = precompiledPugPages[useSheathName](processedData);
+                            } else {
+                                if (typeof contentType === "undefined" || contentType == null) {
+                                    contentType = "text/plain; charset=utf-8";
+                                }
+                                responseData = processedData;
                             }
-                            responseData = processedData;
+                            var head = {
+                                "Cache-Control": clientCacheTime,
+                                "Content-Type": contentType,
+                                "Content-Length": responseData.length
+                            };
+                            response.writeHead(200, head);
+                            response.write(responseData);
+                            response.end();
+                            if (request.method === "GET" && serverCacheTime > 0) cachedRenderedPages[requestedURL] = [new Date().getTime() + (serverCacheTime * 1000), responseData, head];
+                        } catch (e) {
+                            bleed(500, null, response, e);
+                            console.error("An error occurred in router -> renderer (after processor)", e);
                         }
-                        var head = {
-                            "Cache-Control": clientCacheTime,
-                            "Content-Type": contentType,
-                            "Content-Length": responseData.length
-                        };
-                        response.writeHead(200, head);
-                        response.write(responseData);
-                        response.end();
-                        if (request.method === "GET" && serverCacheTime > 0) cachedRenderedPages[requestedURL] = [new Date().getTime() + (serverCacheTime * 1000), responseData, head];
-                    } catch (e) {
-                        bleed(500, null, response, e);
-                        console.error("An error occurred in router -> renderer (after processor)", e);
                     }
                 }
-            }
+            }, sessionData, sessionToken);
         });
     } catch (e) {
         bleed(500, null, response, e);

@@ -1,9 +1,20 @@
 var qs = require('querystring'),
-    router = require("../../../router");
+    router = require("../../../router"),
+    security = require("../../../security");
 
 module.exports = {
     path: new RegExp(/^\/login\/$/u),
-    processor: function (request, response, callback) {
+    processor: function (request, response, callback, sessionContext, sessionToken) {
+
+        if (sessionContext !== null) {
+            var out = "You already logged in!<br/>Your token is: " + sessionToken + "<br/><br/><button onmousedown='window.location=\"/logout/\"'>Logout me!</button>";
+            response.writeHead(200, {
+                "Cache-Control": "no-cache",
+                "Content-Type": "text/html; charset=utf-8",
+                "Content-Size": out.length
+            });
+            response.end(out);
+        }
 
         if (request.method === "POST") {
             router.downloadClientPostData(request, function (error, body) {
@@ -37,15 +48,22 @@ module.exports = {
                         }, "login", 0, 0);
                     }
 
-                    var out = "Login: " + post["login"] + "\nPassword: " + post["password"];
-
-                    response.writeHead(200, {
-                        "Cache-Control": "no-cache",
-                        "Content-Type": "text/html; charset=utf-8",
-                        "Content-Size": out.length
+                    security.loginUsingCookies(login, password, request, response, function (sessionToken, sessionData) {
+                        var out;
+                        if (sessionToken) {
+                            out = "You have been authed!"
+                        } else {
+                            out = "Wrong login/password"
+                        }
+                        response.writeHead(200, {
+                            "Cache-Control": "no-cache",
+                            "Content-Type": "text/html; charset=utf-8",
+                            "Content-Size": out.length
+                        });
+                        response.end(out);
                     });
-                    response.end(out);
                 } catch (e) {
+                    console.error("Processor error, Login: ", e);
                     router.bleed(500, null, response, e);
                 }
             }, 256);
