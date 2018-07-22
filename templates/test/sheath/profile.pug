@@ -3,5 +3,20 @@ html(lang="en")
     head
         title Profile page
     body
-        h1 Profile page
-        p You have requested profile for user #{userID}
+        h1 It's your private profile, #{userLogin}
+        p You have been logged in at #{loginTime}
+        p Secret token is #{sessionToken}
+        br
+        h4 You can store data in your session:
+        form(action='.', method='POST')
+            div
+                | Data key:
+                input(type='text', name='key', value='')
+                | Data value:
+                input(type='text', name='value', value='')
+                input(type='submit', value='Save')
+        br
+        h4 Already stored data in your session:
+        p #{storedData}
+        br
+        button(onmousedown='window.location="/logout/"') Logout me!

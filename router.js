@@ -298,8 +298,10 @@ function downloadClientPostData(request, callback, awaitingDataLength) {
     var body = "";
     request.on("data", function (data) {
         body += data;
-        // Too much POST data, kill the connection!
-        if (body.length > awaitingDataLength) request.connection.destroy();
+        if (body.length > awaitingDataLength) { // Too much POST data, kill the connection!
+            console.warn("User retrieved too much data - destroying connection!");
+            request.connection.destroy();
+        }
     });
     request.on("error", function (e) {
         callback(e, body);

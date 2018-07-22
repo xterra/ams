@@ -46,7 +46,7 @@ function loginUsingCookies(login, password, request, response, callback) {
             console.log("User already logged in");
             return callback(sessionToken, sessionData);
         }
-    });
+    }, true);
 }
 
 function loginUsingToken(login, password, callback) {
@@ -127,7 +127,7 @@ function getSessionFromCookies(rawCookies, callback) {
         var sessionToken = cookies[sessionCookieName];
         console.log("User have session token:", sessionToken);
         return getSessionData(sessionToken, function (error, sessionData) {
-            callback(error, sessionToken, sessionData);
+            callback(error, sessionData !== null ? sessionToken : false, sessionData);
         });
     }
 }
@@ -136,7 +136,7 @@ function getSessionData(sessionToken, callback) {
     if (typeof context[sessionToken] !== "undefined") {
         // TODO: update session lifetime in DB
         context[sessionToken][0] = new Date();
-        callback(null, context[sessionToken][0]);
+        callback(null, context[sessionToken][1]);
     } else {
 
         callback(null, null);
@@ -148,14 +148,41 @@ function getSessionData(sessionToken, callback) {
 
 function updateSessionFromRequest(request, response, sessionData, callback) {
 
+    if (typeof request.headers.cookie === "undefined") {
+        return callback(null, false);
+    }
+
+    var rawCookies = request.headers.cookie;
+    return updateSessionFromCookies(rawCookies, sessionData, function (error, updated) {
+        if (error) {
+            console.error("An error occurred, while logging in using cookies:", error);
+            return router.bleed(500, null, response, error);
+        }
+        return callback(updated);
+    });
 }
 
-function updateSessionFromCookies(cookies, sessionData, callback) {
-
+function updateSessionFromCookies(rawCookies, sessionData, callback) {
+    var cookies = cookie.parse(rawCookies);
+    if (typeof cookies[sessionCookieName] !== "string") {
+        console.log("User do not have session token in cookies");
+        return callback(null, false);
+    } else {
+        var sessionToken = cookies[sessionCookieName];
+        console.log("User have session token:", sessionToken);
+        return updateSession(sessionToken, sessionData, callback);
+    }
 }
 
-function updateSession(sessionKey, sessionData, callback) {
-
+function updateSession(sessionToken, sessionData, callback) {
+    if (typeof context[sessionToken] !== "undefined") {
+        // TODO: update session in DB
+        context[sessionToken][1] = sessionData;
+        callback(null, true);
+    } else {
+        console.warn("User do not have stored data in context. Is that okay, damn?", sessionToken);
+        callback(null, false);
+    }
 }
 
 function reloadConfigurations() {
