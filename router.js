@@ -2,8 +2,28 @@ var fs = require("fs"),
     path = require("path"),
     pug = require("pug"),
     xss = require("xss"),
-    ini = require("ini"),
-    security = require("./security");
+    ini = require("ini");
+
+module.exports = {
+    prepare: function (callback) {
+        reloadConfigurations();
+        return rebootProcessors(function (booted) {
+            reloadMIMEs();
+            callback(booted);
+        });
+    },
+    route: route,
+    bleed: bleed,
+    stream: stream,
+    reloadMIMEs: reloadMIMEs,
+    rebootProcessors: rebootProcessors,
+    resetPrecompiledPugs: resetPrecompiledPugs,
+    resetCachedRenderedPages: resetCachedRenderedPages,
+    reloadConfigurations: reloadConfigurations,
+    downloadClientPostData: downloadClientPostData
+};
+
+var security = require("./security");
 
 var responseErrorMessages = {
     306: ["Unknown error", "Something wrong happened, but we do not know what exactly it was."],
@@ -153,7 +173,18 @@ function bleed(errorCode, retrievedAddress, response, error) {
     // Search for custom error template
     var sheathName = "$httpErr" + errorCode;
     var sheathPath = path.join(PATHS_templateSheathDir, "errors", errorCode + ".pug");
-    var errorTrace = (typeof error !== "undefined" && error !== null && bleedStacktraceAllowed) ? error.stack : null
+    var errorTrace;
+    if (typeof error !== "undefined" && error !== null && bleedStacktraceAllowed){
+        if (typeof error.stack !== "undefined") {
+            errorTrace = error.stack;
+        } else if (typeof error.message !== "undefined") {
+            errorTrace = error.message;
+        } else {
+            errorTrace = "Unknown error: can't be parsed\nSeems to be developer's code makes bleed with incorrect Error-object";
+        }
+    } else {
+        errorTrace = null;
+    }
     var responseData;
     if (fs.existsSync(sheathPath)) {
         if (typeof precompiledPugPages[sheathName] === "undefined") {
@@ -164,7 +195,8 @@ function bleed(errorCode, retrievedAddress, response, error) {
             title: errorMessage[0],
             description: errorMessage[1],
             timestamp: timestamp,
-            url: typeof retrievedAddress === "string" ? retrievedAddress : null
+            url: typeof retrievedAddress === "string" ? retrievedAddress : null,
+            stacktrace: errorTrace
         });
     } else {
         responseData = "<h1>" + errorCode + " " + errorMessage[0] + "</h1>" + errorMessage[1] + "<br/><br/><i>AMS Portal Framework @ 2018, by iLeonidze, Swenkal, Spartedo</i>";
@@ -310,22 +342,3 @@ function downloadClientPostData(request, callback, awaitingDataLength) {
         callback(null, body);
     });
 }
-
-module.exports = {
-    prepare: function (callback) {
-        reloadConfigurations();
-        return rebootProcessors(function (booted) {
-            reloadMIMEs();
-            callback(booted);
-        });
-    },
-    route: route,
-    bleed: bleed,
-    stream: stream,
-    reloadMIMEs: reloadMIMEs,
-    rebootProcessors: rebootProcessors,
-    resetPrecompiledPugs: resetPrecompiledPugs,
-    resetCachedRenderedPages: resetCachedRenderedPages,
-    reloadConfigurations: reloadConfigurations,
-    downloadClientPostData: downloadClientPostData
-};

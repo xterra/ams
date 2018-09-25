@@ -3,27 +3,87 @@ var fs = require("fs"),
     path = require("path"),
     cookie = require('cookie'),
     randomstring = require("randomstring"),
-    router = require("./router"),
+    md5 = require("md5");
+
+module.exports = {
+    prepare: function (callback) {
+        resetContext();
+        reloadConfigurations();
+        runCleaner();
+        callback();
+    },
+    resetContext: resetContext,
+    reloadConfigurations: reloadConfigurations,
+    getSessionFromCookies: getSessionFromCookies,
+    getSessionFromRequest: getSessionFromRequest,
+    getSession: getSessionData,
+    loginUsingCookies: loginUsingCookies,
+    loginUsingToken: loginUsingToken,
+    makeSessionUsingToken: makeSessionUsingToken,
+    makeSession: makeSession,
+    logoutUsingCookies: logoutUsingCookies,
+    logoutUsingToken: logoutUsingToken,
+    updateSessionFromRequest: updateSessionFromRequest,
+    updateSessionFromCookies: updateSessionFromCookies,
+    updateSession: updateSession,
+    runCleaner: runCleaner,
+    stopCleaner: stopCleaner
+};
+
+var router = require("./router"),
     boot = require("./boot");
 
 var sessionCookieName = "SESSID",
     loginCaseSensitive = true,
     passwordCaseSensitive = true,
     randomstringLength = 64,
+    randomstringType = "alphanumeric", // alphanumeric, numeric, alphabetic, hex
     sessionLifetime = 7 * 24 * 60 * 60,
+    sessionTokenInMemoryLifetime = 43200,
+    sessionTokenInMemoryMaxSize = 10000,
     contextCleanerInterval = 60;
 var context;
 
 function generateToken(callback) {
-    // TODO: connection to database
-    var token = null;
-    while (token == null || typeof context[token] !== "undefined") {
-        token = randomstring.generate(randomstringLength);
+    if (boot.isConnected()) {
+        var generationInProcess = false;
+        var generatorInterval = setInterval(function () {
+            if (generationInProcess) return;
+            generationInProcess = true;
+            var token = generateTokenInMemory();
+            boot.getDB().collection("sessions").findOne({
+                _id: token
+            }, {_id: 1}, function (error, found) {
+                if (error) {
+                    clearInterval(generatorInterval);
+                    return callback(error, null);
+                }
+                if (found == null ) {
+                    clearInterval(generatorInterval);
+                    return callback(null, token);
+                } else {
+                    generationInProcess = false;
+                    console.warn("Generated token for user is already in DB. Is that ok? May be you should check configs?");
+                }
+            });
+        }, 0);
+    } else {
+        return callback(null, generateTokenInMemory());
     }
-    callback(null, token);
 }
 
-function loginUsingCookies(login, password, request, response, callback) {
+function generateTokenInMemory() {
+    var token = null;
+    while (token == null || typeof context[token] !== "undefined") {
+        token = randomstring.generate({
+            length:randomstringLength,
+            charset: randomstringType
+        });
+    }
+    return token;
+}
+
+function loginUsingCookies (login, password, request, response, callback) {
     return getSessionFromRequest(request, response, function (sessionToken, sessionData) {
         if (sessionToken == null || sessionData == null) {
             console.log("User is not logged in, logging in...");
@@ -33,7 +93,7 @@ function loginUsingCookies(login, password, request, response, callback) {
                     return router.bleed(500, null, response, error);
                 }
                 if (generatedSessionToken) {
-                    // user can be not logged in - that is why there is condition
+                    // user can fail login - that is why there is condition
                     response.setHeader("Set-Cookie", cookie.serialize(sessionCookieName, generatedSessionToken, {
                         expires: new Date((new Date()).getTime() + sessionLifetime * 1000),
                         path: "/"
@@ -49,22 +109,88 @@ function loginUsingCookies(login, password, request, response, callback) {
     }, true);
 }
 
-function loginUsingToken(login, password, callback) {
+function loginUsingToken (login, password, callback) {
     if (!loginCaseSensitive) {
         login = login.toLowerCase();
     }
     if (!passwordCaseSensitive) {
         password = password.toLowerCase();
     }
-    if (login === "admin" && password === "password") {
-        return generateToken(function (error, token) {
-            context[token] = [new Date(), {}];
-            // TODO: sync in DB
-            callback(error, token, context[token][1]);
+    password = md5(password); // TODO: SHA-256
+    if (boot.isConnected()) {
+        boot.getDB().collection("users").findOne({
+            username : login,
+            password : password
+        }, {
+            _id : 1
+        }, null, function(error, found){
+            if (error) {
+                return callback(error, false, null);
+            }
+            if(found){
+                console.log("Authing user " + found._id + "...");
+                return makeSession(found._id, function(error, token, sessionData){
+                    if(error) return callback(error, false, null);
+                    console.info("User "+ found._id +" authed!");
+                    callback(null, token, sessionData);
+                });
+            } else {
+                callback(null, false, null);
+            }
         });
     } else {
-        callback(null, false, null);
+        if (login === "admin" && password === "5f4dcc3b5aa765d61d8327deb882cf99") {
+            return makeSession("5f4dcc3b5aa765d61d8327deb882cf99", function(error, token, sessionData){
+                if(error) return callback(error, false, null);
+                callback(null, token, sessionData);
+            });
+        } else {
+            callback(null, false, null);
+        }
     }
+}
+
+function makeSession (userID, callback) {
+    return generateToken(function (error, token) {
+        if(error) return callback(error, false, null, null);
+        makeSessionUsingToken(token, userID, callback);
+    });
+}
+
+function makeSessionUsingToken (token, userID, callback) {
+    var defaultSessionData = {};
+    if(boot.isConnected()){
+        return storeSessionInDB(token, defaultSessionData, userID, function(error, storedSessionData){
+            if(error){
+                return callback(error, false, null, null);
+            }
+            var sessionData = storeSessionInMemory(token, storedSessionData, userID);
+            return callback(null, token, sessionData, userID);
+        });
+    } else {
+        console.warn("New session stored at in-memory cache");
+        var sessionData = storeSessionInMemory(token, defaultSessionData, userID);
+        return callback(null, token, sessionData, userID);
+    }
+}
+
+function storeSessionInDB(token, sessionData, userID, callback){
+    return boot.getDB().collection("sessions").insertOne({
+        _id : token,
+        data: sessionData,
+        freshness: new Date(),
+        ownerID: userID
+    }, null, function(error, result) {
+        if (error) {
+            return callback(error, null, null);
+        }
+        callback(null, result.ops[0].data, result.ops[0].ownerID);
+    });
+}
+
+function storeSessionInMemory(token, sessionData, userID){
+    context[token] = [new Date(), sessionData, userID];
+    return context[token][1];
 }
 
 function logoutUsingCookies(request, response, callback) {
@@ -204,13 +330,27 @@ function reloadConfigurations() {
         randomstringLength = parseInt(securityConfigurations["authorization"]["tokenLength"]);
     console.log("Configs, secret token length:\t", randomstringLength);
 
+    if (typeof securityConfigurations["authorization"]["tokenGeneratorMode"] === "string")
+        randomstringType = securityConfigurations["authorization"]["tokenGeneratorMode"];
+    console.log("Configs, token generator mode:\t:", randomstringType);
+
     if (typeof securityConfigurations["client"]["sessionCookieLifetime"] === "string")
         sessionLifetime = parseInt(securityConfigurations["client"]["sessionCookieLifetime"]);
     console.log("Configs, session lifetime:\t\t", sessionLifetime);
 
+    if (typeof securityConfigurations["server"]["sessionTokenInMemoryLifetime"] === "string")
+        sessionTokenInMemoryLifetime = parseInt(securityConfigurations["server"]["sessionTokenInMemoryLifetime"]);
+    console.log("Configs, session token in RAM:\t", sessionTokenInMemoryLifetime);
+
+    if (typeof securityConfigurations["server"]["sessionTokenInMemoryMaxSize"] === "string")
+        sessionTokenInMemoryMaxSize = parseInt(securityConfigurations["server"]["sessionTokenInMemoryMaxSize"]);
+    console.log("Configs, sessions amount in RAM:", sessionTokenInMemoryMaxSize);
+
     if (typeof securityConfigurations["server"]["contextCleanerInterval"] === "string")
         contextCleanerInterval = parseInt(securityConfigurations["server"]["contextCleanerInterval"]);
     console.log("Configs, context cleaning secs:\t", contextCleanerInterval);
+
+
 }
 
 function resetContext() {
@@ -236,26 +376,3 @@ function stopCleaner() {
         cleanerTicker = null;
     }
 }
-
-module.exports = {
-    prepare: function (callback) {
-        resetContext();
-        reloadConfigurations();
-        runCleaner();
-        callback();
-    },
-    resetContext: resetContext,
-    reloadConfigurations: reloadConfigurations,
-    getSessionFromCookies: getSessionFromCookies,
-    getSessionFromRequest: getSessionFromRequest,
-    getSession: getSessionData,
-    loginUsingCookies: loginUsingCookies,
-    loginUsingToken: loginUsingToken,
-    logoutUsingCookies: logoutUsingCookies,
-    logoutUsingToken: logoutUsingToken,
-    updateSessionFromRequest: updateSessionFromRequest,
-    updateSessionFromCookies: updateSessionFromCookies,
-    updateSession: updateSession,
-    runCleaner: runCleaner,
-    stopCleaner: stopCleaner
-};
