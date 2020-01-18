@@ -1,6 +1,6 @@
-var qs = require('querystring'),
-    router = require("../../../router"),
-    security = require("../../../security");
+const qs = require('querystring'),
+      router = require("../../../router"),
+      security = require("../../../security");
 
 module.exports = {
     path: new RegExp(/^\/login\/$/u),
@@ -18,13 +18,13 @@ module.exports = {
                     return router.bleed(400, null, response);
                 }
                 try {
-                    var post = qs.parse(body);
+                    let post = qs.parse(body);
                     if (typeof post["login"] !== "string" || typeof post["password"] !== "string") {
                         callback();
                         return router.bleed(400, null, response);
                     }
 
-                    var login = post["login"],
+                    let login = post["login"],
                         password = post["password"];
 
                     if (login.length === 0 || password.length === 0) {

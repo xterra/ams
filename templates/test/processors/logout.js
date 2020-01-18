@@ -1,5 +1,5 @@
-var router = require("../../../router"),
-    security = require("../../../security");
+const router = require("../../../router"),
+      security = require("../../../security");
 
 module.exports = {
     path: new RegExp(/^\/logout\/$/u),
@@ -11,7 +11,7 @@ module.exports = {
             });
         } else {
             console.log(sessionToken, sessionContext);
-            var out = "You are not authorized :/";
+            let out = "You are not authorized :/";
             response.writeHead(200, {
                 "Cache-Control": "no-cache",
                 "Content-Type": "text/html; charset=utf-8",

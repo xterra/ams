@@ -1,13 +1,13 @@
-var qs = require('querystring'),
-    router = require("../../../router"),
-    security = require("../../../security");
+const qs = require('querystring'),
+      router = require("../../../router"),
+      security = require("../../../security");
 
 module.exports = {
     path: new RegExp(/^\/profile\/\d{6,}\/$/u),
     processor: function (request, response, callback, sessionContext, sessionToken) {
 
-        var urlPath = decodeURI(request.url);
-        var ids = urlPath.match(/\d+/g);
+        let urlPath = decodeURI(request.url);
+        let ids = urlPath.match(/\d+/g);
 
         if (sessionContext !== null && ids.length > 0 && ids[0] === sessionContext["id"]) {
 
@@ -19,9 +19,9 @@ module.exports = {
                         return router.bleed(400, null, response, error);
                     }
                     try {
-                        var post = qs.parse(body);
+                        let post = qs.parse(body);
 
-                        var key = post["key"],
+                        let key = post["key"],
                             value = post["value"];
 
                         sessionContext[key] = value;
