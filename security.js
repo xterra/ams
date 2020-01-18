@@ -33,15 +33,15 @@ module.exports = {
 const router = require("./router"),
       boot = require("./boot");
 
-let sessionCookieName = "SESSID",
-    loginCaseSensitive = true,
-    passwordCaseSensitive = true,
-    randomstringLength = 64,
-    randomstringType = "alphanumeric", // alphanumeric, numeric, alphabetic, hex
-    sessionLifetime = 7 * 24 * 60 * 60,
-    sessionTokenInMemoryLifetime = 43200,
-    sessionTokenInMemoryMaxSize = 10000,
-    contextCleanerInterval = 60;
+const sessionCookieName = "SESSID",
+      loginCaseSensitive = true,
+      passwordCaseSensitive = true,
+      randomstringLength = 64,
+      randomstringType = "alphanumeric", // alphanumeric, numeric, alphabetic, hex
+      sessionLifetime = 7 * 24 * 60 * 60,
+      sessionTokenInMemoryLifetime = 43200,
+      sessionTokenInMemoryMaxSize = 10000,
+      contextCleanerInterval = 60;
 let context;
 
 function generateToken(callback) {

@@ -57,7 +57,7 @@ const  PATHS_templateDir = path.join(__dirname, "templates", currentTemplateName
        PATHS_dataPrivateDir = path.join(PATHS_dataDir, "private");
 
 function reloadMIMEs() {
-    let oldSupportedFileTypes = supportedFileTypes;
+    const oldSupportedFileTypes = supportedFileTypes;
     try {
         supportedFileTypes = JSON.parse(fs.readFileSync(path.join(__dirname, "configurations", "mimeTypes.json"), "utf-8"));
     } catch (e) {
@@ -94,7 +94,7 @@ function rebootProcessors(callback) {
 function route(request, response) {
     try {
         let matchedProcessor = null;
-        let requestedURL = decodeURI(request.url);
+        const requestedURL = decodeURI(request.url);
 
         console.log("Requested page ", requestedURL);
 
@@ -107,7 +107,7 @@ function route(request, response) {
 
         let i = 0;
         while (!matchedProcessor && i < pageProcessors.length) {
-            let routeCondition = pageProcessors[i].path;
+            const routeCondition = pageProcessors[i].path;
             if (!matchedProcessor && routeCondition.test(requestedURL)) {
                 matchedProcessor = pageProcessors[i].processor;
             }
@@ -119,7 +119,7 @@ function route(request, response) {
 
         let stat;
 
-        let filePathInTemplateResources = path.join(PATHS_templateResourcesDir, requestedURL);
+        const filePathInTemplateResources = path.join(PATHS_templateResourcesDir, requestedURL);
         if (fs.existsSync(filePathInTemplateResources)) { // TODO: filesystem vulnarability! - non restricted access to nearby hidden-files
             stat = fs.statSync(filePathInTemplateResources);
             if (stat.isFile()) {
@@ -129,7 +129,7 @@ function route(request, response) {
             }
         }
 
-        let filePathInData = path.join(PATHS_dataPublicDir, requestedURL);
+        const filePathInData = path.join(PATHS_dataPublicDir, requestedURL);
         if (fs.existsSync(filePathInData)) {
             stat = fs.statSync(filePathInData);
             if (stat.isFile()) {
@@ -167,12 +167,12 @@ function bleed(errorCode, retrievedAddress, response, error) {
     }
 
     // Prepare data for bleed
-    let errorMessage = responseErrorMessages[errorCode];
-    let timestamp = new Date().toString();
+    const errorMessage = responseErrorMessages[errorCode],
+          timestamp = new Date().toString();
 
     // Search for custom error template
-    let sheathName = "$httpErr" + errorCode;
-    let sheathPath = path.join(PATHS_templateSheathDir, "errors", errorCode + ".pug");
+    const sheathName = "$httpErr" + errorCode,
+          sheathPath = path.join(PATHS_templateSheathDir, "errors", errorCode + ".pug");
     let errorTrace;
     if (typeof error !== "undefined" && error !== null && bleedStacktraceAllowed){
         if (typeof error.stack !== "undefined") {
@@ -219,8 +219,8 @@ function bleed(errorCode, retrievedAddress, response, error) {
 function stream(filePath, fileStatistics, request, response) {
     console.log("Streaming file", filePath);
 
-    let requestPathElements = request.url.split(".");
-    let fileExtension = requestPathElements[requestPathElements.length - 1].toLowerCase();
+    const requestPathElements = request.url.split("."),
+          fileExtension = requestPathElements[requestPathElements.length - 1].toLowerCase();
     let contentType;
     if (typeof supportedFileTypes[fileExtension] === "string") {
         contentType = supportedFileTypes[fileExtension];
@@ -234,14 +234,14 @@ function stream(filePath, fileStatistics, request, response) {
         "Content-Length": fileStatistics.size
     });
 
-    let readStream = fs.createReadStream(filePath);
+    const readStream = fs.createReadStream(filePath);
     readStream.pipe(response);
 }
 
 function render(pageProcessor, requestedURL, request, response) {
     try {
         let timeoutBleeded = false;
-        let processorTimeout = setTimeout(function () {
+        const processorTimeout = setTimeout(function () {
             if (!response.finished) bleed(503, null, response, new Error("Processor reached timeout"));
         }, renderTimeout);
         return security.getSessionFromRequest(request, response, function (sessionToken, sessionData) {
@@ -262,7 +262,7 @@ function render(pageProcessor, requestedURL, request, response) {
                             if (useSheathName) {
                                 contentType = "text/html; charset=utf-8";
                                 if (typeof useSheathName !== "string") {
-                                    throw new Error("Incorrect sheath letiable type used! Can be only String.");
+                                    throw new Error("Incorrect sheath variable type used! Can be only String.");
                                 }
                                 if (typeof precompiledPugPages[useSheathName] === "undefined") {
                                     precompiledPugPages[useSheathName] = pug.compileFile(path.join(PATHS_templateSheathDir, useSheathName + ".pug"), pugCompilerOptions);
@@ -309,7 +309,7 @@ function reloadConfigurations() {
 
     currentTemplateName = fs.readFileSync(path.join(__dirname, "configurations", "template.txt"), "utf-8");
     console.log("Configs, current template:\t\t", currentTemplateName);
-    let routerConfigurations = ini.parse(fs.readFileSync(path.join(__dirname, "configurations", "router.ini"), "utf-8"));
+    const routerConfigurations = ini.parse(fs.readFileSync(path.join(__dirname, "configurations", "router.ini"), "utf-8"));
 
     // PUG
     pugCompilerOptions.pretty = routerConfigurations["pug"]["pretty"];
@@ -328,9 +328,9 @@ function downloadClientPostData(request, callback, awaitingDataLength) {
         // 1e6 === 1 * Math.pow(10, 6) === 1 * 1000000 ~~~ 1MB
         awaitingDataLength = 1e6;
     }
-    let body = "";
+    let body = Buffer.from();
     request.on("data", function (data) {
-        body += data;
+        body.wrire(data);
         if (body.length > awaitingDataLength) { // Too much POST data, kill the connection!
             console.warn("User retrieved too much data - destroying connection!");
             request.connection.destroy();
