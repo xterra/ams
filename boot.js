@@ -12,15 +12,21 @@ module.exports = {
 };
 
 const router = require("./router.js"),
-    security = require("./security.js");
+      security = require("./security.js");
 
-const port = process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8080,
+let port = process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8080,
     ip   = process.env.IP   || process.env.OPENSHIFT_NODEJS_IP || "0.0.0.0",
     mongoURL = process.env.OPENSHIFT_MONGODB_DB_URL || process.env.MONGO_URL,
-    mongoURLLabel = "";
+    mongoURLLabel = "",
+    mongoServiceName,
+    mongoHost,
+    mongoPort,
+    mongoDatabase,
+    mongoPassword,
+    mongoUser;
 
 if (mongoURL == null && process.env.DATABASE_SERVICE_NAME) {
-    let mongoServiceName = process.env.DATABASE_SERVICE_NAME.toUpperCase(),
+        mongoServiceName = process.env.DATABASE_SERVICE_NAME.toUpperCase(),
         mongoHost = process.env[mongoServiceName + '_SERVICE_HOST'],
         mongoPort = process.env[mongoServiceName + '_SERVICE_PORT'],
         mongoDatabase = process.env[mongoServiceName + '_DATABASE'],
@@ -28,7 +34,7 @@ if (mongoURL == null && process.env.DATABASE_SERVICE_NAME) {
         mongoUser = process.env[mongoServiceName + '_USER'];
 } else if (ip === "0.0.0.0") {
     console.log("App running on localhost: demo MongoDB connection data will be used!");
-    let mongoHost = "localhost",
+        mongoHost = "localhost",
         mongoPort = "27017",
         mongoDatabase = "amsp";
 }
