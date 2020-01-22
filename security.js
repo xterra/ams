@@ -1,9 +1,9 @@
-var fs = require("fs"),
-    ini = require("ini"),
-    path = require("path"),
-    cookie = require('cookie'),
-    randomstring = require("randomstring"),
-    md5 = require("md5");
+const fs = require("fs"),
+      ini = require("ini"),
+      path = require("path"),
+      cookie = require('cookie'),
+      randomstring = require("randomstring"),
+      md5 = require("md5");
 
 module.exports = {
     prepare: function (callback) {
@@ -30,27 +30,27 @@ module.exports = {
     stopCleaner: stopCleaner
 };
 
-var router = require("./router"),
-    boot = require("./boot");
+const router = require("./router"),
+      boot = require("./boot");
 
-var sessionCookieName = "SESSID",
-    loginCaseSensitive = true,
-    passwordCaseSensitive = true,
-    randomstringLength = 64,
-    randomstringType = "alphanumeric", // alphanumeric, numeric, alphabetic, hex
-    sessionLifetime = 7 * 24 * 60 * 60,
-    sessionTokenInMemoryLifetime = 43200,
-    sessionTokenInMemoryMaxSize = 10000,
-    contextCleanerInterval = 60;
-var context;
+let   sessionCookieName = "SESSID",
+      loginCaseSensitive = true,
+      passwordCaseSensitive = true,
+      randomstringLength = 64,
+      randomstringType = "alphanumeric", // alphanumeric, numeric, alphabetic, hex
+      sessionLifetime = 7 * 24 * 60 * 60,
+      sessionTokenInMemoryLifetime = 43200,
+      sessionTokenInMemoryMaxSize = 10000,
+      contextCleanerInterval = 60;
+let   context;
 
 function generateToken(callback) {
     if (boot.isConnected()) {
-        var generationInProcess = false;
-        var generatorInterval = setInterval(function () {
+        let generationInProcess = false;
+        let generatorInterval = setInterval(function () {
             if (generationInProcess) return;
             generationInProcess = true;
-            var token = generateTokenInMemory();
+            let token = generateTokenInMemory();
             boot.getDB().collection("sessions").findOne({
                 _id: token
             }, {_id: 1}, function (error, found) {
@@ -73,7 +73,7 @@ function generateToken(callback) {
 }
 
 function generateTokenInMemory() {
-    var token = null;
+    let token = null;
     while (token == null || typeof context[token] !== "undefined") {
         token = randomstring.generate({
             length:randomstringLength,
@@ -117,7 +117,7 @@ function loginUsingToken (login, password, callback) {
         password = password.toLowerCase();
     }
     password = md5(password); // TODO: SHA-256
-    if (boot.isConnected()) {
+    if (boot.isConnected()) { //TODO: change mongo on Postgre
         boot.getDB().collection("users").findOne({
             username : login,
             password : password
@@ -158,18 +158,18 @@ function makeSession (userID, callback) {
 }
 
 function makeSessionUsingToken (token, userID, callback) {
-    var defaultSessionData = {};
+    let defaultSessionData = {};
     if(boot.isConnected()){
         return storeSessionInDB(token, defaultSessionData, userID, function(error, storedSessionData){
             if(error){
                 return callback(error, false, null, null);
             }
-            var sessionData = storeSessionInMemory(token, storedSessionData, userID);
+            let sessionData = storeSessionInMemory(token, storedSessionData, userID);
             return callback(null, token, sessionData, userID);
         });
     } else {
         console.warn("New session stored at in-memory cache");
-        var sessionData = storeSessionInMemory(token, defaultSessionData, userID);
+        let sessionData = storeSessionInMemory(token, defaultSessionData, userID);
         return callback(null, token, sessionData, userID);
     }
 }
@@ -228,7 +228,7 @@ function getSessionFromRequest(request, response, callback, restrictHeadersChang
 
     if (typeof restrictHeadersChange !== "boolean") restrictHeadersChange = false;
 
-    var rawCookies = request.headers.cookie;
+    const rawCookies = request.headers.cookie;
     return getSessionFromCookies(rawCookies, function (error, sessionToken, sessionData) {
         if (error) {
             console.error("An error occurred, while getting session from request:", error);
@@ -245,12 +245,12 @@ function getSessionFromRequest(request, response, callback, restrictHeadersChang
 }
 
 function getSessionFromCookies(rawCookies, callback) {
-    var cookies = cookie.parse(rawCookies);
+    const cookies = cookie.parse(rawCookies);
     if (typeof cookies[sessionCookieName] !== "string") {
         console.log("User do not have session token in cookies");
         return callback(null, null);
     } else {
-        var sessionToken = cookies[sessionCookieName];
+        const sessionToken = cookies[sessionCookieName];
         console.log("User have session token:", sessionToken);
         return getSessionData(sessionToken, function (error, sessionData) {
             callback(error, sessionData !== null ? sessionToken : false, sessionData);
@@ -278,7 +278,7 @@ function updateSessionFromRequest(request, response, sessionData, callback) {
         return callback(null, false);
     }
 
-    var rawCookies = request.headers.cookie;
+    const rawCookies = request.headers.cookie;
     return updateSessionFromCookies(rawCookies, sessionData, function (error, updated) {
         if (error) {
             console.error("An error occurred, while logging in using cookies:", error);
@@ -289,12 +289,12 @@ function updateSessionFromRequest(request, response, sessionData, callback) {
 }
 
 function updateSessionFromCookies(rawCookies, sessionData, callback) {
-    var cookies = cookie.parse(rawCookies);
+    const cookies = cookie.parse(rawCookies);
     if (typeof cookies[sessionCookieName] !== "string") {
         console.log("User do not have session token in cookies");
         return callback(null, false);
     } else {
-        var sessionToken = cookies[sessionCookieName];
+        const sessionToken = cookies[sessionCookieName];
         console.log("User have session token:", sessionToken);
         return updateSession(sessionToken, sessionData, callback);
     }
@@ -312,7 +312,7 @@ function updateSession(sessionToken, sessionData, callback) {
 }
 
 function reloadConfigurations() {
-    var securityConfigurations = ini.parse(fs.readFileSync(path.join(__dirname, "configurations", "security.ini"), "utf-8"));
+    let securityConfigurations = ini.parse(fs.readFileSync(path.join(__dirname, "configurations", "security.ini"), "utf-8"));
 
     if (typeof securityConfigurations["client"]["sessionCookieName"] === "string")
         sessionCookieName = securityConfigurations["client"]["sessionCookieName"];
@@ -359,7 +359,7 @@ function resetContext() {
 }
 
 
-var cleanerTicker = null;
+let cleanerTicker = null;
 
 function runCleaner() {
     if (cleanerTicker == null) {

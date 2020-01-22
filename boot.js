@@ -1,4 +1,4 @@
-var http = require('http');
+const http = require('http');
 
 // this was placed here in top, because some dependencied like "router" and "security"
 // will not see module.exports if it be initialized after, theirs init.
@@ -11,33 +11,39 @@ module.exports = {
     }
 };
 
-var router = require("./router.js"),
-    security = require("./security.js");
+const router = require("./router.js"),
+      security = require("./security.js");
 
-var port = process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8080,
-    ip   = process.env.IP   || process.env.OPENSHIFT_NODEJS_IP || "0.0.0.0",
-    mongoURL = process.env.OPENSHIFT_MONGODB_DB_URL || process.env.MONGO_URL,
-    mongoURLLabel = "";
+const port = process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8080,
+      ip   = process.env.IP   || process.env.OPENSHIFT_NODEJS_IP || "0.0.0.0";
+let   mongoURL = process.env.OPENSHIFT_MONGODB_DB_URL || process.env.MONGO_URL,
+      mongoURLLabel = "",
+      mongoServiceName,
+      mongoHost,
+      mongoPort,
+      mongoDatabase,
+      mongoPassword,
+      mongoUser;
 
 if (mongoURL == null && process.env.DATABASE_SERVICE_NAME) {
-    var mongoServiceName = process.env.DATABASE_SERVICE_NAME.toUpperCase(),
-        mongoHost = process.env[mongoServiceName + '_SERVICE_HOST'],
-        mongoPort = process.env[mongoServiceName + '_SERVICE_PORT'],
-        mongoDatabase = process.env[mongoServiceName + '_DATABASE'],
-        mongoPassword = process.env[mongoServiceName + '_PASSWORD'],
-        mongoUser = process.env[mongoServiceName + '_USER'];
+      mongoServiceName = process.env.DATABASE_SERVICE_NAME.toUpperCase(),
+      mongoHost = process.env[mongoServiceName + '_SERVICE_HOST'],
+      mongoPort = process.env[mongoServiceName + '_SERVICE_PORT'],
+      mongoDatabase = process.env[mongoServiceName + '_DATABASE'],
+      mongoPassword = process.env[mongoServiceName + '_PASSWORD'],
+      mongoUser = process.env[mongoServiceName + '_USER'];
 } else if (ip === "0.0.0.0") {
-    console.log("App running on localhost: demo MongoDB connection data will be used!");
-    var mongoHost = "localhost",
-        mongoPort = "27017",
-        mongoDatabase = "amsp";
+      console.log("App running on localhost: demo MongoDB connection data will be used!");
+      mongoHost = "localhost",
+      mongoPort = "27017",
+      mongoDatabase = "amsp";
 }
 
-var db = null,
+let db = null,
     dbDetails = new Object();
 
 
-var initDb = function(callback) {
+function initDb(callback) {
 
     if (mongoHost && mongoPort && mongoDatabase) {
         mongoURLLabel = mongoURL = 'mongodb://';
@@ -53,7 +59,7 @@ var initDb = function(callback) {
 
     if (mongoURL == null) return callback(new Error("Mongo URL is not specified!"));
 
-    var mongodb = require('mongodb');
+    const mongodb = require('mongodb');
     if (mongodb == null) return callback(new Error("Mongo module is not connected!"));
 
     return mongodb.connect(mongoURL, function (err, conn) {
@@ -134,7 +140,7 @@ var initDb = function(callback) {
 console.info("App running with IP:\t\t\t", ip);
 console.info("App running on PORT:\t\t\t", port);
 
-var server;
+let server;
 console.log("Preparing router...");
 router.prepare(function () {
     console.info("Router is ready.");
@@ -150,7 +156,7 @@ router.prepare(function () {
             }
             console.log("Running http server...");
             server = http.createServer(function (request, response) {
-                var timeStart = new Date().getTime();
+                const timeStart = new Date().getTime();
                 console.log();
                 /* TODO: capture some logs & statistics */
                 router.route(request, response);

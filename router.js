@@ -1,8 +1,8 @@
-var fs = require("fs"),
-    path = require("path"),
-    pug = require("pug"),
-    xss = require("xss"),
-    ini = require("ini");
+const fs = require("fs"),
+      path = require("path"),
+      pug = require("pug"),
+      xss = require("xss"),
+      ini = require("ini");
 
 module.exports = {
     prepare: function (callback) {
@@ -23,9 +23,9 @@ module.exports = {
     downloadClientPostData: downloadClientPostData
 };
 
-var security = require("./security");
+const security = require("./security");
 
-var responseErrorMessages = {
+const responseErrorMessages = {
     306: ["Unknown error", "Something wrong happened, but we do not know what exactly it was."],
 
     400: ["Bad Request", "It's not our fault: your browser did not deliver correct data."],
@@ -36,28 +36,28 @@ var responseErrorMessages = {
     503: ["Service Unavailable", "Seems to be server is broken. It will be cured, but actually we do not know when!"]
 };
 
-var supportedFileTypes = {};
-var pageProcessors = {};
-var precompiledPugPages = {};
-var cachedRenderedPages = {};
-var pugCompilerOptions = {
+let supportedFileTypes = {};
+let pageProcessors = {};
+let precompiledPugPages = {};
+let cachedRenderedPages = {};
+let pugCompilerOptions = {
     pretty: false
 };
 
-var renderTimeout = 5000;
-var bleedStacktraceAllowed = false;
-var currentTemplateName = "test";
+let renderTimeout = 5000;
+let bleedStacktraceAllowed = false;
+let currentTemplateName = "test";
 
-var PATHS_templateDir = path.join(__dirname, "templates", currentTemplateName);
-var PATHS_templateResourcesDir = path.join(PATHS_templateDir, "resources");
-var PATHS_templateSheathDir = path.join(PATHS_templateDir, "sheath");
-var PATHS_templatePreprocessorsDir = path.join(PATHS_templateDir, "processors");
-var PATHS_dataDir = path.join(__dirname, "data");
-var PATHS_dataPublicDir = path.join(PATHS_dataDir, "public");
-var PATHS_dataPrivateDir = path.join(PATHS_dataDir, "private");
+const  PATHS_templateDir = path.join(__dirname, "templates", currentTemplateName),
+       PATHS_templateResourcesDir = path.join(PATHS_templateDir, "resources"),
+       PATHS_templateSheathDir = path.join(PATHS_templateDir, "sheath"),
+       PATHS_templatePreprocessorsDir = path.join(PATHS_templateDir, "processors"),
+       PATHS_dataDir = path.join(__dirname, "data"),
+       PATHS_dataPublicDir = path.join(PATHS_dataDir, "public"),
+       PATHS_dataPrivateDir = path.join(PATHS_dataDir, "private");
 
 function reloadMIMEs() {
-    var oldSupportedFileTypes = supportedFileTypes;
+    const oldSupportedFileTypes = supportedFileTypes;
     try {
         supportedFileTypes = JSON.parse(fs.readFileSync(path.join(__dirname, "configurations", "mimeTypes.json"), "utf-8"));
     } catch (e) {
@@ -67,11 +67,11 @@ function reloadMIMEs() {
 }
 
 function rebootProcessors(callback) {
-    var newPageProcessors = [];
+    let newPageProcessors = [];
     fs.readdir(PATHS_templatePreprocessorsDir, function (err, filesList) {
-        var booted = 0;
-        var stat;
-        var fileFullPath;
+        let booted = 0;
+        let stat;
+        let fileFullPath;
         filesList.forEach(function (fileName) {
             fileFullPath = path.join(PATHS_templatePreprocessorsDir, fileName);
             stat = fs.statSync(fileFullPath);
@@ -93,8 +93,8 @@ function rebootProcessors(callback) {
 
 function route(request, response) {
     try {
-        var matchedProcessor = null;
-        var requestedURL = decodeURI(request.url);
+        let matchedProcessor = null;
+        const requestedURL = decodeURI(request.url);
 
         console.log("Requested page ", requestedURL);
 
@@ -105,9 +105,9 @@ function route(request, response) {
             return response.end();
         }
 
-        var i = 0;
+        let i = 0;
         while (!matchedProcessor && i < pageProcessors.length) {
-            var routeCondition = pageProcessors[i].path;
+            const routeCondition = pageProcessors[i].path;
             if (!matchedProcessor && routeCondition.test(requestedURL)) {
                 matchedProcessor = pageProcessors[i].processor;
             }
@@ -117,9 +117,9 @@ function route(request, response) {
             return render(matchedProcessor, requestedURL, request, response);
         }
 
-        var stat;
+        let stat;
 
-        var filePathInTemplateResources = path.join(PATHS_templateResourcesDir, requestedURL);
+        const filePathInTemplateResources = path.join(PATHS_templateResourcesDir, requestedURL);
         if (fs.existsSync(filePathInTemplateResources)) { // TODO: filesystem vulnarability! - non restricted access to nearby hidden-files
             stat = fs.statSync(filePathInTemplateResources);
             if (stat.isFile()) {
@@ -129,7 +129,7 @@ function route(request, response) {
             }
         }
 
-        var filePathInData = path.join(PATHS_dataPublicDir, requestedURL);
+        const filePathInData = path.join(PATHS_dataPublicDir, requestedURL);
         if (fs.existsSync(filePathInData)) {
             stat = fs.statSync(filePathInData);
             if (stat.isFile()) {
@@ -167,13 +167,13 @@ function bleed(errorCode, retrievedAddress, response, error) {
     }
 
     // Prepare data for bleed
-    var errorMessage = responseErrorMessages[errorCode];
-    var timestamp = new Date().toString();
+    const errorMessage = responseErrorMessages[errorCode],
+          timestamp = new Date().toString();
 
     // Search for custom error template
-    var sheathName = "$httpErr" + errorCode;
-    var sheathPath = path.join(PATHS_templateSheathDir, "errors", errorCode + ".pug");
-    var errorTrace;
+    const sheathName = "$httpErr" + errorCode,
+          sheathPath = path.join(PATHS_templateSheathDir, "errors", errorCode + ".pug");
+    let errorTrace;
     if (typeof error !== "undefined" && error !== null && bleedStacktraceAllowed){
         if (typeof error.stack !== "undefined") {
             errorTrace = error.stack;
@@ -185,7 +185,7 @@ function bleed(errorCode, retrievedAddress, response, error) {
     } else {
         errorTrace = null;
     }
-    var responseData;
+    let responseData;
     if (fs.existsSync(sheathPath)) {
         if (typeof precompiledPugPages[sheathName] === "undefined") {
             precompiledPugPages[sheathName] = pug.compileFile(sheathPath, pugCompilerOptions);
@@ -219,9 +219,9 @@ function bleed(errorCode, retrievedAddress, response, error) {
 function stream(filePath, fileStatistics, request, response) {
     console.log("Streaming file", filePath);
 
-    var requestPathElements = request.url.split(".");
-    var fileExtension = requestPathElements[requestPathElements.length - 1].toLowerCase();
-    var contentType;
+    const requestPathElements = request.url.split("."),
+          fileExtension = requestPathElements[requestPathElements.length - 1].toLowerCase();
+    let contentType;
     if (typeof supportedFileTypes[fileExtension] === "string") {
         contentType = supportedFileTypes[fileExtension];
     }
@@ -234,14 +234,14 @@ function stream(filePath, fileStatistics, request, response) {
         "Content-Length": fileStatistics.size
     });
 
-    var readStream = fs.createReadStream(filePath);
+    const readStream = fs.createReadStream(filePath);
     readStream.pipe(response);
 }
 
 function render(pageProcessor, requestedURL, request, response) {
     try {
-        var timeoutBleeded = false;
-        var processorTimeout = setTimeout(function () {
+        let timeoutBleeded = false;
+        const processorTimeout = setTimeout(function () {
             if (!response.finished) bleed(503, null, response, new Error("Processor reached timeout"));
         }, renderTimeout);
         return security.getSessionFromRequest(request, response, function (sessionToken, sessionData) {
@@ -250,6 +250,7 @@ function render(pageProcessor, requestedURL, request, response) {
                     clearTimeout(processorTimeout);
                     if (!response.finished && typeof processedData !== "undefined" && processedData !== null) {
                         try {
+                            let responseData;
                             if (typeof serverCacheTime !== "number" || serverCacheTime == null || !serverCacheTime) {
                                 serverCacheTime = 0;
                             }
@@ -266,14 +267,14 @@ function render(pageProcessor, requestedURL, request, response) {
                                 if (typeof precompiledPugPages[useSheathName] === "undefined") {
                                     precompiledPugPages[useSheathName] = pug.compileFile(path.join(PATHS_templateSheathDir, useSheathName + ".pug"), pugCompilerOptions);
                                 }
-                                var responseData = precompiledPugPages[useSheathName](processedData);
+                                responseData = precompiledPugPages[useSheathName](processedData);
                             } else {
                                 if (typeof contentType === "undefined" || contentType == null) {
                                     contentType = "text/plain; charset=utf-8";
                                 }
                                 responseData = processedData;
                             }
-                            var head = {
+                            let head = {
                                 "Cache-Control": clientCacheTime,
                                 "Content-Type": contentType,
                                 "Content-Length": responseData.length
@@ -308,7 +309,7 @@ function reloadConfigurations() {
 
     currentTemplateName = fs.readFileSync(path.join(__dirname, "configurations", "template.txt"), "utf-8");
     console.log("Configs, current template:\t\t", currentTemplateName);
-    var routerConfigurations = ini.parse(fs.readFileSync(path.join(__dirname, "configurations", "router.ini"), "utf-8"));
+    const routerConfigurations = ini.parse(fs.readFileSync(path.join(__dirname, "configurations", "router.ini"), "utf-8"));
 
     // PUG
     pugCompilerOptions.pretty = routerConfigurations["pug"]["pretty"];
@@ -327,18 +328,18 @@ function downloadClientPostData(request, callback, awaitingDataLength) {
         // 1e6 === 1 * Math.pow(10, 6) === 1 * 1000000 ~~~ 1MB
         awaitingDataLength = 1e6;
     }
-    var body = "";
+  let body = Buffer.from("");
     request.on("data", function (data) {
-        body += data;
+        body = Buffer.concat([body, data]);
         if (body.length > awaitingDataLength) { // Too much POST data, kill the connection!
             console.warn("User retrieved too much data - destroying connection!");
             request.connection.destroy();
         }
     });
     request.on("error", function (e) {
-        callback(e, body);
+        callback(e, body.toString());
     });
     request.on("end", function () {
-        callback(null, body);
+        callback(null, body.toString());
     });
 }
