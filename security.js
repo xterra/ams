@@ -33,7 +33,7 @@ module.exports = {
 const router = require("./router"),
       boot = require("./boot");
 
-const sessionCookieName = "SESSID",
+let   sessionCookieName = "SESSID",
       loginCaseSensitive = true,
       passwordCaseSensitive = true,
       randomstringLength = 64,
@@ -42,7 +42,7 @@ const sessionCookieName = "SESSID",
       sessionTokenInMemoryLifetime = 43200,
       sessionTokenInMemoryMaxSize = 10000,
       contextCleanerInterval = 60;
-let context;
+let   context;
 
 function generateToken(callback) {
     if (boot.isConnected()) {
@@ -117,7 +117,7 @@ function loginUsingToken (login, password, callback) {
         password = password.toLowerCase();
     }
     password = md5(password); // TODO: SHA-256
-    if (boot.isConnected()) {
+    if (boot.isConnected()) { //TODO: change mongo on Postgre
         boot.getDB().collection("users").findOne({
             username : login,
             password : password
@@ -228,7 +228,7 @@ function getSessionFromRequest(request, response, callback, restrictHeadersChang
 
     if (typeof restrictHeadersChange !== "boolean") restrictHeadersChange = false;
 
-    let rawCookies = request.headers.cookie;
+    const rawCookies = request.headers.cookie;
     return getSessionFromCookies(rawCookies, function (error, sessionToken, sessionData) {
         if (error) {
             console.error("An error occurred, while getting session from request:", error);
@@ -245,12 +245,12 @@ function getSessionFromRequest(request, response, callback, restrictHeadersChang
 }
 
 function getSessionFromCookies(rawCookies, callback) {
-    let cookies = cookie.parse(rawCookies);
+    const cookies = cookie.parse(rawCookies);
     if (typeof cookies[sessionCookieName] !== "string") {
         console.log("User do not have session token in cookies");
         return callback(null, null);
     } else {
-        let sessionToken = cookies[sessionCookieName];
+        const sessionToken = cookies[sessionCookieName];
         console.log("User have session token:", sessionToken);
         return getSessionData(sessionToken, function (error, sessionData) {
             callback(error, sessionData !== null ? sessionToken : false, sessionData);
@@ -278,7 +278,7 @@ function updateSessionFromRequest(request, response, sessionData, callback) {
         return callback(null, false);
     }
 
-    let rawCookies = request.headers.cookie;
+    const rawCookies = request.headers.cookie;
     return updateSessionFromCookies(rawCookies, sessionData, function (error, updated) {
         if (error) {
             console.error("An error occurred, while logging in using cookies:", error);
@@ -289,12 +289,12 @@ function updateSessionFromRequest(request, response, sessionData, callback) {
 }
 
 function updateSessionFromCookies(rawCookies, sessionData, callback) {
-    let cookies = cookie.parse(rawCookies);
+    const cookies = cookie.parse(rawCookies);
     if (typeof cookies[sessionCookieName] !== "string") {
         console.log("User do not have session token in cookies");
         return callback(null, false);
     } else {
-        let sessionToken = cookies[sessionCookieName];
+        const sessionToken = cookies[sessionCookieName];
         console.log("User have session token:", sessionToken);
         return updateSession(sessionToken, sessionData, callback);
     }

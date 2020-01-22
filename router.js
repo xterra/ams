@@ -328,18 +328,18 @@ function downloadClientPostData(request, callback, awaitingDataLength) {
         // 1e6 === 1 * Math.pow(10, 6) === 1 * 1000000 ~~~ 1MB
         awaitingDataLength = 1e6;
     }
-    let body = Buffer.from();
+  let body = Buffer.from("");
     request.on("data", function (data) {
-        body.wrire(data);
+        body = Buffer.concat([body, data]);
         if (body.length > awaitingDataLength) { // Too much POST data, kill the connection!
             console.warn("User retrieved too much data - destroying connection!");
             request.connection.destroy();
         }
     });
     request.on("error", function (e) {
-        callback(e, body);
+        callback(e, body.toString());
     });
     request.on("end", function () {
-        callback(null, body);
+        callback(null, body.toString());
     });
 }
