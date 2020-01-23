@@ -24,6 +24,7 @@ module.exports = {
 };
 
 const security = require("./security");
+const boot = require("./boot");
 
 const responseErrorMessages = {
     306: ["Unknown error", "Something wrong happened, but we do not know what exactly it was."],
@@ -244,6 +245,7 @@ function render(pageProcessor, requestedURL, request, response) {
         const processorTimeout = setTimeout(function () {
             if (!response.finished) bleed(503, null, response, new Error("Processor reached timeout"));
         }, renderTimeout);
+        const db = boot.getDB();
         return security.getSessionFromRequest(request, response, function (sessionToken, sessionData) {
             pageProcessor(request, response, function (processedData, useSheathName, serverCacheTime, clientCacheTime, contentType) {
                 if (!timeoutBleeded) {
@@ -289,7 +291,7 @@ function render(pageProcessor, requestedURL, request, response) {
                         }
                     }
                 }
-            }, sessionData, sessionToken);
+            }, sessionData, sessionToken, db);
         });
     } catch (e) {
         bleed(500, null, response, e);

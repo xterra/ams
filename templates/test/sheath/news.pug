@@ -1,0 +1,15 @@
+doctype html
+html
+    head
+        title "NEWS page"
+    body
+        h1="NEWS"
+        p #{sessionLogin}
+        hr
+        each news in newsInstances
+            h2 #{news.title}
+            p  #{news.text}
+            hr
+          else 
+            li There are no news.
+    
