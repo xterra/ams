@@ -276,14 +276,14 @@ function render(pageProcessor, requestedURL, request, response) {
                                 }
                                 responseData = processedData;
                             }
+                            
                             let head = {
                                 "Cache-Control": clientCacheTime,
                                 "Content-Type": contentType,
-                                "Content-Length": responseData.length
+                                "Content-Length": Buffer.byteLength(responseData)
                             };
                             response.writeHead(200, head);
-                            response.write(responseData);
-                            response.end();
+                            response.end(responseData);
                             if (request.method === "GET" && serverCacheTime > 0) cachedRenderedPages[requestedURL] = [new Date().getTime() + (serverCacheTime * 1000), responseData, head];
                         } catch (e) {
                             bleed(500, null, response, e);
