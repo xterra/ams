@@ -1,0 +1,15 @@
+doctype html
+html
+  head
+    title #{title}
+  body
+    h1 #{title}
+    p #{userInfo.username}
+    hr
+    h2 #{discipline.name}, #{discipline.mnemo}
+    | #{discipline.description}
+    if userInfo.securityRole.includes("superadmin")
+      hr
+      p lastEditor: #{discipline.lastEditor}
+      p dateUpdate: #{discipline.dateUpdate}
+    

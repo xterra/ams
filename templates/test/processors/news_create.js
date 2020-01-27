@@ -3,7 +3,7 @@ const qs = require('querystring'),
       security = require("../../../security");
 
 module.exports = {
-  path: new RegExp("^\/create_news\/$"),
+  path: new RegExp("^\/news\/create\/$"),
   processor: function(request, response, callback, sessionContext, sessionToken, db){
     if(sessionToken == null || sessionContext == undefined || sessionContext == null){
       callback();
@@ -23,8 +23,9 @@ module.exports = {
 
             if(titleNews.length == 0 || textNews.length == 0){
               return callback({
+                title: "Create news",
                 errorMessage: "Title or text can't be empty!"
-              }, "create_news", 0, 0);
+              }, "news_create", 0, 0);
             }
             db.collection("news").insertOne({
               title: titleNews,
@@ -47,7 +48,8 @@ module.exports = {
       }, 512);
     }
     callback({
+      title: "Create news",
       errorMessage: ""
-    }, "create_news", 0, 0);
+    }, "news_create", 0, 0);
   }
 }

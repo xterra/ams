@@ -1,0 +1,23 @@
+doctype html
+html
+  head
+    title #{title}
+  body
+    h1 #{title}
+    form(method='POST' action='')
+      p
+        label(for=name) Name:
+        input#name(type="text", placeholder="Name of discipline", name="name", value=(discipline===undefined ? "" : discipline.name))
+        br
+        label(for=mnemo) Mnemo:
+        input#mnemo(type="text", placeholder="Short name discipline", name="mnemo", value=(discipline===undefined ? "" : discipline.mnemo))
+        br
+        label(for=allias) Allias:
+        input#allias(type="text", placeholder="Allias discipline for URL", name="allias", value=(discipline===undefined ? "" : discipline.allias))
+        br
+        label(for=description) Description:
+        textarea#description(type="textarea", placeholder="About discipline", name="description") #{discipline===undefined ? "" : discipline.description}
+        input#creator(type="hidden", name="creator", value=creatorId)
+      if errorMessage.length
+        p(style="color: red") #{errorMessage}
+      input(type="submit", value="Confirm")

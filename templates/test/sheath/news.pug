@@ -7,12 +7,12 @@ html
       p #{sessionLogin}
       hr
       if sessionLogin=='admin'
-        a(href="/create_news/")
+        a(href="/news/create/")
           button(type="button") Create news
       each pieceOfNews in news
         h2 #{pieceOfNews.title}
         p  #{pieceOfNews.text}
         hr
       else 
-        li There are no news.
+        p There are no news.
     
