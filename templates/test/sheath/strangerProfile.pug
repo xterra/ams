@@ -1,7 +1,13 @@
 doctype html
 html(lang="en")
     head
-        title Profile page
+        title #{title}
     body
         h1 Profile page
-        p You have requested profile for user #{userID}
+        p You have requested profile for user #{strangerProfile.username}
+        p Mail: #{strangerProfile.email}
+        if userInfo.securityRole.length !== 0 && userInfo.securityRole.includes("superadmin")
+          a(href="/profiles/edit/"+strangerProfile._id+"/")
+            button(type="button") Edit
+          a(href="/profiles/delete/"+strangerProfile._id+"/")
+            button(type="button") Delete

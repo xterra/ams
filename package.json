@@ -30,5 +30,8 @@
   "bugs": {
     "url": "https://github.com/blue-b1rd/ams/issues"
   },
-  "homepage": "https://github.com/blue-b1rd/ams"
+  "homepage": "https://github.com/blue-b1rd/ams",
+  "devDependencies": {
+    "formidable": "^1.2.1"
+  }
 }

@@ -1,15 +1,19 @@
 const qs = require('querystring'),
       router = require("../../../router"),
-      security = require("../../../security");
+      security = require("../../../security"),
+      ObjectID = require('mongodb').ObjectID;
 
 module.exports = {
-    path: new RegExp(/^\/profile\/\d{6,}\/$/u),
-    processor: function (request, response, callback, sessionContext, sessionToken) {
-
+    path: new RegExp(/^\/profiles\/[^\/]{24,}\/$/u),
+    processor: function (request, response, callback, sessionContext, sessionToken, db) {
+      if(sessionToken == null || sessionContext == undefined || sessionContext == null){
+        callback();
+        return router.bleed(301, "/login/", response);
+      }
         let urlPath = decodeURI(request.url);
-        let ids = urlPath.match(/\d+/g);
-
-        if (sessionContext !== null && ids.length > 0 && ids[0] === sessionContext["id"]) {
+        const ids = urlPath.match(/[^\/]{24}/g);
+        console.log(ids);
+        if (sessionContext !== null && ids.length > 0 && sessionContext !== undefined && ids[0].toString() == sessionContext.id) {
 
             if (request.method === "POST") {
 
@@ -54,12 +58,34 @@ module.exports = {
             }
 
         } else {
-
-            callback({
-                userID: ids[0]
-            }, "strangerProfile", 5, 5);
-
+            db.collection("users").findOne({ _id: new ObjectID(ids[0]) }, {username: 1, email: 1, securityRole: 1}, function(err, result){
+              if(err){
+                callback();
+                return router.bleed(500, null, response, err);
+              }
+              console.log(result);
+              if(result == null){
+                callback();
+                return router.bleed(404, request.url, response);
+              }
+              let strangerProfile = result;
+              return db.collection("users").findOne({username: sessionContext.login}, {username: 1, securityRole: 1}, function(err, result){
+                if(err){
+                  callback();
+                  return router.bleed(500, null, response, err);
+                }
+                if(result == null){
+                  callback();
+                  return router.bleed(403, request.url, response);
+                }
+                let userInfo = result;
+                return callback({
+                    title: "Profile page",
+                    strangerProfile: strangerProfile,
+                    userInfo: userInfo
+                }, "strangerProfile", 5, 5);
+              });
+            });
         }
-
     }
 };

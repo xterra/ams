@@ -8,7 +8,7 @@ module.exports = {
 
         if (sessionToken !== null && sessionToken) {
             callback();
-            return router.bleed(301, "/profile/" + sessionContext["id"] + "/", response);
+            return router.bleed(301, "/profiles/" + sessionContext["id"] + "/", response);
         }
 
         if (request.method === "POST") {
@@ -50,8 +50,7 @@ module.exports = {
                         if (sessionToken !== null && sessionToken) {
 
                             console.log("Logged in user, setting initial data to his context...");
-
-                            sessionContext["id"] = "000000";
+                            console.log(`USER sessionContext: ${JSON.stringify(sessionContext)}`);
                             sessionContext["login"] = login;
                             sessionContext["loggedInTime"] = new Date();
 

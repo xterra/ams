@@ -5,17 +5,12 @@ html
   body
     h1 #{title}
     p  #{userInfo.username}
-    if userInfo.securityRole.includes("superadmin") 
+    if userInfo.securityRole.includes("superadmin") || userInfo.securityRole.includes("teacher")
       a(href="/disciplines/create/")
-        button(type="button") Create discipline
+        button(type="button") New discipline
         br
     each disc in disciplines
       a(href=urlDiscDetail+disc.allias) #{disc.name}, #{disc.mnemo}
-      if userInfo.securityRole.includes("superadmin")
-        a(href="/disciplines/update/"+disc.allias)
-          button(type="button") Update
-        a(href="/disciplines/delete/"+disc.allias)
-          button(type="button") Delete
       hr
     else
       p There are no disciplines.

@@ -1,0 +1,96 @@
+const router = require('../../../router'),
+      ObjectID = require('mongodb').ObjectID,
+      qs = require('querystring');
+
+module.exports = {
+  path: new RegExp("^\/profiles\/edit\/[^\/]{24,}\/$"),
+  processor: function(request, response, callback, sessionContext, sessionToken, db){
+    if(sessionToken == null || sessionContext == undefined || sessionContext == null){
+      callback();
+      return router.bleed(301, "/login/", response);
+    }
+    db.collection("users").findOne({username: sessionContext.login}, {username: 1, securityRole: 1}, function(err, result){
+      if(err){
+        callback();
+        return router.bleed(500, null, response, err);
+      }
+      const requestedUrl = decodeURI(request.url);
+      if(result == null){
+        callback();
+        return router.bleed(400, requestedUrl, response);
+      }
+      let adminInfo = result;
+      let userId = requestedUrl.match(/[^\/]{24,}/g)[0];
+      if( userId !== adminInfo._id && (adminInfo.securityRole.length == 0 || !adminInfo.securityRole.includes('superadmin'))) {
+        callback();
+        return router.bleed(403, null, response);
+      }
+      db.collection("users").findOne({_id: new ObjectID(userId)}, function(err, result){
+        if(err){
+          callback();
+          return router.bleed(500, null, response, err);
+        }
+        if(result == null){
+          callback();
+          return router.bleed(400, requestedUrl, response);
+        }
+        let userInfo = result;
+        if(request.method == "POST"){
+          return router.downloadClientPostData(request, function(err, data){
+            if(err){
+              callback();
+              return router.bleed(400, null, response, err);
+            }
+            try{
+              let postData = qs.parse(data);
+              if(postData.username < 5){
+                return callback({
+                  title: "Profile edit",
+                  adminInfo: adminInfo,
+                  userInfo: userInfo,
+                  errorMessage: "Логин слишком короткий!"
+                }, "profile_edit", 0, 0);
+              }
+              db.collection("users").findOneAndUpdate({_id: userInfo._id}, {$set: {
+                email: postData.email,
+                phone: postData.phone,
+                username: postData.username,
+                securityRole: [postData.securityRole]
+              }}, function(err){
+                if(err){
+                  callback();
+                  return router.bleed(500, null, response, err);
+                }
+                if(postData.username == userInfo.username){
+                  callback();
+                  return router.bleed(301, `/profiles/${userInfo._id}/`, response);
+                } else{
+                  return db.collection("users").update({_id: userInfo._id}, {$push: {loginHistory: userInfo.username}}, function(err){
+                    if(err) {
+                      console.log(`Error in update login ${userInfo.username}`);
+                      callback();
+                      return router.bleed(500, null, response, err);
+                    }
+                    callback();
+                    return router.bleed(301, `/profiles/${userInfo._id}/`, response);
+                  });
+                }
+              });
+            }catch(err){
+              console.log(`Error in profile_edit -> POST in try{}`);
+              callback();
+              return router.bleed(500, null, response, err);
+            }
+          });
+        } else{
+          return callback({
+            title: "Profile edit",
+            adminInfo: adminInfo,
+            userInfo: userInfo,
+            errorMessage: ""
+          }, "profile_edit", 0, 0)
+        }
+      });
+    });
+  }
+}

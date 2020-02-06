@@ -8,8 +8,37 @@ html
     hr
     h2 #{discipline.name}, #{discipline.mnemo}
     | #{discipline.description}
-    if userInfo.securityRole.includes("superadmin")
+    if (userInfo.securityRole.includes("student"))
+      p Discipline files
+      dl
+        for file in files
+          -let dirName = file._id.substr(0,2)
+          dt
+            a(href="/files/"+dirName+"/"+file._id download=file.name+"."+file.ext) #{file.name}
+            dd #{file.comment}
+          br
+    if (userInfo.securityRole.includes("superadmin") || (userInfo.securityRole.includes("teacher") && discipline.editors.includes(userInfo._id.toString())))
       hr
       p lastEditor: #{discipline.lastEditor}
       p dateUpdate: #{discipline.dateUpdate}
-    
+      a(href="/disciplines/edit/"+discipline.allias)
+        button(type="button") Edit
+      a(href="/disciplines/delete/"+discipline.allias)
+        button(type="button") Delete
+      a(href="/upload/") 
+        button(type="button") Upload File
+      hr
+      p Discipline files
+      dl
+        for file in files
+          -let dirName = file._id.substr(0,2)
+          dt
+            a(href="/files/"+dirName+"/"+file._id download=file.name+"."+file.ext) #{file.name}
+            dd #{file.comment}
+          br
+          a(href="/file/delete/"+discipline.allias+"/"+file._id)
+            button(type="button") Delete
+          a(href="/file/edit/"+discipline.allias+"/"+file._id)
+            button(type="button") Edit   
+          hr
+        

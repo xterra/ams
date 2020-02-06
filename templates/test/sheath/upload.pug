@@ -1,0 +1,30 @@
+doctype html
+html
+  head
+    title #{title}
+    script(src="../script.js" type="text/javascript")
+  body
+    h1 #{title}
+    p #{userInfo.username}
+    hr
+    if message.length
+      p(style="color: green") #{message}
+        a(href="/disciplines/"+currentDisc)
+          button(type="button") Go to the discipline
+    form#upload(action="" method="POST" enctype="")
+      label(for="discipline") Discipline:
+      select#discipline(type="select" placeholder="Select discipline" name="discipline" required="true")
+        -disciplines.sort((a,b) => {let textA = a.name.toUpperCase(); let textB = b.name.toUpperCase(); return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;});
+        for disc in disciplines
+          option(value = disc.allias) #{disc.name}
+      br
+      input#myfile(type="file" name="myfile" onchange="selectedFile();" required="true")
+      div#fileSize
+      div#fileType
+      label(for="filename") File name:
+      input#filename(type="text" name="filename" required="true")
+      br
+      label(for="comment") Comment:
+      textarea#comment(type="textarea" name="comment")
+      br
+      input(type="submit" value="Upload file")

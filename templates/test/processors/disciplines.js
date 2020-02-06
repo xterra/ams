@@ -19,7 +19,6 @@ module.exports = {
             return router.bleed(500, null, response, err);
           }
           userInfo = result;
-          console.log(userInfo);
           callback({
             title: "Disciplines list",
             urlDiscDetail: "/disciplines/",

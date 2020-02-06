@@ -3,7 +3,7 @@ const qs = require('querystring'),
       security = require("../../../security");
 
 module.exports = {
-  path: new RegExp("^\/disciplines\/update\/.*$"),
+  path: new RegExp("^\/disciplines\/edit\/[^\/]+$"),
   processor: function(request, response, callback, sessionContext, sessionToken, db){
     if(sessionToken == null || sessionContext == undefined || sessionContext == null){
       callback();

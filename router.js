@@ -139,8 +139,26 @@ function route(request, response) {
                 return bleed(403, requestedURL, response);
             }
         }
-
-        bleed(404, requestedURL, response);
+        return security.getSessionFromRequest(request, response, function(sessionToken, sessionData){
+          console.log(sessionData);
+          if(sessionToken == null || sessionData == null){
+            console.log("User is not logged in");
+            return bleed(404, requestedURL, response);
+          } else{
+            const filePathInPrivateData = path.join(PATHS_dataPrivateDir, requestedURL);
+            if (fs.existsSync(filePathInPrivateData)) {
+                stat = fs.statSync(filePathInPrivateData);
+                if (stat.isFile()) {
+                    return stream(filePathInPrivateData, stat, request, response);
+                } else {
+                    return bleed(404, requestedURL, response);
+                }
+            } else {
+                console.log(`I'm here.`);
+                return bleed(404, requestedURL, response);
+            }
+          }
+        }, true);
     } catch (e) {
         bleed(500, null, response, e);
         console.error("An error occurred in router -> route", e);
@@ -276,7 +294,7 @@ function render(pageProcessor, requestedURL, request, response) {
                                 }
                                 responseData = processedData;
                             }
-                            
+
                             let head = {
                                 "Cache-Control": clientCacheTime,
                                 "Content-Type": contentType,

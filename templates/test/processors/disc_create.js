@@ -10,6 +10,7 @@ module.exports = {
       return router.bleed(301, "/login/", response);
     }
     if(request.method == "POST"){
+      console.log(request);
       return router.downloadClientPostData(request, function(err, data){
         if(err){
           callback();
@@ -48,7 +49,8 @@ module.exports = {
             creator: postData.creator,
             dateCreate: new Date(),
             dateUpdate: new Date(),
-            lastEditor: postData.creator
+            lastEditor: postData.creator,
+            editors: [postData.creator]
           }, function(err){
             if(err) {
               callback();

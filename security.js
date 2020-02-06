@@ -117,7 +117,7 @@ function loginUsingToken (login, password, callback) {
         password = password.toLowerCase();
     }
     password = md5(password); // TODO: SHA-256
-    if (boot.isConnected()) { //TODO: change mongo on Postgre
+    if (boot.isConnected()) {
         boot.getDB().collection("users").findOne({
             username : login,
             password : password
@@ -132,6 +132,7 @@ function loginUsingToken (login, password, callback) {
                 return makeSession(found._id, function(error, token, sessionData){
                     if(error) return callback(error, false, null);
                     console.info("User "+ found._id +" authed!");
+                    sessionData["id"] = found._id;
                     callback(null, token, sessionData);
                 });
             } else {
@@ -217,6 +218,11 @@ function logoutUsingCookies(request, response, callback) {
 function logoutUsingToken(sessionKey, callback) {
     delete context[sessionKey];
     // TODO: delete from DB
+    try{
+      boot.getDB().collection("sessions").deleteOne({_id: sessionKey});
+    }catch(err){
+      console.log(`Error with deleting session token from ${err}`);
+    }
     callback(null);
 }
 
@@ -261,9 +267,14 @@ function getSessionFromCookies(rawCookies, callback) {
 function getSessionData(sessionToken, callback) {
     if (typeof context[sessionToken] !== "undefined") {
         // TODO: update session lifetime in DB
+        console.log(`\ngetSessionData: ${JSON.stringify(context[sessionToken])}  \n`);
         context[sessionToken][0] = new Date();
         callback(null, context[sessionToken][1]);
     } else {
+        boot.getDB().collection("sessions").findOne({_id: sessionToken}, function(err, result){
+          if(err) console.log(err)
+          console.log(`Get info about session: ${JSON.stringify(result)}`);
+        });
 
         callback(null, null);
 
@@ -366,6 +377,13 @@ function runCleaner() {
         cleanerTicker = setInterval(function () {
             console.log("Cleaning security context...");
             // TODO: clear context!
+            const TWO_DAYS_IN_MS = 1728000;
+            let currentTime = new Date();
+            let expiresTime = currentTime - TWO_DAYS_IN_MS;
+            boot.getDB().collection("sessions").remove({freshness: {$lte: new Date(expiresTime) }}, function(err, result){
+              if(err) console.log(err);
+              console.log(`Sessions deleted:\n ${JSON.stringify(result)}`);
+            });
         }, contextCleanerInterval * 1000);
     }
 }
