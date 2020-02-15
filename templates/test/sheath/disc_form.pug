@@ -1,23 +1,127 @@
 doctype html
 html
   head
+    meta(http-equiv='content-type', content='text/html;charset=utf-8')
+    meta(charset='utf-8')
+    meta(name='viewport', content='width=device-width,initial-scale=1,shrink-to-fit=no')
     title #{title}
+    style.
+      @keyframes hidePreloader {
+      0% {
+      width: 100%;
+      height: 100%
+      }
+      100% {
+      width: 0;
+      height: 0
+      }
+      }
+      body>div.preloader {
+      position: fixed;
+      background: #fff;
+      width: 100%;
+      height: 100%;
+      z-index: 1071;
+      opacity: 0;
+      transition: opacity .5s ease;
+      overflow: hidden;
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+      justify-content: center
+      }
+      body:not(.loaded)>div.preloader {
+      opacity: 1
+      }
+      body:not(.loaded) {
+      overflow: hidden
+      }
+      body.loaded>div.preloader {
+      animation: hidePreloader .5s linear .5s forwards
+      }
+    script.
+      window.addEventListener("load", function() {
+      setTimeout(function() {
+      document.querySelector("body").classList.add("loaded")
+      }, 300)
+      })
+    link(rel='icon', href='../../../assets/img/brand/favicon.png', type='image/png')
+    link(rel='stylesheet', href='../../../assets/libs/fortawesome/fontawesome-free/css/all.min.css')
+    link#stylesheet(rel='stylesheet', href='../../../assets/css/quick-website.css')
   body
-    h1 #{title}
-    form(method='POST' action='')
-      p
-        label(for=name) Name:
-        input#name(type="text", placeholder="Name of discipline", name="name", required, value=(discipline===undefined ? "" : discipline.name))
-        br
-        label(for=mnemo) Mnemo:
-        input#mnemo(type="text", placeholder="Short name discipline", name="mnemo", required, value=(discipline===undefined ? "" : discipline.mnemo))
-        br
-        label(for=allias) Allias:
-        input#allias(type="text", placeholder="Allias discipline for URL", name="allias", required, value=(discipline===undefined ? "" : discipline.allias))
-        br
-        label(for=description) Description:
-        textarea#description(type="textarea", placeholder="About discipline", name="description") #{discipline===undefined ? "" : discipline.description}
-        input#creator(type="hidden", name="creator", value=creatorId)
-      if errorMessage.length
-        p(style="color: red") #{errorMessage}
-      input(type="submit", value="Confirm")
+    section
+      .container.d-flex.flex-column
+        .row.align-items-center.justify-content-center.min-vh-100
+          .col-md-6.col-lg-7.col-xl-8.py-6.py-md-0
+            div
+              .mb-5.text-center
+                h6.h3.mb-1 #{title}
+              span.clearfix
+              if errorMessage.length
+                p.mb-0(style=" color: red")=errorMessage
+              form(action='.', method='POST')
+                .form-group.mb-0
+                    .d-flex.align-items-center.justify-content-between
+                      div
+                        label.form-control-label Имя дисциплины
+                          span.text-danger *
+                    .input-group.input-group-merge
+                      input#name.form-control.form-control-prepend(type='text', name="name", placeholder='Имя', required, value=(discipline===undefined ? "" : discipline.name))
+                      .input-group-prepend
+                        span.input-group-text
+                          i(data-feather='align-left')
+                .row
+                  .col.form-group.mb-0
+                    .d-flex.align-items-center.justify-content-between
+                      div
+                        label.form-control-label Аббревиатура
+                          span.text-danger *
+                    .input-group.input-group-merge
+                      input#mnemo.form-control.form-control-prepend(type='text', name="mnemo", placeholder='Краткое имя', required, value=(discipline===undefined ? "" : discipline.mnemo))
+                      .input-group-prepend
+                        span.input-group-text
+                          i(data-feather='minimize-2')
+                  .col.form-group.mb-0
+                    .d-flex.align-items-center.justify-content-between
+                      div
+                        label.form-control-label Имя для ссылки(URL)
+                          span.text-danger *
+                    .input-group.input-group-merge
+                      input#allias.form-control.form-control-prepend(type='text', name="allias", placeholder='Короткое имя для ссылки', required, value=(discipline===undefined ? "" : discipline.allias))
+                      .input-group-prepend
+                        span.input-group-text
+                          i(data-feather='link')
+                  .col.form-group.mb-0
+                    .d-flex.align-items-center.justify-content-between
+                      div
+                        label.form-control-label Номер курса
+                          span.text-danger *
+                    .input-group.input-group-merge
+                      input#course.form-control.form-control-prepend(type='text', name="course", placeholder='Номер курса', required, value=(discipline===undefined ? "" : discipline.course))
+                      .input-group-prepend
+                        span.input-group-text
+                          i(data-feather='link')
+                .form-group.mb-0
+                  .d-flex.align-items-center.justify-content-between
+                    div
+                      label.form-control-label Описание дисциплины
+                  .input-group.input-group-merge
+                    textarea#description.form-control.form-control-prepend(type='textarea', placeholder='Добавьте описание дисциплины', name='description', rows="4") #{discipline===undefined ? "" : discipline.description}
+                    .input-group-prepend
+                      span.input-group-text
+                        i(data-feather='align-justify')    
+                .mt-4  
+                  button.btn.btn-block.btn-primary(type='submit') Подтвердить
+    script(src='../../../assets/libs/jquery/dist/jquery.min.js')
+    script(src='../../../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js')
+    script(src='../../../assets/libs/svg-injector/dist/svg-injector.min.js')
+    script(src='../../../assets/libs/feather-icons/dist/feather.min.js')
+    script(src='../../../assets/libs/in-view/dist/in-view.min.js')
+    script(src='../../../assets/libs/sticky-kit/dist/sticky-kit.min.js')
+    script(src='../../../assets/libs/imagesloaded/imagesloaded.pkgd.min.js')
+    script(src='../../../assets/js/quick-website.js')
+    script.
+      feather.replace({
+      width: "1em",
+      height: "1em"
+      })

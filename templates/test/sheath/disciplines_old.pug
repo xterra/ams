@@ -1,0 +1,17 @@
+doctype html
+html
+  head
+    title #{title}
+  body
+    h1 #{title}
+    p  #{userInfo.username}
+    if userInfo.securityRole.includes("superadmin") || userInfo.securityRole.includes("teacher")
+      a(href="/disciplines/create/")
+        button(type="button") New discipline
+        br
+    each disc in disciplines
+      a(href=urlDiscDetail+disc.allias) #{disc.name}, #{disc.mnemo}
+      hr
+    else
+      p There are no disciplines.
+    

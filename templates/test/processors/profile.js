@@ -49,6 +49,7 @@ module.exports = {
             } else {
 
                 callback({
+                    userId: sessionContext["id"],
                     userLogin: sessionContext["login"],
                     loginTime: sessionContext["loggedInTime"],
                     sessionToken: sessionToken,

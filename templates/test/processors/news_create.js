@@ -19,17 +19,20 @@ module.exports = {
         try{
             const postData = qs.parse(body),
                   titleNews = postData.title,
+                  newsDescription = postData.short || `${postData.text.substr(0, 115)}...`,
                   textNews = postData.text;
 
-            if(titleNews.length == 0 || textNews.length == 0){
+            if(newsDescription.length > 120){
               return callback({
-                title: "Create news",
-                errorMessage: "Title or text can't be empty!"
+                title: "Создание новости",
+                errorMessage: "Краткое описание не должно превышать 120 символов!"
               }, "news_create", 0, 0);
             }
             db.collection("news").insertOne({
               title: titleNews,
+              short: newsDescription,
               text: textNews,
+              url: postData.url,
               author: sessionContext.login,
               dateCreate: new Date(),
               dateUpdate: new Date(),
@@ -45,10 +48,10 @@ module.exports = {
         callback();
         return router.bleed(500, null, response, err);
       }
-      }, 512);
+    });
     }
     callback({
-      title: "Create news",
+      title: "Создание новости",
       errorMessage: ""
     }, "news_create", 0, 0);
   }

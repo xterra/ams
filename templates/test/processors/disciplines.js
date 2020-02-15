@@ -11,30 +11,23 @@ module.exports = {
         router.bleed(500, null, response, err);
       }
       const disciplines = result;
-      let userInfo = {};
       if( sessionContext !== undefined && sessionContext !== null && "login" in sessionContext){
         db.collection("users").findOne({username: sessionContext.login}, {securityRole : 1, username : 1}, function(err, result){
           if(err){
             callback();
             return router.bleed(500, null, response, err);
           }
-          userInfo = result;
+          let userInfo = result;
           callback({
-            title: "Disciplines list",
+            title: "Дисциплины",
             urlDiscDetail: "/disciplines/",
             disciplines: disciplines,
             userInfo: userInfo
           }, "disciplines", 0, 0);
         });
       } else {
-        userInfo.username = "John Doe";
-        userInfo.securityRole = ['user'];
-        callback({
-          title: "Disciplines list",
-          urlDiscDetail: "/disciplines/",
-          disciplines: disciplines,
-          userInfo: userInfo
-        }, "disciplines", 0, 0);
+        callback();
+        return router.bleed(404, null, response);
       }
     });
   }

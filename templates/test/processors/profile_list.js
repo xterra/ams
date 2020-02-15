@@ -7,16 +7,23 @@ module.exports = {
       callback();
       return router.bleed(301, "/login/", response);
     }
-    db.collection("users").find({}, {username: 1, securityRole: 1}).toArray(function(err, result){
+    db.collection("users").find({}).toArray(function(err, result){
       if(err){
         callback();
         return router.bleed(500, null, response, err);
       }
       let users = result;
+      let currentUser = users.find((element, index, array)=>{
+        if(element.username == sessionContext.login){
+          return element;
+        } else{
+          return false;
+        }
+      });
       return callback({
-        title: "Profiles list",
+        title: "Список пользователей",
         profiles: users,
-        userName: sessionContext.login
+        currentUser: currentUser
       }, "profile_list", 0, 0);
     });
   }

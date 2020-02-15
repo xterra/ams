@@ -26,16 +26,17 @@ module.exports = {
           disc_detail.mnemo = postData.mnemo;
           disc_detail.allias =  postData.allias;
           disc_detail.description = postData.description;
+          disc_detail.course = postData.course;
           if(disc_detail.name.length == 0 || disc_detail.description.length == 0 || disc_detail.allias.length == 0){
             return callback({
-              title: "Update discipline",
+              title: "Изменение дисциплины",
               discipline: disc_detail,
               errorMessage: "New name, allias or description can't be empty!"
             }, "disc_form", 0, 0);
           }
           if(/[А-яЁё]/gi.test(disc_detail.allias)){
             return callback({
-              title: "Update discipline",
+              title: "Изменение дисциплины",
               discipline: disc_detail,
               errorMessage: "New allias can't exist russian symbols"
             }, "disc_form", 0, 0 );
@@ -44,6 +45,7 @@ module.exports = {
             name: disc_detail.name,
             mnemo: disc_detail.mnemo,
             allias: disc_detail.allias,
+            course: disc_detail.course,
             description: disc_detail.description,
             dateUpdate: new Date(),
             lastEditor: postData.creator
@@ -55,7 +57,7 @@ module.exports = {
             }
             if(result.value == null){
               return callback({
-                title: "Update discipline",
+                title: "Изменение дисциплины",
                 discipline: disc_detail,
                 errorMessage: "Something wrong with update - try again."
               }, "disc_form", 0, 0 );
@@ -90,7 +92,7 @@ module.exports = {
             return router.bleed(500, null, response, err);
           }
         callback({
-          title: "Discipline update",
+          title: "Изменение дисциплины",
           errorMessage: "",
           creatorId: userId._id,
           discipline: disc_detail

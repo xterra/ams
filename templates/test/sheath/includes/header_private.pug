@@ -1,0 +1,27 @@
+header#header-main.header-transparent
+  nav#navbar-main.navbar.navbar-main.navbar-expand-lg.navbar-dark.bg-dark
+    .container
+      a.navbar-brand(href='/')
+        img(alt='Логотип', src='../../../../assets/img/brand/asu-logo-main-beta-small.png')
+      button.navbar-toggler(type='button', data-toggle='collapse', data-target='#navbar-main-collapse', aria-controls='navbar-main-collapse', aria-expanded='false', aria-label='Toggle navigation')
+        span.navbar-toggler-icon
+      #navbar-main-collapse.collapse.navbar-collapse.navbar-collapse-overlay
+        .position-relative
+          button.navbar-toggler(type='button', data-toggle='collapse', data-target='#navbar-main-collapse', aria-controls='navbar-main-collapse', aria-expanded='false', aria-label='Toggle navigation')
+            i(data-feather='x')
+        ul.navbar-nav.ml-lg-auto
+          li.nav-item.nav-item-spaced
+            a.nav-link(href='/') Главная
+          li.nav-item.nav-item-spaced
+            a.nav-link(href='/about/') О нас   
+          li.nav-item.nav-item-spaced
+            a.nav-link(href='/news/') Новости
+          li.nav-item.nav-item-spaced
+            a.nav-link(href='/for-abiturients/') Абитуриентам
+          li.nav-item.nav-item-spaced
+            a.nav-link(href='/disciplines/') Дисциплины
+          li.nav-item.nav-item-spaced
+            a.nav-link(href='/contacts/') Контакты
+        ul.navbar-nav.align-items-lg-center.d-none.d-lg-flex.ml-lg-auto
+          li.nav-item
+            a.nav-link(href='/login/') Вход

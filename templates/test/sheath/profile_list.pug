@@ -1,12 +1,137 @@
 doctype html
-html
+html(lang='en')
   head
+    meta(http-equiv='content-type', content='text/html;charset=utf-8')
+    meta(charset='utf-8')
+    meta(name='viewport', content='width=device-width,initial-scale=1,shrink-to-fit=no')
     title #{title}
+    style.
+      @keyframes hidePreloader {
+      0% {
+      width: 100%;
+      height: 100%
+      }
+      100% {
+      width: 0;
+      height: 0
+      }
+      }
+      body>div.preloader {
+      position: fixed;
+      background: #fff;
+      width: 100%;
+      height: 100%;
+      z-index: 1071;
+      opacity: 0;
+      transition: opacity .5s ease;
+      overflow: hidden;
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+      justify-content: center
+      }
+      body:not(.loaded)>div.preloader {
+      opacity: 1
+      }
+      body:not(.loaded) {
+      overflow: hidden
+      }
+      body.loaded>div.preloader {
+      animation: hidePreloader .5s linear .5s forwards
+      }
+    script.
+      window.addEventListener("load", function() {
+      setTimeout(function() {
+      document.querySelector("body").classList.add("loaded")
+      }, 300)
+      })
+    link(rel='icon', href='../assets/img/brand/favicon.png', type='image/png')
+    link(rel='stylesheet', href='../assets/libs/fortawesome/fontawesome-free/css/all.min.css')
+    link#stylesheet(rel='stylesheet', href='../assets/css/quick-website.css')
   body
-    h1 #{title}
-    p #{userName}
-    ul
-    for user in profiles
-      a(href="/profiles/"+user._id+"/")
-        li #{user.username}
-       
+    .preloader
+      .spinner-border.text-primary(role='status')
+        span.sr-only Loading...
+    .slice.slice-sm.bg-section-secondary
+      .container
+        .row.justify-content-center
+          .col-lg-9
+            .row.align-items-center.mb-4
+              .pr-3
+                span.h5.mb-0
+                  i(data-feather='users')
+              .col
+                if currentUser.securityRole !== 0 && currentUser.securityRole.includes('superadmin')
+                  h3.h5.mb-0 Управление пользователями
+                  p.text-muted.mb-0 Все пользовательские привелегии и настройки.
+                else
+                  h3.h5.mb-0 #{title}
+                  p.text-muted.mb-0 Все пользователи системы.
+              .col-auto
+                if currentUser.securityRole !== 0 && currentUser.securityRole.includes('superadmin')
+                  a(href="/profiles/new/" data-toggle="tooltip" title="Добавить пользователя")
+                    button.btn.btn-sm.btn-primary.btn-icon-only.rounded-circle(type='button')
+                      span.btn-inner--icon
+                        i.fas.fa-plus
+            .row.mt-4
+              .col-lg-12
+                .mb-5
+                  .table-responsive
+                    table.table.table-cards.align-items-center
+                      thead
+                        tr
+                          th(scope='col', style='min-width:240px') Имя
+                          th(scope='col') Статус
+                          if currentUser.securityRole !== 0 && currentUser.securityRole.includes('superadmin')
+                            th(scope='col') Роль доступа
+                          th(scope='col')
+                      tbody
+                      for user in profiles
+                        tr
+                          th(scope='row')
+                            .media.align-items-center
+                              div
+                                .avatar-parent-child
+                                  span.avatar.bg-primary.text-white.rounded-circle.avatar-sm #{user.username.substr(0,2).toUpperCase()}
+                              .media-body.ml-4
+                                a.name.h6.mb-0.text-sm(href='#') #{user.username}
+                                small.d-block.font-weight-bold #{user.email}
+                          td
+                              button.btn.btn-sm.btn-secondary(type='button', aria-haspopup='true', aria-expanded='false') Активен
+                          if currentUser.securityRole !== 0 && currentUser.securityRole.includes('superadmin')
+                            td
+                                button.btn.btn-sm.btn-secondary(type='button', aria-haspopup='true', aria-expanded='false') #{user.securityRole}
+                          td.text-right
+                            .actions.ml-3
+                              a.action-item.mr-2(href="/profiles/"+user._id+"/", data-toggle='tooltip', title='Просмотр профиля')
+                                i(data-feather='external-link')
+                              if currentUser.securityRole !== 0 && currentUser.securityRole.includes('superadmin')
+                                a.action-item.mr-2(href='/profiles/edit/'+user._id+"/", data-toggle='tooltip', title='Редактировать')
+                                  i(data-feather='edit-2')
+                                a.action-item.text-danger.mr-2(href='/profiles/delete/'+user._id+"/", data-toggle='tooltip', title='Удалить')
+                                  i(data-feather='trash-2')
+                      
+    script(src='../assets/libs/jquery/dist/jquery.min.js')
+    script(src='../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js')
+    script(src='../assets/libs/svg-injector/dist/svg-injector.min.js')
+    script(src='../assets/libs/feather-icons/dist/feather.min.js')
+    script(src='../assets/libs/in-view/dist/in-view.min.js')
+    script(src='../assets/libs/sticky-kit/dist/sticky-kit.min.js')
+    script(src='../assets/libs/imagesloaded/imagesloaded.pkgd.min.js')
+    script(src='../assets/libs/progressbar.js/dist/progressbar.min.js')
+    script(src='../assets/js/quick-website.js')
+    script.
+      feather.replace({
+      width: "1em",
+      height: "1em"
+      })
+    script.
+      ! function(e, t, a, n, g) {
+      e[n] = e[n] || [], e[n].push({
+      "gtm.start": (new Date).getTime(),
+      event: "gtm.js"
+      });
+      var m = t.getElementsByTagName(a)[0],
+      r = t.createElement(a);
+      r.async = !0, r.src = "../../www.googletagmanager.com/gtm4c6a.js?id=GTM-MF4DZVH", m.parentNode.insertBefore(r, m)
+      }(window, document, "script", "dataLayer")

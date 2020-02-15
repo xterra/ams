@@ -1,44 +1,127 @@
 doctype html
-html
+html(lang='en')
   head
+    meta(http-equiv='content-type', content='text/html;charset=utf-8')
+    meta(charset='utf-8')
+    meta(name='viewport', content='width=device-width,initial-scale=1,shrink-to-fit=no')
     title #{title}
+    style.
+      @keyframes hidePreloader {
+      0% {
+      width: 100%;
+      height: 100%
+      }
+      100% {
+      width: 0;
+      height: 0
+      }
+      }
+      body>div.preloader {
+      position: fixed;
+      background: #fff;
+      width: 100%;
+      height: 100%;
+      z-index: 1071;
+      opacity: 0;
+      transition: opacity .5s ease;
+      overflow: hidden;
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+      justify-content: center
+      }
+      body:not(.loaded)>div.preloader {
+      opacity: 1
+      }
+      body:not(.loaded) {
+      overflow: hidden
+      }
+      body.loaded>div.preloader {
+      animation: hidePreloader .5s linear .5s forwards
+      }
+    script.
+      window.addEventListener("load", function() {
+      setTimeout(function() {
+      document.querySelector("body").classList.add("loaded")
+      }, 300)
+      })
+    link(rel='icon', href='../../assets/img/brand/favicon.png', type='image/png')
+    link(rel='stylesheet', href='../../assets/libs/swiper/dist/css/swiper.min.css')
+    link(rel='stylesheet', href='../../assets/libs/fancyapps/fancybox/dist/jquery.fancybox.min.css')
+    link(rel='stylesheet', href='../../assets/libs/fortawesome/fontawesome-free/css/all.min.css')
+    link#stylesheet(rel='stylesheet', href='../../assets/css/quick-website.css')
   body
-    h1 #{title}
-    p #{userInfo.username}
-    hr
-    h2 #{discipline.name}, #{discipline.mnemo}
-    | #{discipline.description}
-    if (userInfo.securityRole.includes("student"))
-      p Discipline files
-      dl
-        for file in files
-          -let dirName = file._id.substr(0,2)
-          dt
-            a(href="/files/"+dirName+"/"+file._id download=file.name+"."+file.ext) #{file.name}
-            dd #{file.comment}
-          br
-    if (userInfo.securityRole.includes("superadmin") || (userInfo.securityRole.includes("teacher") && discipline.editors.includes(userInfo._id.toString())))
-      hr
-      p lastEditor: #{discipline.lastEditor}
-      p dateUpdate: #{discipline.dateUpdate}
-      a(href="/disciplines/edit/"+discipline.allias)
-        button(type="button") Edit
-      a(href="/disciplines/delete/"+discipline.allias)
-        button(type="button") Delete
-      a(href="/upload/") 
-        button(type="button") Upload File
-      hr
-      p Discipline files
-      dl
-        for file in files
-          -let dirName = file._id.substr(0,2)
-          dt
-            a(href="/files/"+dirName+"/"+file._id download=file.name+"."+file.ext) #{file.name}
-            dd #{file.comment}
-          br
-          a(href="/file/delete/"+discipline.allias+"/"+file._id)
-            button(type="button") Delete
-          a(href="/file/edit/"+discipline.allias+"/"+file._id)
-            button(type="button") Edit   
-          hr
-        
+    .preloader
+      .spinner-border.text-primary(role='status')
+        span.sr-only Loading...
+    section.slice.slice-lg.delimiter-bottom
+      .container
+        .row.justify-content-center.mb-3
+          .col-lg-7.text-center
+            h1.mb-4 #{discipline.name}, #{discipline.mnemo}
+            p.lead.lh-190 #{discipline.description}
+        if (userInfo.securityRole.includes("superadmin") || (userInfo.securityRole.includes("teacher") && discipline.editors.includes(userInfo._id.toString())))
+          .row.justify-content-center.mb-3
+            a.mr-1(href="/disciplines/edit/"+discipline.allias, data-toggle='tooltip', title='Редактировать дисциплину')
+              button.btn.btn-outline-primary(type='button') Редактировать
+            a.ml-1(href="/disciplines/delete/"+discipline.allias, data-toggle='tooltip', title='Удалить дисциплину')
+              button.btn.btn-outline-danger(type='button') Удалить
+        if (!userInfo.securityRole.includes("guest"))
+          .mb-5
+            .card
+              .card-header
+                .row.mx-n2
+                  .col.col-lg.px-2
+                    h5.h6.mb-0 Документы для дисциплины
+                    p.text-sm.mb-0 Возможность загрузить все необходимые документы
+                  .col-auto.px-2
+                    a(href="/file/upload/"+discipline.allias+"/", data-toggle='tooltip', title='Добавить файл')
+                      button.btn.btn-secondary.px-3(type='button')
+                        i(data-feather='plus')
+              ul.list-group.list-group-flush
+                for file in files
+                  li.list-group-item
+                    .row.align-items-center
+                      .col-auto
+                        i(data-feather='file-text')
+                      .col.ml-n2
+                        h6.text-sm.mb-0 #{file.name}
+                        p.card-text.small.text-muted #{file.comment}
+                      .col-md.d-none.d-md-block
+                        span.text-muted Изменен:
+                        |  2019-05-16 11:05:08
+                      .col-auto
+                        .actions.text-right.ml-3
+                          -let dirName = file._id.substr(0,2);
+                          a.action-item.mr-2(href="/files/"+dirName+"/"+file._id download=file.name+"."+file.ext data-toggle='tooltip', title='Скачать')
+                            i(data-feather='download')
+                          if (userInfo.securityRole.includes("superadmin") || (userInfo.securityRole.includes("teacher") && discipline.editors.includes(userInfo._id.toString())))
+                            a.action-item.mr-2(href="/file/edit/"+discipline.allias+"/"+file._id, data-toggle='tooltip', title='Редактировать')
+                              i(data-feather='edit')
+                            a.action-item.mr-2(href="/file/delete/"+discipline.allias+"/"+file._id, data-toggle='tooltip', title='Удалить')
+                              i(data-feather='trash-2')
+    script(src='../../assets/libs/jquery/dist/jquery.min.js')
+    script(src='../../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js')
+    script(src='../../assets/libs/svg-injector/dist/svg-injector.min.js')
+    script(src='../../assets/libs/feather-icons/dist/feather.min.js')
+    script(src='../../assets/libs/in-view/dist/in-view.min.js')
+    script(src='../../assets/libs/sticky-kit/dist/sticky-kit.min.js')
+    script(src='../../assets/libs/imagesloaded/imagesloaded.pkgd.min.js')
+    script(src='../../assets/libs/swiper/dist/js/swiper.min.js')
+    script(src='../../assets/libs/fancyapps/fancybox/dist/jquery.fancybox.min.js')
+    script(src='../../assets/js/quick-website.js')
+    script.
+      feather.replace({
+      width: "1em",
+      height: "1em"
+      })
+    script.
+      ! function(e, t, a, n, g) {
+      e[n] = e[n] || [], e[n].push({
+      "gtm.start": (new Date).getTime(),
+      event: "gtm.js"
+      });
+      var m = t.getElementsByTagName(a)[0],
+      r = t.createElement(a);
+      r.async = !0, r.src = "../../../../www.googletagmanager.com/gtm4c6a.js?id=GTM-MF4DZVH", m.parentNode.insertBefore(r, m)
+      }(window, document, "script", "dataLayer")

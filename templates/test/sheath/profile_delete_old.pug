@@ -1,0 +1,14 @@
+doctype html
+html
+  head
+    title #{title}
+  body
+    h1 #{title}
+    p #{adminInfo.username}
+    hr
+    h2 Do you really want delete profile "#{userInfo.username}"?
+    a(href="/profiles/"+userInfo._id+"/")
+      button(type="button") Back to profile
+    form(action="" method="POST")
+      input(type="submit" value="Delete")
+    

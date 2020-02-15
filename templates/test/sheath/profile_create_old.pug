@@ -1,0 +1,26 @@
+doctype html
+html
+  head
+    title #{title}
+  body
+    h1 #{title}
+    p #{adminName}
+    hr
+    form(action="" method="POST")
+      label(for="username") Login:
+      input#username(type="text" name="username" placeholder="Name for new user" required="true" value=(userInfo===undefined ? "" : userInfo.username))
+      label(for="password") Password:
+      input#password(type="password" name="password" placeholder="Password for new user" required="true")
+      label(for="email") Email:
+      input#email(type="email" name="email" placeholder="Email for new user" value=(userInfo===undefined ? "" : userInfo.email))
+      label(for="phone") Phone:
+      input#phone(type="tel" name="phone" placeholder="Phone for new user" value=(userInfo===undefined ? "" : userInfo.phone))
+      label(for="securityRole") Security Role:
+      select#securityRole(type="select" name="securityRole" placeholder="Select Role..." required="true")
+        option(value="teacher") teacher
+        option(value="student") student
+        option(value="superadmin") superadmin
+        option(value="admin") admin
+      input(type="submit" value="Create") 
+    if errorMessage.length
+      p(style="color: red") #{errorMessage}

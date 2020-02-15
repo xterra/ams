@@ -1,0 +1,163 @@
+doctype html
+html
+  head
+    meta(http-equiv='content-type', content='text/html;charset=utf-8')
+    meta(charset='utf-8')
+    meta(name='viewport', content='width=device-width,initial-scale=1,shrink-to-fit=no')
+    title #{title}
+    style.
+      @keyframes hidePreloader {
+      0% {
+      width: 100%;
+      height: 100%
+      }
+      100% {
+      width: 0;
+      height: 0
+      }
+      }
+      body>div.preloader {
+      position: fixed;
+      background: #fff;
+      width: 100%;
+      height: 100%;
+      z-index: 1071;
+      opacity: 0;
+      transition: opacity .5s ease;
+      overflow: hidden;
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+      justify-content: center
+      }
+      body:not(.loaded)>div.preloader {
+      opacity: 1
+      }
+      body:not(.loaded) {
+      overflow: hidden
+      }
+      body.loaded>div.preloader {
+      animation: hidePreloader .5s linear .5s forwards
+      }
+    script.
+      window.addEventListener("load", function() {
+      setTimeout(function() {
+      document.querySelector("body").classList.add("loaded")
+      }, 300)
+      })
+    link(rel='icon', href='../../assets/img/brand/favicon.png', type='image/png')
+    link(rel='stylesheet', href='../../assets/libs/%40fancyapps/fancybox/dist/jquery.fancybox.min.css')
+    link(rel='stylesheet', href='../../assets/libs/%40fortawesome/fontawesome-free/css/all.min.css')
+    link#stylesheet(rel='stylesheet', href='../../assets/css/quick-website.css')
+  body
+    .preloader
+      .spinner-border.text-primary(role='status')
+        span.sr-only Loading...
+    if user == null
+      include includes/header_public.pug
+    else
+      include includes/header_private.pug
+    section.slice.slice-lg.py-7.bg-cover.bg-size--cover
+      span.mask.bg-primary.opacity-8
+      .container.d-flex.align-items-center(data-offset-top='#navbar-main')
+        .col.py-5
+          .row.align-items-center.justify-content-center.mb-4
+            .col-md-7.col-lg-7.text-center
+              h1.display-4.text-white.mb-2
+                strong Абитуриентам
+    section.slice.slice-lg.pt-6.pb-5
+      .container.pb-6
+        .row.row-grid.align-items-center
+          .col-xl-8.col-lg-10.offset-xl-2.offset-lg-1
+            h5.h3.text-center Направления бакалавриата
+            .row
+              .col-lg-6
+                .card
+                  .card-body.py-4
+                    small.d-block.text-sm.mb-2 09.03.01
+                    p.h5.stretched-link.lh-150 Информатика и вычислительная техника
+                    p.mt-3.mb-0.lh-170 Автоматизированные системы обработки информации и управления
+              .col-lg-6
+                .card
+                  .card-body.py-4
+                    small.d-block.text-sm.mb-2 09.03.02
+                    p.h5.stretched-link.lh-150 Информационные системы и технологии
+                    p.mt-3.mb-0.lh-170 Информационные системы и технологии на транспорте
+            article.text-justify
+              span.badge.badge-primary.badge-pill Общее
+              p.mt-4
+                | На младших курсах подготовка по направлениям «Автоматизированные системы обработки информации и управления» и «Информационные системы и технологии (на транспорте)» ведётся практически по одному плану с незначительными различиями, основное внимание обращено на изучение принципов действия вычислительной техники и информационных технологий.
+              p.mt-2
+                | I и II курс — основы математики, физики и программирования, а также теоретические основы построения ЭВМ и информационных систем и некоторые другие общетехнические науки.
+              span.badge.badge-primary.badge-pill.mb-4 Различия
+              p.mt-4
+                | На старших курсах сохраняется общая направленность подготовки на системный анализ и проектирование информационных систем. Студенты разных направлений глубже изучают:
+              .row
+                .col-lg-6
+                  .card
+                    .card-body.py-4
+                      small.d-block.text-sm.mb-2 09.03.01
+                      p.mt-3.mb-0.lh-170
+                        | Технологии сбора, хранения и преобразования информации, алгоритмические аспекты вычислений, мультимедиа-технологии
+                .col-lg-6
+                  .card
+                    .card-body.py-4
+                      small.d-block.text-sm.mb-2 09.03.02
+                      p.mt-3.mb-0.lh-170
+                        | Методы организации и планирования перевозок (логистику) и информационные технологии на транспорте и в транспортном деле
+              p.mt-2
+                | III и IV курс — профессиональные тонкости современных информационных технологий, такие дисциплины, как: Архитектура информационных систем,
+                | Сети и сетевые технологии, Управление данными и базы данных, Теория и технологии искусственного интеллекта, Качество информационных систем,Корпоративные информационные системы, Математическое моделирование и др.
+              h5.h3.text-center Направление магистратуры
+              .row.justify-content-center
+                .col-lg-8
+                  .card
+                    .card-body.py-4
+                      small.d-block.text-sm.mb-2 09.04.01
+                      p.h5.stretched-link.lh-150 Информатика и вычислительная техника
+                      p.mt-3.mb-0.lh-170 Информационная аналитика и технологии  «больших данных»
+              span.badge.badge-primary.badge-pill.mb-4 Условия
+              p.mt-4
+                | В магистратуру могут поступить все желающие, подавшие в приёмную комиссию соответствующее заявление, представившие диплом о высшем образовании и успешно сдавшие вступительные экзамены.
+                | При поступлении в магистратуру действующие правила не требуют соответствия направления магистерской подготовки и специальности или направления предыдущего образования
+              span.badge.badge-primary.badge-pill.mb-4 Дисциплины
+              p.mt-4
+                | Будущие магистры изучают: Cognitive Science и модели знаний, Анализ данных(диагностика и прогностика), Методы и инструментальные средства информационной аналитики,
+                | Проектирование и оценка качества информационных систем и технологий, Моделирование (математическое и имитационное), Прикладные задачи аналитики
+              h5.h3.text-center Перспективы обучения
+              ul.list-unstyled.list-bullet
+                li.py-2
+                  span.badge.badge-circle.rounded-circle.badge-soft-success.mr-2
+                    i(data-feather='check')
+                  |  Сотрудничество с разработчиками и поставщиками IT (IBM, SAS, SAP, ORACLE и др.)
+                li.py-2
+                  span.badge.badge-circle.rounded-circle.badge-soft-success.mr-2
+                    i(data-feather='check')
+                  |  Отслеживание тенденций развития IT, создание хостингов IBM и SAP технологий
+                li.py-2
+                  span.badge.badge-circle.rounded-circle.badge-soft-success.mr-2
+                    i(data-feather='check')
+                  |  Расширение сферы образовательных услуг за счёт использования дистанционных технологий обучения
+                li.py-2
+                  span.badge.badge-circle.rounded-circle.badge-soft-success.mr-2
+                    i(data-feather='check')
+                  |  Выпускники кафедры могут легко найти интересную и высокооплачиваемую работу
+                li.py-2
+                  span.badge.badge-circle.rounded-circle.badge-soft-success.mr-2
+                    i(data-feather='check')
+                  |  Хорошие специалисты по информационным технологиям нужны во всём мире
+    include includes/footer.pug
+    script(src='../../assets/libs/jquery/dist/jquery.min.js')
+    script(src='../../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js')
+    script(src='../../assets/libs/svg-injector/dist/svg-injector.min.js')
+    script(src='../../assets/libs/feather-icons/dist/feather.min.js')
+    script(src='../../assets/libs/in-view/dist/in-view.min.js')
+    script(src='../../assets/libs/sticky-kit/dist/sticky-kit.min.js')
+    script(src='../../assets/libs/imagesloaded/imagesloaded.pkgd.min.js')
+    script(src='../../assets/libs/%40fancyapps/fancybox/dist/jquery.fancybox.min.js')
+    script(src='../../assets/js/quick-website.js')
+    script.
+      feather.replace({
+      width: "1em",
+      height: "1em"
+      })

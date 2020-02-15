@@ -48,7 +48,7 @@ module.exports = {
             });
           }else{
             return callback({
-              title: "Delete profile",
+              title: "Удаление профиля",
               adminInfo: adminInfo,
               userInfo: userInfo
             }, "profile_delete", 0, 0);

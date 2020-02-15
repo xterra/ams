@@ -1,0 +1,98 @@
+doctype html
+html
+  head
+    meta(http-equiv='content-type', content='text/html;charset=utf-8')
+    meta(charset='utf-8')
+    meta(name='viewport', content='width=device-width,initial-scale=1,shrink-to-fit=no')
+    title #{title}
+    style.
+      @keyframes hidePreloader {
+      0% {
+      width: 100%;
+      height: 100%
+      }
+      100% {
+      width: 0;
+      height: 0
+      }
+      }
+      body>div.preloader {
+      position: fixed;
+      background: #fff;
+      width: 100%;
+      height: 100%;
+      z-index: 1071;
+      opacity: 0;
+      transition: opacity .5s ease;
+      overflow: hidden;
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+      justify-content: center
+      }
+      body:not(.loaded)>div.preloader {
+      opacity: 1
+      }
+      body:not(.loaded) {
+      overflow: hidden
+      }
+      body.loaded>div.preloader {
+      animation: hidePreloader .5s linear .5s forwards
+      }
+    script.
+      window.addEventListener("load", function() {
+      setTimeout(function() {
+      document.querySelector("body").classList.add("loaded")
+      }, 300)
+      })
+    link(rel='icon', href='../../assets/img/brand/favicon.png', type='image/png')
+    link(rel='stylesheet', href='../../assets/libs/swiper/dist/css/swiper.min.css')
+    link(rel='stylesheet', href='../../assets/libs/fancyapps/fancybox/dist/jquery.fancybox.min.css')
+    link(rel='stylesheet', href='../../assets/libs/fortawesome/fontawesome-free/css/all.min.css')
+    link#stylesheet(rel='stylesheet', href='../../assets/css/quick-website.css')
+  body
+    .preloader
+      .spinner-border.text-primary(role='status')
+        span.sr-only Loading...
+    if user == null
+      include includes/header_public.pug
+    else
+      include includes/header_private.pug
+    section.slice.slice-lg.pt-10.pb-0.bg-cover.bg-info.bg-size--cover
+      .container
+        .row.justify-content-center
+          .col-xl-9.col-lg-10
+            .card.mb-n7.position-relative.zindex-100
+              .card-body.p-md-5
+                .text-center
+                  h1.h2.lh-150.mt-3.mb-0 #{news_detail.title}
+                .row.align-items-center.mt-5.pt-5.delimiter-top
+                  .col.mb-3.mb-lg-0
+                    .media.align-items-center
+                      div
+                        span.avatar.avatar-sm.bg-primary.rounded-circle ПС
+                      .media-body.ml-1
+                        span.d-block.h6.mb-0 Пользователь сайта
+                        span.text-sm.text-muted Опубликовано: #{newsDateString}
+    section.slice.slice-lg.pt-10.pb-5
+      .container.pb-6
+        .row.row-grid.align-items-center
+          .col-xl-8.col-lg-10.offset-xl-2.offset-lg-1
+            article
+              p #{news_detail.text}
+    include includes/footer.pug                
+    script(src='../../assets/libs/jquery/dist/jquery.min.js')
+    script(src='../../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js')
+    script(src='../../assets/libs/svg-injector/dist/svg-injector.min.js')
+    script(src='../../assets/libs/feather-icons/dist/feather.min.js')
+    script(src='../../assets/libs/in-view/dist/in-view.min.js')
+    script(src='../../assets/libs/sticky-kit/dist/sticky-kit.min.js')
+    script(src='../../assets/libs/imagesloaded/imagesloaded.pkgd.min.js')
+    script(src='../../assets/libs/swiper/dist/js/swiper.min.js')
+    script(src='../../assets/libs/fancyapps/fancybox/dist/jquery.fancybox.min.js')
+    script(src='../../assets/js/quick-website.js')
+    script.
+      feather.replace({
+      width: "1em",
+      height: "1em"
+      })

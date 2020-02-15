@@ -38,7 +38,7 @@ module.exports = {
           });
       });
     } else{
-      db.collection("disciplines").findOne({allias: disciplineAllias}, {name: 1, editors: 1}, function(err, result){
+      db.collection("disciplines").findOne({allias: disciplineAllias}, {name: 1, editors: 1, allias: 1}, function(err, result){
         if(err){
           callback();
           return router.bleed(500, null, response, err);
@@ -63,8 +63,8 @@ module.exports = {
               return router.bleed(301, "/disciplines/", response);
           }
           return callback({
-            title: "Delete discipline",
-            nameDisc: discipline.name
+            title: "Удаление дисциплины",
+            discipline: discipline
           }, "disc_delete", 0, 0);
         });
       });

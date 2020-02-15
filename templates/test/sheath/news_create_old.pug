@@ -1,0 +1,25 @@
+doctype html
+html
+  head 
+    title #{title}
+  body
+    h1 #{title}
+    form(method='POST' action='.')
+      p
+        label(for=title) Title:
+        input#title(type='text', placeholder='Title of news', name='title', value='')
+        br  
+        label(for=text) Text:
+        textarea#text(type='textarea', placeholder='Text of news', name='text', value='')
+        br
+        label(for=hidden) Hidden:
+        p 
+          input#hidden(type='radio', name='hidden', value='false', checked)
+          |No
+        p
+          input#hidden(type='radio', name='hidden', value='true')
+          |Yes
+        if errorMessage.length
+          p(style="color: red") #{errorMessage}          
+        input(type='submit', value='Confirm')
+      

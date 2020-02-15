@@ -22,11 +22,12 @@ module.exports = {
           disc_detail.name = postData.name;
           disc_detail.mnemo = postData.mnemo;
           disc_detail.allias =  postData.allias;
+          disc_detail.course = postData.course;
           disc_detail.description = postData.description;
           //TODO: use one pug pattern to update and create form!
           if(disc_detail.name.length == 0 || disc_detail.description.length == 0 || disc_detail.allias.length == 0){
             return callback({
-              title: "Create discipline",
+              title: "Новая дисциплина",
               discipline: disc_detail,
               creatorId: postData.creator,
               errorMessage: "Name, allias or description can't be empty!"
@@ -35,7 +36,7 @@ module.exports = {
           console.log("allias: " + disc_detail.allias);
           if(/[А-яЁё]/gi.test(disc_detail.allias)){
             return callback({
-              title: "Create discipline",
+              title: "Новая дисциплина",
               discipline: disc_detail,
               creatorId: postData.creator,
               errorMessage: "Allias can't exist russian symbols"
@@ -45,12 +46,14 @@ module.exports = {
             name: disc_detail.name,
             mnemo: disc_detail.mnemo,
             allias: disc_detail.allias,
+            course: disc_detail.course,
             description: disc_detail.description,
             creator: postData.creator,
             dateCreate: new Date(),
             dateUpdate: new Date(),
             lastEditor: postData.creator,
-            editors: [postData.creator]
+            editors: [postData.creator],
+            files: []
           }, function(err){
             if(err) {
               callback();
@@ -73,7 +76,7 @@ module.exports = {
         router.bleed(500, null, response, err);
       }
       callback({
-        title: "Create discipline",
+        title: "Новая дисциплина",
         creatorId: userId._id,
         errorMessage: ""
       }, "disc_form", 0, 0);

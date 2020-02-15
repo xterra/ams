@@ -1,0 +1,148 @@
+doctype html
+html
+  head
+    meta(http-equiv='content-type', content='text/html;charset=utf-8')
+    meta(charset='utf-8')
+    meta(name='viewport', content='width=device-width,initial-scale=1,shrink-to-fit=no')
+    title #{title}
+    style.
+      @keyframes hidePreloader {
+      0% {
+      width: 100%;
+      height: 100%
+      }
+      100% {
+      width: 0;
+      height: 0
+      }
+      }
+      body>div.preloader {
+      position: fixed;
+      background: #fff;
+      width: 100%;
+      height: 100%;
+      z-index: 1071;
+      opacity: 0;
+      transition: opacity .5s ease;
+      overflow: hidden;
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+      justify-content: center
+      }
+      body:not(.loaded)>div.preloader {
+      opacity: 1
+      }
+      body:not(.loaded) {
+      overflow: hidden
+      }
+      body.loaded>div.preloader {
+      animation: hidePreloader .5s linear .5s forwards
+      }
+    script.
+      window.addEventListener("load", function() {
+      setTimeout(function() {
+      document.querySelector("body").classList.add("loaded")
+      }, 300)
+      })
+    link(rel='icon', href='../assets/img/brand/favicon.png', type='image/png')
+    link(rel='stylesheet', href='../assets/libs/animate.css/animate.min.css')
+    link(rel='stylesheet', href='../assets/libs/fortawesome/fontawesome-free/css/all.min.css')
+    link#stylesheet(rel='stylesheet', href='../assets/css/quick-website.css')
+  body
+    .preloader
+      .spinner-border.text-primary(role='status')
+        span.sr-only Loading...
+    if user == null
+      include includes/header_public.pug
+    else
+      include includes/header_private.pug
+    section.slice.slice-lg.py-7.bg-cover.bg-size--cover
+      span.mask.bg-primary
+      .container.d-flex.align-items-center(data-offset-top='#navbar-main')
+        .col.py-5
+          .row.align-items-center.justify-content-center.mb-4
+            .col-md-7.col-lg-7.text-center
+              h1.display-4.text-white.mb-2
+                strong Контакты
+    section.slice.slice-lg
+      .container
+        .row
+          .col-lg-4
+            .card.text-center.hover-translate-y-n10.hover-shadow-lg(style="min-height: 370px")
+              .px-5.pb-5
+                .py-5
+                  .icon.text-primary.mx-auto
+                    i(data-feather='phone-call')
+                h5 Дежурный телефон
+                p.mt-2.mb-0 Доступность: пн-пт с 10 до 16
+                .mt-4
+                  a.link-underline-primary(href='tel: 8(495)6842250') 8 (495) 684-22-50
+          .col-lg-4
+            .card.text-center.hover-translate-y-n10.hover-shadow-lg(style="min-height: 370px")
+              .px-5.pb-5
+                .py-5
+                  .icon.text-primary.mx-auto
+                    i(data-feather='at-sign')
+                h5 Заведующий кафедрой
+                p.mt-2.mb-0 Лецкий Эдуард Константинович
+                .mt-4
+                  a.link-underline-primary(href='mailto:letzky@mail.ru') letzky@mail.ru
+          .col-lg-4
+            .card.text-center.hover-translate-y-n10.hover-shadow-lg(style="min-height: 370px")
+              .px-5.pb-5
+                .py-5 
+                  .icon.text-primary.mx-auto
+                    i(data-feather='users')
+                h5 Ответственный за учебную работу
+                p.mt-2.mb-0 Нуждин Олег Олегович
+                .mt-4
+                  a.link-underline-primary(href='mailto:oonuzhdin@mail.ru') oonuzhdin@mail.ru 
+    section.slice.slice-lg
+      .container
+        .row.row-grid.justify-content-between.align-items-center
+          .col-lg-5
+            h3
+              | улица Образцова 9, строение 9
+              br
+              | Москва, 127055
+              br
+              | ауд. 1312-1314, кафедра АСУ
+            p.lead.my-4
+              .icon.bg-dark.text-white.rounded-circle.icon-shape.shadow.mr-2
+                i(data-feather='users') 
+              a(href='mailto:oonuzhdin@mail.ru') oonuzhdin@mail.ru
+              br
+              .icon.bg-dark.text-white.rounded-circle.icon-shape.shadow.mt-2.mr-2
+                i(data-feather='at-sign') 
+              a(href='mailto: letzky@mail.ru ') letzky@mail.ru 
+              br
+              .icon.bg-dark.text-white.rounded-circle.icon-shape.shadow.mt-2.mr-2
+                i(data-feather='settings') 
+              a(href='mailto:ksndr.pdsh@gmail.com') ksndr.pdsh@gmail.com  
+              | -техническая поддержка
+              br
+              .icon.bg-dark.text-white.rounded-circle.icon-shape.shadow.mt-2.mr-2
+                i(data-feather='phone')
+              a(href='tel:84956842250') 8 (495) 684-22-50
+            p
+              | Хотите поделиться с нами обратной связью, сообщить о технической проблеме или просто задать нам вопрос? Свяжитесь с нами, и мы свяжемся с вами в ближайшее время.
+          .col-lg-6
+            div(style='height:600px')
+              iframe(src='https://yandex.ru/map-widget/v1/?um=constructor%3A48d59795cfe9426e5360dd3693a63a581d94f3420564999ef47ec6883a15d0ba&source=constructor', width='450', height='500', frameborder='0')
+    include includes/footer.pug
+    script(src='../assets/libs/jquery/dist/jquery.min.js')
+    script(src='../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js')
+    script(src='../assets/libs/svg-injector/dist/svg-injector.min.js')
+    script(src='../assets/libs/feather-icons/dist/feather.min.js')
+    script(src='../assets/libs/in-view/dist/in-view.min.js')
+    script(src='../assets/libs/sticky-kit/dist/sticky-kit.min.js')
+    script(src='../assets/libs/imagesloaded/imagesloaded.pkgd.min.js')
+    script(src='../assets/libs/bootstrap-notify/bootstrap-notify.min.js')
+    script(src='../assets/libs/autosize/dist/autosize.min.js')
+    script(src='../assets/js/quick-website.js')
+    script.
+      feather.replace({
+      width: "1em",
+      height: "1em"
+      })

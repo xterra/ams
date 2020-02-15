@@ -1,25 +1,117 @@
 doctype html
 html
-  head 
-    title 3{title}
+  head
+    meta(http-equiv='content-type', content='text/html;charset=utf-8')
+    meta(charset='utf-8')
+    meta(name='viewport', content='width=device-width,initial-scale=1,shrink-to-fit=no')
+    title #{title}
+    style.
+      @keyframes hidePreloader {
+      0% {
+      width: 100%;
+      height: 100%
+      }
+      100% {
+      width: 0;
+      height: 0
+      }
+      }
+      body>div.preloader {
+      position: fixed;
+      background: #fff;
+      width: 100%;
+      height: 100%;
+      z-index: 1071;
+      opacity: 0;
+      transition: opacity .5s ease;
+      overflow: hidden;
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+      justify-content: center
+      }
+      body:not(.loaded)>div.preloader {
+      opacity: 1
+      }
+      body:not(.loaded) {
+      overflow: hidden
+      }
+      body.loaded>div.preloader {
+      animation: hidePreloader .5s linear .5s forwards
+      }
+    script.
+      window.addEventListener("load", function() {
+      setTimeout(function() {
+      document.querySelector("body").classList.add("loaded")
+      }, 300)
+      })
+    link(rel='icon', href='../../assets/img/brand/favicon.png', type='image/png')
+    link(rel='stylesheet', href='../../assets/libs/fortawesome/fontawesome-free/css/all.min.css')
+    link#stylesheet(rel='stylesheet', href='../../assets/css/quick-website.css')
   body
-    h1 #{title}
-    form(method='POST' action='.')
-      p
-        label(for=title) Title:
-        input#title(type='text', placeholder='Title of news', name='title', value='')
-        br  
-        label(for=text) Text:
-        textarea#text(type='textarea', placeholder='Text of news', name='text', value='')
-        br
-        label(for=hidden) Hidden:
-        p 
-          input#hidden(type='radio', name='hidden', value='false', checked)
-          |No
-        p
-          input#hidden(type='radio', name='hidden', value='true')
-          |Yes
-        if errorMessage.length
-          p(style="color: red") #{errorMessage}          
-        input(type='submit', value='Confirm')
-      
+    .preloader
+      .spinner-border.text-primary(role='status')
+        span.sr-only Loading...
+    section
+      .container.d-flex.flex-column
+        .row.align-items-center.justify-content-center.min-vh-100
+          .col-md-6.col-lg-6.col-xl-6.py-6.py-md-0
+            div
+              .mb-5.text-center
+                h6.h3.mb-1 Создание новости
+              span.clearfix
+              if errorMessage.length
+                p.mb-0(style=" color: red")=errorMessage
+              form(action='.', method='POST')
+                .form-group
+                  label.form-control-label Заголовок
+                    span.text-danger *
+                  .input-group.input-group-merge
+                    input#title.form-control.form-control-prepend(type='text', placeholder='Заголовок новости', name='title', value='' required)
+                    .input-group-prepend
+                      span.input-group-text
+                        i(data-feather='align-left')
+                .form-group.mb-0
+                  .d-flex.align-items-center.justify-content-between
+                    div
+                      label.form-control-label Имя для ссылки
+                        span.text-danger *
+                  .input-group.input-group-merge
+                    input#url.form-control.form-control-prepend(type='text', placeholder='Короткое имя для URL', name='url', value='', required)
+                    .input-group-prepend
+                      span.input-group-text
+                        i(data-feather='at-sign')
+                .form-group.mb-0
+                  .d-flex.align-items-center.justify-content-between
+                    div
+                      label.form-control-label Краткое описание
+                  .input-group.input-group-merge
+                    textarea#short.form-control.form-control-prepend(type='textarea', placeholder='Краткое описание новости', name='short', value='', rows="2")
+                    .input-group-prepend
+                      span.input-group-text
+                        i(data-feather='align-justify')
+                .form-group.mb-0
+                  .d-flex.align-items-center.justify-content-between
+                    div
+                      label.form-control-label Основной текст
+                        span.text-danger *
+                  .input-group.input-group-merge
+                    textarea#text.form-control.form-control-prepend(type='textarea', placeholder='Текст новости', name='text', value='', rows="4" required)
+                    .input-group-prepend
+                      span.input-group-text
+                        i(data-feather='align-justify')
+                .mt-4
+                  button.btn.btn-block.btn-primary(type='submit') Создать
+    script(src='../../assets/libs/jquery/dist/jquery.min.js')
+    script(src='../../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js')
+    script(src='../../assets/libs/svg-injector/dist/svg-injector.min.js')
+    script(src='../../assets/libs/feather-icons/dist/feather.min.js')
+    script(src='../../assets/libs/in-view/dist/in-view.min.js')
+    script(src='../../assets/libs/sticky-kit/dist/sticky-kit.min.js')
+    script(src='../../assets/libs/imagesloaded/imagesloaded.pkgd.min.js')
+    script(src='../../assets/js/quick-website.js')
+    script.
+      feather.replace({
+      width: "1em",
+      height: "1em"
+      })

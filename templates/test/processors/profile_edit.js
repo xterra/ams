@@ -43,39 +43,97 @@ module.exports = {
             }
             try{
               let postData = qs.parse(data);
-              if(postData.username < 5){
+              if(postData.username.length < 5){
                 return callback({
-                  title: "Profile edit",
+                  title: "Изменение профиля",
                   adminInfo: adminInfo,
                   userInfo: userInfo,
                   errorMessage: "Логин слишком короткий!"
                 }, "profile_edit", 0, 0);
               }
-              db.collection("users").findOneAndUpdate({_id: userInfo._id}, {$set: {
-                email: postData.email,
-                phone: postData.phone,
-                username: postData.username,
-                securityRole: [postData.securityRole]
-              }}, function(err){
-                if(err){
-                  callback();
-                  return router.bleed(500, null, response, err);
-                }
-                if(postData.username == userInfo.username){
-                  callback();
-                  return router.bleed(301, `/profiles/${userInfo._id}/`, response);
-                } else{
-                  return db.collection("users").update({_id: userInfo._id}, {$push: {loginHistory: userInfo.username}}, function(err){
-                    if(err) {
-                      console.log(`Error in update login ${userInfo.username}`);
-                      callback();
-                      return router.bleed(500, null, response, err);
-                    }
+              if(postData.username.length > 16){
+                return callback({
+                  title: "Изменение профиля",
+                  adminInfo: adminInfo,
+                  userInfo: userInfo,
+                  errorMessage: "Логин слишком длинный!"
+                }, "profile_edit", 0, 0);
+              }
+              if(postData.username !== userInfo.username){
+                return db.collection("users").findOne({username: postData.username}, {_id:1}, null, function(err, foundUser){
+                  if(err){
                     callback();
-                    return router.bleed(301, `/profiles/${userInfo._id}/`, response);
+                    return router.bleed(500, null, response, err);
+                  }
+                  if(foundUser){
+                    return callback({
+                      title: "Изменение профиля",
+                      adminInfo: adminInfo,
+                      userInfo: userInfo,
+                      errorMessage: "Такой пользователь уже существует!"
+                    }, "profile_edit", 0, 0);
+                  }else{
+                    db.collection("users").findOneAndUpdate({_id: userInfo._id}, {$set: {
+                      email: postData.email,
+                      phone: postData.phone,
+                      lastName: postData.lastname,
+                      name: postData.name,
+                      fatherName: postData.fathername,
+                      username: postData.username,
+                      securityRole: [postData.securityRole]
+                    }}, function(err){
+                      if(err){
+                        callback();
+                        return router.bleed(500, null, response, err);
+                      }
+                      if(postData.username == userInfo.username){
+                        callback();
+                        return router.bleed(301, `/profiles/${userInfo._id}/`, response);
+                      } else{
+                        return db.collection("users").update({_id: userInfo._id}, {$push: {loginHistory: userInfo.username}}, function(err){
+                          if(err) {
+                            console.log(`Error in update login ${userInfo.username}`);
+                            callback();
+                            return router.bleed(500, null, response, err);
+                          }
+                          callback();
+                          return router.bleed(301, `/profiles/${userInfo._id}/`, response);
+                        });
+                      }
+                    });
+                  }
+                });
+              }
+              else {
+                    db.collection("users").findOneAndUpdate({_id: userInfo._id}, {$set: {
+                    email: postData.email,
+                    phone: postData.phone,
+                    lastName: postData.lastname,
+                    name: postData.name,
+                    fatherName: postData.fathername,
+                    username: postData.username,
+                    securityRole: [postData.securityRole]
+                    }}, function(err){
+                      if(err){
+                        callback();
+                        return router.bleed(500, null, response, err);
+                      }
+                      if(postData.username == userInfo.username){
+                        callback();
+                        return router.bleed(301, `/profiles/${userInfo._id}/`, response);
+                      } else{
+                        return db.collection("users").update({_id: userInfo._id}, {$push: {loginHistory: userInfo.username}}, function(err){
+                          if(err) {
+                            console.log(`Error in update login ${userInfo.username}`);
+                            callback();
+                            return router.bleed(500, null, response, err);
+                          }
+                          callback();
+                          return router.bleed(301, `/profiles/${userInfo._id}/`, response);
+                        });
+                      }
                   });
-                }
-              });
+              }
             }catch(err){
               console.log(`Error in profile_edit -> POST in try{}`);
               callback();
@@ -84,7 +142,7 @@ module.exports = {
           });
         } else{
           return callback({
-            title: "Profile edit",
+            title: "Изменение профиля",
             adminInfo: adminInfo,
             userInfo: userInfo,
             errorMessage: ""

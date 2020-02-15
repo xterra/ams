@@ -20,7 +20,6 @@ module.exports = {
         return router.bleed(301, "/disciplines/", response);
       }
       const disc_detail = result;
-      let userInfo = {};
       let disc_files = [];
       if( sessionContext !== undefined && sessionContext !== null && "login" in sessionContext){
         db.collection("users").findOne({username : sessionContext.login}, {securityRole : 1, username : 1}, function(err, result){
@@ -28,7 +27,7 @@ module.exports = {
             callback();
             return router.bleed(500, null, response, err);
           }
-          userInfo = result;
+          let userInfo = result;
           if(disc_detail.files.length == 0){
             return callback({
               title: "Discipline detail",
@@ -45,7 +44,7 @@ module.exports = {
             console.log(result);
             disc_files = result;
             return callback({
-              title: "Discipline detail",
+              title: "О дисциплине",
               userInfo: userInfo,
               discipline: disc_detail,
               files: disc_files
@@ -53,14 +52,8 @@ module.exports = {
           });
         });
       } else {
-        userInfo.username = "John Doe";
-        userInfo.securityRole = ["guest"];
-        callback({
-          title: "Discipline detail",
-          userInfo: userInfo,
-          discipline: disc_detail,
-          files: disc_files
-        }, "disc_detail", 0, 0);
+        callback();
+        return router.bleed(404, null, response);
       }
     });
   }

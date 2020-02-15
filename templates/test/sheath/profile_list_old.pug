@@ -1,0 +1,12 @@
+doctype html
+html
+  head
+    title #{title}
+  body
+    h1 #{title}
+    p #{userName}
+    ul
+    for user in profiles
+      a(href="/profiles/"+user._id+"/")
+        li #{user.username}
+       

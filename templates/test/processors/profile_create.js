@@ -19,7 +19,6 @@ module.exports = {
         return router.bleed(403, null, response);
       }
       if(request.method == "POST"){
-        /////
         router.downloadClientPostData(request, function(err, data){
           if(err){
             callback();
@@ -28,7 +27,7 @@ module.exports = {
           const postData = qs.parse(data);
           if(postData.username.length < 5 || postData.password.length < 8){
             return callback({
-              title: "New profile",
+              title: "Новый профиль",
               adminName: adminInfo.username,
               userInfo: postData,
               errorMessage: "Логин или пароль короткие!"
@@ -37,7 +36,7 @@ module.exports = {
 
           if(postData.username.length > 16 || postData.password.length > 64){
             return callback({
-              title: "New profile",
+              title: "Новый профиль",
               adminName: adminInfo.username,
               userInfo: postData,
               errorMessage: "Логин или пароль слишком длинные!"
@@ -51,7 +50,7 @@ module.exports = {
             }
             if(foundUser){
               return callback({
-                title: "New profile",
+                title: "Новый профиль",
                 adminName: adminInfo.username,
                 userInfo: postData,
                 errorMessage: "Такой пользователь уже существует!"
@@ -60,6 +59,9 @@ module.exports = {
               db.collection("users").insertOne({
                 email: postData.email,
                 phone: postData.phone,
+                lastName: postData.lastname,
+                name: postData.name,
+                fatherName: postData.fatherName,
                 username: postData.username,
                 password: cryptoPass,
                 accountCreated: new Date(),
@@ -80,7 +82,7 @@ module.exports = {
                 } else {
                     if(result.result.ok === 1) {
                       return callback({
-                        title: "New profile",
+                        title: "Новый профиль",
                         adminName: adminInfo.username,
                         userInfo: postData,
                         errorMessage: "Пользователь не создан... Попробуйте ещё раз!"
@@ -98,7 +100,7 @@ module.exports = {
         });
       } else{
           return callback({
-            title: "New profile",
+            title: "Новый профиль",
             adminName: adminInfo.username,
             userInfo: {},
             errorMessage: ""

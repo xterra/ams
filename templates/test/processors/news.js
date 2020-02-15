@@ -9,14 +9,19 @@ module.exports = {
         bleed(500, null, response, err);
       }
       const news = result;
-      let sessionLogin = "John Doe";
-      if(sessionContext !== undefined && sessionContext !== null && "login" in sessionContext){
-        sessionLogin = sessionContext.login;
-      }
+      if(sessionToken == null || sessionContext == undefined || sessionContext == null){
       callback({
+        title: "Новости",
         news: news,
-        sessionLogin: sessionLogin
-      }, "news", 0, 0);
+        user: null
+      }, "news", 5, 5);
+    } else{
+      callback({
+        title: "Новости",
+        news: news,
+        user: sessionContext.login
+      }, "news", 5, 5);
+    }
     });
   }
 }

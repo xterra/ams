@@ -2,13 +2,81 @@ doctype html
 html
   head
     title #{title}
+    style.
+      @keyframes hidePreloader {
+      0% {
+      width: 100%;
+      height: 100%
+      }
+      100% {
+      width: 0;
+      height: 0
+      }
+      }
+      body>div.preloader {
+      position: fixed;
+      background: #fff;
+      width: 100%;
+      height: 100%;
+      z-index: 1071;
+      opacity: 0;
+      transition: opacity .5s ease;
+      overflow: hidden;
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+      justify-content: center
+      }
+      body:not(.loaded)>div.preloader {
+      opacity: 1
+      }
+      body:not(.loaded) {
+      overflow: hidden
+      }
+      body.loaded>div.preloader {
+      animation: hidePreloader .5s linear .5s forwards
+      }
+    script.
+      window.addEventListener("load", function() {
+      setTimeout(function() {
+      document.querySelector("body").classList.add("loaded")
+      }, 300)
+      })
+    link(rel='icon', href='../../../assets/img/brand/favicon.png', type='image/png')
+    link(rel='stylesheet', href='../../../assets/libs/fortawesome/fontawesome-free/css/all.min.css')
+    link#stylesheet(rel='stylesheet', href='../../../assets/css/quick-website.css')
   body
-    h1 #{title}
-    p #{adminInfo.username}
-    hr
-    h2 Do you really want delete profile "#{userInfo.username}"?
-    a(href="/profiles/"+userInfo._id+"/")
-      button(type="button") Back to profile
-    form(action="" method="POST")
-      input(type="submit" value="Delete")
+    .preloader
+      .spinner-border.text-primary(role='status')
+        span.sr-only Loading...
+    .jumbotron.bg-light-secondary.shadow-lg.mb-0
+      .row.justify-content-center.py-8
+        .col-lg-8.text-center
+          h2.lh-160
+            | Вы точно хотите удалить пользователя 
+            br
+            strong "#{userInfo.username}" ?
+          .mt-5.row.justify-content-center
+            a.btn.btn-lg.btn-outline-primary.btn-icon.mr-3(href="/profiles/")
+              span.btn-inner--icon
+                i(data-feather='arrow-left')
+              span.btn-inner--text Отмена
+            form(action="" method="POST")
+              button.btn.btn-lg.btn-outline-danger(type="submit") Удалить
+    script(src='../../../assets/libs/jquery/dist/jquery.min.js')
+    script(src='../../../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js')
+    script(src='../../../assets/libs/svg-injector/dist/svg-injector.min.js')
+    script(src='../../../assets/libs/feather-icons/dist/feather.min.js')
+    script(src='../../../assets/libs/in-view/dist/in-view.min.js')
+    script(src='../../../assets/libs/sticky-kit/dist/sticky-kit.min.js')
+    script(src='../../../assets/libs/imagesloaded/imagesloaded.pkgd.min.js')
+    script(src='../../../assets/libs/swiper/dist/js/swiper.min.js')
+    script(src='../../../assets/libs/fancyapps/fancybox/dist/jquery.fancybox.min.js')
+    script(src='../../../assets/js/quick-website.js')
+    script.
+     feather.replace({
+     width: "1em",
+     height: "1em"
+     })
+
     

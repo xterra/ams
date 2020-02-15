@@ -1,0 +1,26 @@
+doctype html
+html
+  head
+    title #{title}
+    script(src="../../../script.js" type="text/javascript")
+  body
+    h1 #{title}
+    p #{userInfo.username}
+    hr
+    if message.length
+      p(style="color: green") #{message}
+        a(href="/disciplines/"+currentDisc)
+          button(type="button") Перейти к дисциплине
+    form#upload(action="" method="POST" enctype="")
+      label(for="discipline") Дисциплина: #{discipline.name}
+      br
+      input#myfile(type="file" name="myfile" onchange="selectedFile();" required="true")
+      div#fileSize
+      div#fileType
+      label(for="filename") Имя файла:
+      input#filename(type="text" name="filename" required="true")
+      br
+      label(for="comment") Комментарий:
+      textarea#comment(type="textarea" name="comment")
+      br
+      input(type="submit" value="Добавить")
