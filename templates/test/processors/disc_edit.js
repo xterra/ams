@@ -3,7 +3,7 @@ const qs = require('querystring'),
       security = require("../../../security");
 
 module.exports = {
-  path: new RegExp("^\/disciplines\/edit\/[^\/]+$"),
+  path: new RegExp("^\/disciplines\/edit\/[^\/]+\/$"),
   processor: function(request, response, callback, sessionContext, sessionToken, db){
     if(sessionToken == null || sessionContext == undefined || sessionContext == null){
       callback();
@@ -11,7 +11,7 @@ module.exports = {
     }
     requestedUrl = decodeURI(request.url);
     delimeteredUrl = requestedUrl.split("/");
-    disciplineAllias = delimeteredUrl[delimeteredUrl.length-1];
+    disciplineAllias = delimeteredUrl[delimeteredUrl.length-2];
 
     if(request.method == "POST"){
       return router.downloadClientPostData(request, function(err, data){
@@ -26,26 +26,17 @@ module.exports = {
           disc_detail.mnemo = postData.mnemo;
           disc_detail.allias =  postData.allias;
           disc_detail.description = postData.description;
-          disc_detail.course = postData.course;
-          if(disc_detail.name.length == 0 || disc_detail.description.length == 0 || disc_detail.allias.length == 0){
-            return callback({
-              title: "Изменение дисциплины",
-              discipline: disc_detail,
-              errorMessage: "New name, allias or description can't be empty!"
-            }, "disc_form", 0, 0);
-          }
           if(/[А-яЁё]/gi.test(disc_detail.allias)){
             return callback({
               title: "Изменение дисциплины",
               discipline: disc_detail,
-              errorMessage: "New allias can't exist russian symbols"
+              errorMessage: "Новое имя ссылки должно быть на английском!"
             }, "disc_form", 0, 0 );
           }
           db.collection("disciplines").findOneAndUpdate({allias: disciplineAllias}, { $set: {
             name: disc_detail.name,
             mnemo: disc_detail.mnemo,
             allias: disc_detail.allias,
-            course: disc_detail.course,
             description: disc_detail.description,
             dateUpdate: new Date(),
             lastEditor: postData.creator
@@ -65,7 +56,7 @@ module.exports = {
             console.log(result);
             console.log("Discipline updated!");
             callback();
-            return router.bleed(301, `/disciplines/${disc_detail.allias}`, response);
+            return router.bleed(301, `/disciplines/${disc_detail.allias}/`, response);
           });
         } catch(err){
           console.log(`Proccesor error disc_update: ${err}`);

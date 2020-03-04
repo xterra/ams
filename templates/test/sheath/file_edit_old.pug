@@ -11,7 +11,7 @@ html
       p(style="color: red") #{errorMessage}
     form#upload(action="" method="POST" enctype="")
       label(for="discipline") Discipline:
-      p#discipline(name="discipline") #{discpline.name}
+      p#discipline(name="discipline") #{discipline.name}
       br
       label(for="myfile") Refresh file:
       input#myfile(type="file" name="myfile" onchange="selectedFile();")

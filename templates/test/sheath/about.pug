@@ -1,54 +1,11 @@
 doctype html
 html
   head
-    meta(http-equiv='content-type', content='text/html;charset=utf-8')
-    meta(charset='utf-8')
-    meta(name='viewport', content='width=device-width,initial-scale=1,shrink-to-fit=no')
     title #{title}
-    style.
-      @keyframes hidePreloader {
-      0% {
-      width: 100%;
-      height: 100%
-      }
-      100% {
-      width: 0;
-      height: 0
-      }
-      }
-      body>div.preloader {
-      position: fixed;
-      background: #fff;
-      width: 100%;
-      height: 100%;
-      z-index: 1071;
-      opacity: 0;
-      transition: opacity .5s ease;
-      overflow: hidden;
-      pointer-events: none;
-      display: flex;
-      align-items: center;
-      justify-content: center
-      }
-      body:not(.loaded)>div.preloader {
-      opacity: 1
-      }
-      body:not(.loaded) {
-      overflow: hidden
-      }
-      body.loaded>div.preloader {
-      animation: hidePreloader .5s linear .5s forwards
-      }
-    script.
-      window.addEventListener("load", function() {
-      setTimeout(function() {
-      document.querySelector("body").classList.add("loaded")
-      }, 300)
-      })
-    link(rel='icon', href='../../assets/img/brand/favicon.png', type='image/png')
+    include includes/head_html.pug
     link(rel='stylesheet', href='../../assets/libs/fancyapps/fancybox/dist/jquery.fancybox.min.css')
     link(rel='stylesheet', href='../../assets/libs/fortawesome/fontawesome-free/css/all.min.css')
-    link#stylesheet(rel='stylesheet', href='../../assets/css/quick-website.css')
+    
   body
     .preloader
       .spinner-border.text-primary(role='status')
@@ -57,10 +14,9 @@ html
       include includes/header_public.pug
     else
       include includes/header_private.pug
-    section.slice.slice-lg.py-7.bg-cover.bg-size--cover
-      span.mask.bg-primary
+    section.slice.slice-lg.py-2.bg-cover.bg-size--cover.bg-primary
       .container.d-flex.align-items-center(data-offset-top='#navbar-main')
-        .col.py-5
+        .col
           .row.align-items-center.justify-content-center.mb-4
             .col-md-7.col-lg-7.text-center
               h1.display-4.text-white.mb-2
@@ -71,31 +27,31 @@ html
           .col-xl-8.col-lg-10.offset-xl-2.offset-lg-1
             article.text-justify
               h5.h3.text-center История
-              p.mt-4
+              p.mt-4.mb-4
                 | Кафедра “Автоматизированные системы управления” была образована в 1970 г. Её первым руководителем стал профессор, доктор технических наук А.Г. Мамиконов, затем кафедру возглавил профессор доктор технических наук Г.В. Дружинин. С 1990 г. кафедрой заведует профессор, доктор технических наук Э.К. Лецкий.
               .row.justify-content-center
                 .col-lg-7
-                  img.rounded.img-fluid(alt='Лецкий Э.К', src='../../assets/img/theme/light/letzky-600-400.png')
+                  img.rounded.img-fluid(alt='Лецкий Э.К', src='../../assets/img/about/letzky-600-400.png')
               .row.justify-content-center.mb-2
                 p(text-center='', text-muted='')
                   small Лецкий Эдуард Константинович
               h5.h3.text-center Выпускники
-              p.mt-4
+              p.mt-4.mb-4
                 | Кафедра АСУ готовит инженеров-системотехников по информационным технологиям.
                 | Основная задача системотехников — разработка информационных систем, эксплуатационное обслуживание и совершенствование  действующих информационных систем.
                 | За время работы кафедра подготовила около 3500 специалистов по проектированию информационных систем.
               .row.justify-content-center
                 .col-lg-7
-                  img.rounded.img-fluid(alt='Выпускники', src='../../assets/img/theme/light/asu-about-graduate.jpg')
+                  img.rounded.img-fluid(alt='Выпускники', src='../../assets/img/about/asu-about-graduate.jpg')
               .row.justify-content-center.mb-2
                 p(text-center='', text-muted='')
                   small Выпускники кафедры АСУ 2017 года
               h5.h3.text-center Разработки
-              p.mt-4
+              p.mt-4.mb-4
                 | Проводимые на кафедре научные исследования направлены на совершенствование методов расчета и проектирования автоматизированных систем обработки данных и управления (модели и методы оценки показателей качества информации, методы и средства оценки качества информационных образовательных ресурсов, методы и системы поддержки принятия решений при управлении железнодорожным транспортом, методы и средства построения и исследования моделей информационных систем, компьютерные технологии проектирования информационных систем).
               .row.justify-content-center
                 .col-lg-7
-                  img.rounded.img-fluid(alt='Центр обработки данных', src='../../assets/img/theme/light/asu-about-cod.png')
+                  img.rounded.img-fluid(alt='Центр обработки данных', src='../../assets/img/about/asu-about-cod.png')
               .row.justify-content-center.mb-2
                 p(text-center='', text-muted='')
                   small Демонстрация центра обработки данных РУТ(МИИТ)
@@ -104,7 +60,7 @@ html
               h5.h3.text-center Достижения
               p.mt-4
                 | Преподавателями кафедры АСУ в период 2000-2015 годы написано и издано свыше 15 монографий, в том числе, шесть учебников, более 50 учебный пособий и методических указаний. За время существования кафедры подготовлено 3 доктора технических наук, 12 кандидатов технических наук. В 2005, 2007 и 2008 годах кафедра «АСУ»
-                | была признана лучшей среди выпускающих кафедр в МИИТе
+                | была признана лучшей среди выпускающих кафедр в МИИТе.
     include includes/footer.pug
     script(src='../../assets/libs/jquery/dist/jquery.min.js')
     script(src='../../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js')
@@ -120,3 +76,4 @@ html
       width: "1em",
       height: "1em"
       })
+    include includes/yandex_metrika.pug

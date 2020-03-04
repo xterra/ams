@@ -1,57 +1,18 @@
 doctype html
 html
   head
-    meta(http-equiv='content-type', content='text/html;charset=utf-8')
-    meta(charset='utf-8')
-    meta(name='viewport', content='width=device-width,initial-scale=1,shrink-to-fit=no')
+    include includes/head_html.pug
     title #{title}
-    style.
-      @keyframes hidePreloader {
-      0% {
-      width: 100%;
-      height: 100%
-      }
-      100% {
-      width: 0;
-      height: 0
-      }
-      }
-      body>div.preloader {
-      position: fixed;
-      background: #fff;
-      width: 100%;
-      height: 100%;
-      z-index: 1071;
-      opacity: 0;
-      transition: opacity .5s ease;
-      overflow: hidden;
-      pointer-events: none;
-      display: flex;
-      align-items: center;
-      justify-content: center
-      }
-      body:not(.loaded)>div.preloader {
-      opacity: 1
-      }
-      body:not(.loaded) {
-      overflow: hidden
-      }
-      body.loaded>div.preloader {
-      animation: hidePreloader .5s linear .5s forwards
-      }
-    script.
-      window.addEventListener("load", function() {
-      setTimeout(function() {
-      document.querySelector("body").classList.add("loaded")
-      }, 300)
-      })
-    link(rel='icon', href='../../../assets/img/brand/favicon.png', type='image/png')
+    script(src="../../../../disc_script.js" type="text/javascript")
     link(rel='stylesheet', href='../../../assets/libs/fortawesome/fontawesome-free/css/all.min.css')
-    link#stylesheet(rel='stylesheet', href='../../../assets/css/quick-website.css')
   body
-    section
+    include includes/header_private.pug
+    section.slice.slice-lg.delimiter-bottom
+      a.btn.btn-neutral.btn-icon-only.rounded-circle.position-absolute.left-4.top-90.d-none.d-lg-inline-flex(href=(discipline===undefined ? "/disciplines/" : "/disciplines/"+discipline.allias+"/"))
+        span.btn-inner--icon
+          i(data-feather='arrow-left')
       .container.d-flex.flex-column
-        .row.align-items-center.justify-content-center.min-vh-100
+        .row.align-items-center.justify-content-center
           .col-md-6.col-lg-7.col-xl-8.py-6.py-md-0
             div
               .mb-5.text-center
@@ -66,7 +27,7 @@ html
                         label.form-control-label Имя дисциплины
                           span.text-danger *
                     .input-group.input-group-merge
-                      input#name.form-control.form-control-prepend(type='text', name="name", placeholder='Имя', required, value=(discipline===undefined ? "" : discipline.name))
+                      input#name.form-control.form-control-prepend(type='text', name="name", placeholder='Имя', required, value=(discipline===undefined ? "" : discipline.name), maxlength=120)
                       .input-group-prepend
                         span.input-group-text
                           i(data-feather='align-left')
@@ -77,7 +38,7 @@ html
                         label.form-control-label Аббревиатура
                           span.text-danger *
                     .input-group.input-group-merge
-                      input#mnemo.form-control.form-control-prepend(type='text', name="mnemo", placeholder='Краткое имя', required, value=(discipline===undefined ? "" : discipline.mnemo))
+                      input#mnemo.form-control.form-control-prepend(type='text', name="mnemo", placeholder='Краткое имя', required, value=(discipline===undefined ? "" : discipline.mnemo), maxlength=20)
                       .input-group-prepend
                         span.input-group-text
                           i(data-feather='minimize-2')
@@ -87,17 +48,7 @@ html
                         label.form-control-label Имя для ссылки(URL)
                           span.text-danger *
                     .input-group.input-group-merge
-                      input#allias.form-control.form-control-prepend(type='text', name="allias", placeholder='Короткое имя для ссылки', required, value=(discipline===undefined ? "" : discipline.allias))
-                      .input-group-prepend
-                        span.input-group-text
-                          i(data-feather='link')
-                  .col.form-group.mb-0
-                    .d-flex.align-items-center.justify-content-between
-                      div
-                        label.form-control-label Номер курса
-                          span.text-danger *
-                    .input-group.input-group-merge
-                      input#course.form-control.form-control-prepend(type='text', name="course", placeholder='Номер курса', required, value=(discipline===undefined ? "" : discipline.course))
+                      input#allias.form-control.form-control-prepend(type='text', name="allias", placeholder='Короткое имя для ссылки', required, value=(discipline===undefined ? "" : discipline.allias), , maxlength=30)
                       .input-group-prepend
                         span.input-group-text
                           i(data-feather='link')
@@ -106,12 +57,16 @@ html
                     div
                       label.form-control-label Описание дисциплины
                   .input-group.input-group-merge
-                    textarea#description.form-control.form-control-prepend(type='textarea', placeholder='Добавьте описание дисциплины', name='description', rows="4") #{discipline===undefined ? "" : discipline.description}
+                    textarea#description.form-control.form-control-prepend(type='textarea', placeholder='Добавьте описание дисциплины', name='description', rows="4", maxlength=300) #{discipline===undefined ? "" : discipline.description}
                     .input-group-prepend
                       span.input-group-text
                         i(data-feather='align-justify')    
-                .mt-4  
-                  button.btn.btn-block.btn-primary(type='submit') Подтвердить
+                .row.mt-4
+                  .col.form-group.mb-0
+                    button.btn.btn-block.btn-primary(type='submit') #{discipline===undefined ? "Создать" : "Изменить"}
+                  .col.form-group.mb-0
+                    a(href=(discipline===undefined ? "/disciplines/" : "/disciplines/"+discipline.allias+"/"))
+                      button.btn.btn-block.btn-secondary(type='button') Отмена
     script(src='../../../assets/libs/jquery/dist/jquery.min.js')
     script(src='../../../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js')
     script(src='../../../assets/libs/svg-injector/dist/svg-injector.min.js')
@@ -125,3 +80,4 @@ html
       width: "1em",
       height: "1em"
       })
+    include includes/yandex_metrika.pug

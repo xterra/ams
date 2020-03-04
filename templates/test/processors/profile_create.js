@@ -61,7 +61,7 @@ module.exports = {
                 phone: postData.phone,
                 lastName: postData.lastname,
                 name: postData.name,
-                fatherName: postData.fatherName,
+                fatherName: postData.fathername,
                 username: postData.username,
                 password: cryptoPass,
                 accountCreated: new Date(),

@@ -1,54 +1,10 @@
 doctype html
 html
   head
-    meta(http-equiv='content-type', content='text/html;charset=utf-8')
-    meta(charset='utf-8')
-    meta(name='viewport', content='width=device-width,initial-scale=1,shrink-to-fit=no')
     title #{title}
-    style.
-      @keyframes hidePreloader {
-      0% {
-      width: 100%;
-      height: 100%
-      }
-      100% {
-      width: 0;
-      height: 0
-      }
-      }
-      body>div.preloader {
-      position: fixed;
-      background: #fff;
-      width: 100%;
-      height: 100%;
-      z-index: 1071;
-      opacity: 0;
-      transition: opacity .5s ease;
-      overflow: hidden;
-      pointer-events: none;
-      display: flex;
-      align-items: center;
-      justify-content: center
-      }
-      body:not(.loaded)>div.preloader {
-      opacity: 1
-      }
-      body:not(.loaded) {
-      overflow: hidden
-      }
-      body.loaded>div.preloader {
-      animation: hidePreloader .5s linear .5s forwards
-      }
-    script.
-      window.addEventListener("load", function() {
-      setTimeout(function() {
-      document.querySelector("body").classList.add("loaded")
-      }, 300)
-      })
-    link(rel='icon', href='../assets/img/brand/favicon.png', type='image/png')
+    include includes/head_html.pug
     link(rel='stylesheet', href='../assets/libs/animate.css/animate.min.css')
     link(rel='stylesheet', href='../assets/libs/fortawesome/fontawesome-free/css/all.min.css')
-    link#stylesheet(rel='stylesheet', href='../assets/css/quick-website.css')
   body
     .preloader
       .spinner-border.text-primary(role='status')
@@ -57,79 +13,118 @@ html
       include includes/header_public.pug
     else
       include includes/header_private.pug
-    section.slice.slice-lg.py-7.bg-cover.bg-size--cover
-      span.mask.bg-primary
+    section.slice.slice-lg.py-2.bg-cover.bg-size--cover.bg-primary
       .container.d-flex.align-items-center(data-offset-top='#navbar-main')
-        .col.py-5
+        .col
           .row.align-items-center.justify-content-center.mb-4
             .col-md-7.col-lg-7.text-center
               h1.display-4.text-white.mb-2
                 strong Контакты
     section.slice.slice-lg
       .container
-        .row
+        .row.row-grid.align-items-center
+          .col-xl-8.col-lg-10.offset-xl-2.offset-lg-1
+            h5.h3.text-center К кому обращаться
+        .row.row-grid.align-items-center
           .col-lg-4
-            .card.text-center.hover-translate-y-n10.hover-shadow-lg(style="min-height: 370px")
-              .px-5.pb-5
-                .py-5
-                  .icon.text-primary.mx-auto
-                    i(data-feather='phone-call')
-                h5 Дежурный телефон
-                p.mt-2.mb-0 Доступность: пн-пт с 10 до 16
-                .mt-4
-                  a.link-underline-primary(href='tel: 8(495)6842250') 8 (495) 684-22-50
+            a(href='admin@miitasu.ru')
+              .card.text-center.hover-translate-y-n10.hover-shadow-lg(style="min-height: 370px")
+                .px-5.pb-5
+                  .py-5
+                    .icon.text-primary.mx-auto
+                      i(data-feather='settings')
+                  h5 Администратор сайта
+                  p.mt-2.mb-0 Техническая поддрежка
+                  br
+                  .mt-4
+                    a.link-underline-primary(href='admin@miitasu.ru') admin@miitasu.ru
           .col-lg-4
-            .card.text-center.hover-translate-y-n10.hover-shadow-lg(style="min-height: 370px")
-              .px-5.pb-5
-                .py-5
-                  .icon.text-primary.mx-auto
-                    i(data-feather='at-sign')
-                h5 Заведующий кафедрой
-                p.mt-2.mb-0 Лецкий Эдуард Константинович
-                .mt-4
-                  a.link-underline-primary(href='mailto:letzky@mail.ru') letzky@mail.ru
+            a(href='mailto:letzky@mail.ru')
+              .card.text-center.hover-translate-y-n10.hover-shadow-lg(style="min-height: 370px")
+                .px-5.pb-5
+                  .py-5
+                    .icon.text-primary.mx-auto
+                      i(data-feather='at-sign')
+                  h5 Заведующий кафедрой
+                  p.mt-2.mb-0 Лецкий Эдуард Константинович
+                  br
+                  .mt-4
+                    a.link-underline-primary(href='mailto:letzky@mail.ru') letzky@mail.ru
           .col-lg-4
-            .card.text-center.hover-translate-y-n10.hover-shadow-lg(style="min-height: 370px")
-              .px-5.pb-5
-                .py-5 
-                  .icon.text-primary.mx-auto
-                    i(data-feather='users')
-                h5 Ответственный за учебную работу
-                p.mt-2.mb-0 Нуждин Олег Олегович
-                .mt-4
-                  a.link-underline-primary(href='mailto:oonuzhdin@mail.ru') oonuzhdin@mail.ru 
+            a(href='mailto:oonuzhdin@mail.ru')
+              .card.text-center.hover-translate-y-n10.hover-shadow-lg(style="min-height: 370px")
+                .px-5.pb-5
+                  .py-5 
+                    .icon.text-primary.mx-auto
+                      i(data-feather='users')
+                  h5 Ответственный за учебную работу
+                  p.mt-2.mb-0 Нуждин Олег Олегович
+                  .mt-4
+                    a.link-underline-primary(href='mailto:oonuzhdin@mail.ru') oonuzhdin@mail.ru
     section.slice.slice-lg
       .container
         .row.row-grid.justify-content-between.align-items-center
-          .col-lg-5
-            h3
-              | улица Образцова 9, строение 9
-              br
-              | Москва, 127055
-              br
-              | ауд. 1312-1314, кафедра АСУ
-            p.lead.my-4
-              .icon.bg-dark.text-white.rounded-circle.icon-shape.shadow.mr-2
-                i(data-feather='users') 
-              a(href='mailto:oonuzhdin@mail.ru') oonuzhdin@mail.ru
-              br
-              .icon.bg-dark.text-white.rounded-circle.icon-shape.shadow.mt-2.mr-2
-                i(data-feather='at-sign') 
-              a(href='mailto: letzky@mail.ru ') letzky@mail.ru 
-              br
-              .icon.bg-dark.text-white.rounded-circle.icon-shape.shadow.mt-2.mr-2
-                i(data-feather='settings') 
-              a(href='mailto:ksndr.pdsh@gmail.com') ksndr.pdsh@gmail.com  
-              | -техническая поддержка
-              br
-              .icon.bg-dark.text-white.rounded-circle.icon-shape.shadow.mt-2.mr-2
-                i(data-feather='phone')
-              a(href='tel:84956842250') 8 (495) 684-22-50
-            p
-              | Хотите поделиться с нами обратной связью, сообщить о технической проблеме или просто задать нам вопрос? Свяжитесь с нами, и мы свяжемся с вами в ближайшее время.
           .col-lg-6
-            div(style='height:600px')
-              iframe(src='https://yandex.ru/map-widget/v1/?um=constructor%3A48d59795cfe9426e5360dd3693a63a581d94f3420564999ef47ec6883a15d0ba&source=constructor', width='450', height='500', frameborder='0')
+            h5.h3 Контактный телефон
+            p 8 (495) 684-22-50 
+            | доступность: пн-пт с 10:00 до 16:00
+          .col-lg-6
+            h5.h3 Полезные ссылки
+            p
+              a(href="https://rut-miit.ru", target="_blank") rut-miit.ru
+              | - официальный сайт РУТ(МИИТ)
+            p
+              a(href="http://imiit.ru/", target="_blank") imiit.ru
+              | - сайт института управления и информационных технологий
+    section.slice.slice-lg
+      .container
+        .row.row-grid.align-items-center
+          .col-xl-8.col-lg-10.offset-xl-2.offset-lg-1
+            h5.h3.text-center Как добраться
+        .row.row-grid.justify-content-between.align-items-center
+          .col-lg-6
+            h4.mt-0
+              | Москва, улица Образцова 9 ст.9 (корпус №1), 127055
+              br
+              | 3 этаж, ауд. 1312-1314, кафедра АСУ
+            #accordionExample.accordion
+              .card
+                #headingOne.card-header
+                  h2.mb-0.py-0
+                    button.btn.btn-link(type='button', data-toggle='collapse', data-target='#collapseOne', aria-expanded='false'  aria-controls='collapseOne', style="color: darkorange")
+                      | от станции метро "Новослободская" на трамвае
+                #collapseOne.collapse(aria-labelledby='headingOne', data-parent='#accordionExample')
+                  .card-body
+                    | от станции метро "Новослободская" (выход №1) пройти 200 метров до остановки "метро Новослобоская", затем на трамвае № 50 до остановки "МИИТ", после пройти 100 метров до КПП.
+              .card
+                #headingTwo.card-header
+                  h2.mb-0
+                    button.btn.btn-link.collapsed(type='button', data-toggle='collapse', data-target='#collapseTwo', aria-expanded='false', aria-controls='collapseTwo', style="color: maroon")
+                      | от станции метро "Новослободская" пешком
+                #collapseTwo.collapse(aria-labelledby='headingTwo', data-parent='#accordionExample')
+                  .card-body
+                    | от станции метро "Новослобоская" (выход №1) пешком 15 минут.
+              .card
+                #headingThree.card-header
+                  h2.mb-0
+                    button.btn.btn-link.collapsed(type='button', data-toggle='collapse', data-target='#collapseThree', aria-expanded='false', aria-controls='collapseThree', style="color: blue")
+                      | от станции метро "Достоевская" на трамвае
+                #collapseThree.collapse(aria-labelledby='headingThree', data-parent='#accordionExample')
+                  .card-body
+                    | от станции метро "Достоевская" (выход №1 к театру Российской армии) пройти 300 метров до остановки "улица Достоевского", затем на трамвае №50 до остановки "МИИТ", после пройти 200 метров до КПП.
+              .card
+                #headingFour.card-header
+                  h2.mb-0
+                    button.btn.btn-link.collapsed(type='button', data-toggle='collapse', data-target='#collapseFour', aria-expanded='false', aria-controls='collapseFour', style="color: green")
+                      | от станции метро "Достоевская" пешком
+                #collapseFour.collapse(aria-labelledby='headingFour', data-parent='#accordionExample')
+                  .card-body
+                    | от станции метро "Достоевская" (выход №1 к театру Российской армии), 10-12 минут пешком.     
+            h5.mt-3.text-center Важно
+            p.text-center При себе необходимо иметь паспорт для прохода на территорию университета через КПП.              
+          .col-lg-6
+            div
+              iframe(src='https://yandex.ru/map-widget/v1/?um=constructor%3A48d59795cfe9426e5360dd3693a63a581d94f3420564999ef47ec6883a15d0ba&source=constructor', width='450', height='600', frameborder='0')
     include includes/footer.pug
     script(src='../assets/libs/jquery/dist/jquery.min.js')
     script(src='../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js')
@@ -146,3 +141,4 @@ html
       width: "1em",
       height: "1em"
       })
+    include includes/yandex_metrika.pug

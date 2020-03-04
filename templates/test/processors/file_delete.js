@@ -1,7 +1,9 @@
 const fs = require("fs"),
-      router = require('../../../router');
+      router = require('../../../router'),
+      path = require("path"),
+      ini = require('ini');
 module.exports = {
-  path: new RegExp("^\/file\/delete\/[^\/]+\/[^\/]+$"),
+  path: new RegExp("^\/file\/delete\/[^\/]+\/[^\/]+\/$"),
   processor: function(request, response, callback, sessionContext, sessionToken, db){
     if(sessionToken == null || sessionContext == undefined || sessionContext == null){
       callback();
@@ -20,8 +22,8 @@ module.exports = {
       }
       let requestedUrl = decodeURI(request.url);
       let delimeteredUrl = requestedUrl.split("/");
-      let requestFileName = delimeteredUrl[delimeteredUrl.length - 1];
-      let disciplineAllias = delimeteredUrl[delimeteredUrl.length - 2];
+      let requestFileName = delimeteredUrl[delimeteredUrl.length - 2];
+      let disciplineAllias = delimeteredUrl[delimeteredUrl.length - 3];
       console.log(requestFileName);
       return db.collection("files").findOne({_id: requestFileName}, function(err, result){
           if(err){
@@ -35,7 +37,11 @@ module.exports = {
           }
           let fileInfo = result;
           if(request.method == "POST"){
-            const PATH_TO_FILES = "D:/1_swenkal/Projects/ams/data/private/files";
+            const storageConfigurations = ini.parse(fs.readFileSync(path.join(__dirname, "../../../" , "configurations", "storage.ini"), "utf-8"));
+            console.log(storageConfigurations['data']['location']);
+            const STORAGE_DATA_LOCATION = process.env['STORAGE_DATA_LOCATION'] ? `${process.env['STORAGE_DATA_LOCATION']}/private` : '';
+            console.log(`STORAGE_DATA_LOCATION: ${STORAGE_DATA_LOCATION}`);
+            const PATH_TO_FILES = STORAGE_DATA_LOCATION || storageConfigurations['data']['location'] || path.join(__dirname, "../../../", "/data/private");
             const dirName = requestFileName.substr(0,2);
             fs.unlink(`${PATH_TO_FILES}/${dirName}/${requestFileName}`, function(err){
               if(err){
@@ -61,10 +67,10 @@ module.exports = {
             }catch(err){
               console.log(`Deleting file error: ${err}`);
               return callback({
-                title: "Delete file",
-                userInfo: userInfo,
+                title: "Удаление файла",
+                disciplineAllias: disciplineAllias,
                 file: fileInfo,
-                errorMessage: "Something wrong with deleting file."
+                errorMessage: "Что-то не так с удалением файла"
               }, "file_delete", 0, 0);
             }
           return db.collection("disciplines").update({files: requestFileName}, {$pull: { files: requestFileName}}, function(err){
@@ -73,12 +79,12 @@ module.exports = {
                 return router.bleed(500, null, response, err);
               }
               callback();
-              return router.bleed(301, `/disciplines/${disciplineAllias}`, response);
+              return router.bleed(301, `/disciplines/${disciplineAllias}/`, response);
             });
           } else{
             return callback({
-              title: "Delete file",
-              userInfo: userInfo,
+              title: "Удаление файла",
+              disciplineAllias: disciplineAllias,
               file: fileInfo,
               errorMessage: ""
             }, "file_delete", 0, 0);

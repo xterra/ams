@@ -2,25 +2,75 @@ doctype html
 html
   head
     title #{title}
-    script(src="../../../script.js" type="text/javascript")
+    script(src="../../../../upload_script.js" type="text/javascript")
+    include includes/head_html.pug
+    link(rel='stylesheet', href='../../../../assets/libs/fortawesome/fontawesome-free/css/all.min.css')
   body
-    h1 #{title}
-    p #{userInfo.username}
-    hr
-    if errorMessage.length
-      p(style="color: red") #{errorMessage}
-    form#upload(action="" method="POST" enctype="")
-      label(for="discipline") Discipline:
-      p#discipline(name="discipline") #{discpline.name}
-      br
-      label(for="myfile") Refresh file:
-      input#myfile(type="file" name="myfile" onchange="selectedFile();")
-      div#fileSize
-      div#fileType
-      label(for="filename") File name:
-      input#filename(type="text" name="filename" value=(fileInfo===undefined ? "" : fileInfo.name))
-      br
-      label(for="comment") Comment:
-      textarea#comment(type="textarea" name="comment") #{fileInfo===undefined ? "" : fileInfo.comment}
-      br
-      input(type="submit" value="Update file")
+    include includes/header_private.pug
+    section
+      a.btn.btn-neutral.btn-icon-only.rounded-circle.position-absolute.left-4.top-90.d-none.d-lg-inline-flex(href="/disciplines/"+discipline.allias+"/")
+        span.btn-inner--icon
+          i(data-feather='arrow-left')
+      .container.d-flex.flex-column
+        .row.align-items-center.justify-content-center
+          .col-md-6.col-lg-7.col-xl-8.py-6.py-md-0
+            div
+              .mb-5.text-center
+                h6.h3.mb-1 #{title}
+              span.clearfix
+              if errorMessage.length
+                p(style="color: red") #{errorMessage}
+              form#upload(action='', method='POST' enctype="")
+                .form-group.mb-0
+                    .d-flex.align-items-center
+                      div
+                        p#discipline.form-control-label(name="discipline")  Дисциплина: #{discipline.name}
+                .form-group.mb-0
+                    .d-flex.align-items-center.justify-content-between
+                      div
+                        label.form-control-label Обновить файл
+                        input#myfile.custom-input-file(type='file', name='myfile', onchange="selectedFile();")
+                        label(for='myfile')
+                          i.ml-0.mr-2(data-feather='upload')
+                          span Выберите файл
+                div#fileSize
+                div#fileType
+                .form-group.mb-0
+                    .d-flex.align-items-center.justify-content-between
+                      div
+                        label.form-control-label Имя файла
+                          span.text-danger *
+                    .input-group.input-group-merge
+                      input#filename.form-control.form-control-prepend(type='text', name="filename", placeholder='Имя файла', required, value=(fileInfo===undefined ? "" : fileInfo.name), maxlength=100)
+                      .input-group-prepend
+                        span.input-group-text
+                          i(data-feather='file-text')
+                .form-group.mb-0
+                  .d-flex.align-items-center.justify-content-between
+                    div
+                      label.form-control-label Комментарий
+                  .input-group.input-group-merge
+                    textarea#comment.form-control.form-control-prepend(type="textarea" name="comment", placeholder='Добавьте описание файла', rows="3", maxlength=150) #{fileInfo===undefined ? "" : fileInfo.comment}
+                    .input-group-prepend
+                      span.input-group-text
+                        i(data-feather='align-justify')    
+                .row.mt-4  
+                  .col.form-group.mb-0
+                    button.btn.btn-block.btn-primary(type='submit') Изменить
+                  .col.form-group.mb-0
+                    a(href="/disciplines/"+discipline.allias+"/")
+                      button.btn.btn-block.btn-secondary(type='button') Отмена
+    script(src='../../../../assets/libs/jquery/dist/jquery.min.js')
+    script(src='../../../../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js')
+    script(src='../../../../assets/libs/svg-injector/dist/svg-injector.min.js')
+    script(src='../../../../assets/libs/feather-icons/dist/feather.min.js')
+    script(src='../../../../assets/libs/in-view/dist/in-view.min.js')
+    script(src='../../../../assets/libs/sticky-kit/dist/sticky-kit.min.js')
+    script(src='../../../../assets/libs/imagesloaded/imagesloaded.pkgd.min.js')
+    script(src='../../../../assets/js/quick-website.js')
+    script.
+      feather.replace({
+      width: "1em",
+      height: "1em"
+      })
+    include includes/yandex_metrika.pug

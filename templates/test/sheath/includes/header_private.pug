@@ -1,8 +1,8 @@
-header#header-main.header-transparent
+header#header-main.header-transparent.bg-primary
   nav#navbar-main.navbar.navbar-main.navbar-expand-lg.navbar-dark.bg-dark
     .container
       a.navbar-brand(href='/')
-        img(alt='Логотип', src='../../../../assets/img/brand/asu-logo-main-beta-small.png')
+        img(alt='Логотип', src='../../../../assets/img/logo/asu-main-beta-small.png')
       button.navbar-toggler(type='button', data-toggle='collapse', data-target='#navbar-main-collapse', aria-controls='navbar-main-collapse', aria-expanded='false', aria-label='Toggle navigation')
         span.navbar-toggler-icon
       #navbar-main-collapse.collapse.navbar-collapse.navbar-collapse-overlay
@@ -24,4 +24,9 @@ header#header-main.header-transparent
             a.nav-link(href='/contacts/') Контакты
         ul.navbar-nav.align-items-lg-center.d-none.d-lg-flex.ml-lg-auto
           li.nav-item
-            a.nav-link(href='/login/') Вход
+            a.nav-link(href='/profile/') Профиль
+          li.nav-item
+            a.nav-link(href='/logout/') Выход
+        .d-lg-none.px-4.text-center
+          a.btn.btn-block.btn-sm.btn-primary(href='/profile/') Профиль
+          a.btn.btn-block.btn-sm.btn-primary(href='/logout/') Выход

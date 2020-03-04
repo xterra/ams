@@ -1,0 +1,94 @@
+doctype html
+html
+  head
+    title #{title}
+    include includes/head_html.pug
+    link(rel='stylesheet', href='../assets/libs/animate.css/animate.min.css')
+    link(rel='stylesheet', href='../assets/libs/fortawesome/fontawesome-free/css/all.min.css')
+  body
+    .preloader
+      .spinner-border.text-primary(role='status')
+        span.sr-only Loading...
+    if user == null
+      include includes/header_public.pug
+    else
+      include includes/header_private.pug
+    section.slice.slice-lg.py-2.bg-cover.bg-size--cover.bg-primary
+      .container.d-flex.align-items-center(data-offset-top='#navbar-main')
+        .col
+          .row.align-items-center.justify-content-center.mb-4
+            .col-md-7.col-lg-7.text-center
+              h1.display-4.text-white.mb-2
+                strong Контакты
+    section.slice.slice-lg
+      .container
+        .row
+          .col-lg-4
+            a(href='tel: 8(495)6842250')
+              .card.text-center.hover-translate-y-n10.hover-shadow-lg(style="min-height: 370px")
+                .px-5.pb-5
+                  .py-5
+                    .icon.text-primary.mx-auto
+                      i(data-feather='phone-call')
+                  h5 Дежурный телефон
+                  p.mt-2.mb-0 Доступность: пн-пт с 10:00 до 16:00
+                  .mt-4
+                    a.link-underline-primary(href='tel: 8(495)6842250') 8 (495) 684-22-50
+          .col-lg-4
+            a(href='mailto:letzky@mail.ru')
+              .card.text-center.hover-translate-y-n10.hover-shadow-lg(style="min-height: 370px")
+                .px-5.pb-5
+                  .py-5
+                    .icon.text-primary.mx-auto
+                      i(data-feather='at-sign')
+                  h5 Заведующий кафедрой
+                  p.mt-2.mb-0 Лецкий Эдуард Константинович
+                  br
+                  .mt-4
+                    a.link-underline-primary(href='mailto:letzky@mail.ru') letzky@mail.ru
+          .col-lg-4
+            a(href='mailto:oonuzhdin@mail.ru')
+              .card.text-center.hover-translate-y-n10.hover-shadow-lg(style="min-height: 370px")
+                .px-5.pb-5
+                  .py-5 
+                    .icon.text-primary.mx-auto
+                      i(data-feather='users')
+                  h5 Ответственный за учебную работу
+                  p.mt-2.mb-0 Нуждин Олег Олегович
+                  .mt-4
+                    a.link-underline-primary(href='mailto:oonuzhdin@mail.ru') oonuzhdin@mail.ru 
+    section.slice.slice-lg
+      .container
+        .row.row-grid.justify-content-between.align-items-center
+          .col-lg-5
+            h3
+              | Москва, улица Образцова 9 ст.9 (РУТ), 127055
+              br
+              | ауд. 1312-1314, кафедра АСУ
+            p
+              | Хотите поделиться обратной связью, сообщить о технической проблеме или просто задать вопрос? Свяжитесь с нами, и мы ответим Вам в ближайшее время.
+            p.lead.my-4
+              .icon.bg-dark.text-white.rounded-circle.icon-shape.shadow.mr-2
+                i(data-feather='info') 
+              a(href='https://rut-miit.ru/', target='_blank') rut-miit.ru
+              | - официальный сайт РУТ(МИИТ)
+          .col-lg-6
+            div(style='height:600px')
+              iframe(src='https://yandex.ru/map-widget/v1/?um=constructor%3A48d59795cfe9426e5360dd3693a63a581d94f3420564999ef47ec6883a15d0ba&source=constructor', width='450', height='500', frameborder='0')
+    include includes/footer.pug
+    script(src='../assets/libs/jquery/dist/jquery.min.js')
+    script(src='../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js')
+    script(src='../assets/libs/svg-injector/dist/svg-injector.min.js')
+    script(src='../assets/libs/feather-icons/dist/feather.min.js')
+    script(src='../assets/libs/in-view/dist/in-view.min.js')
+    script(src='../assets/libs/sticky-kit/dist/sticky-kit.min.js')
+    script(src='../assets/libs/imagesloaded/imagesloaded.pkgd.min.js')
+    script(src='../assets/libs/bootstrap-notify/bootstrap-notify.min.js')
+    script(src='../assets/libs/autosize/dist/autosize.min.js')
+    script(src='../assets/js/quick-website.js')
+    script.
+      feather.replace({
+      width: "1em",
+      height: "1em"
+      })
+    include includes/yandex_metrika.pug

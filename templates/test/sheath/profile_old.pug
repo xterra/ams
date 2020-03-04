@@ -23,6 +23,12 @@ html
                   |  #{profileInfo.name} #{profileInfo.fatherName}
                 -let role = { "student": "Студент", "teacher": "Сотрудник кафедры", "admin": "admin", "superadmin": "superadmin"}
                 span.text-muted.d-block #{role[profileInfo.securityRole[0]]}
+              if profileInfo.securityRole.includes('superadmin')
+                .col-auto
+                  a(href="/profiles/edit/"+profileInfo._id+"/")
+                    button.btn.btn-primary.btn-icon.rounded-pill(type='button')
+                      span.btn-inner--icon
+                        i(data-feather='edit-2')
     section.slice.slice-sm.bg-section-secondary
       .container
         .row.justify-content-center
@@ -63,7 +69,6 @@ html
                   button.btn.btn-outline-primary(type='button') Сменить пароль
                 a.ml-1(href="/logout/")
                   button.btn.btn-outline-danger(type='button') Выход из профиля          
-    include includes/footer.pug
     script(src='../../assets/libs/jquery/dist/jquery.min.js')
     script(src='../../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js')
     script(src='../../assets/libs/svg-injector/dist/svg-injector.min.js')
@@ -78,4 +83,3 @@ html
       width: "1em",
       height: "1em"
       })
-    include includes/yandex_metrika.pug

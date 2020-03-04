@@ -9,77 +9,66 @@ module.exports = {
       callback();
       return router.bleed(301, "/login/", response);
     }
-    if(request.method == "POST"){
-      console.log(request);
-      return router.downloadClientPostData(request, function(err, data){
-        if(err){
-          callback();
-          return router.bleed(400, null, response, err);
-        }
-        try{
-          const postData = qs.parse(data);
-          let disc_detail = {};
-          disc_detail.name = postData.name;
-          disc_detail.mnemo = postData.mnemo;
-          disc_detail.allias =  postData.allias;
-          disc_detail.course = postData.course;
-          disc_detail.description = postData.description;
-          //TODO: use one pug pattern to update and create form!
-          if(disc_detail.name.length == 0 || disc_detail.description.length == 0 || disc_detail.allias.length == 0){
-            return callback({
-              title: "Новая дисциплина",
-              discipline: disc_detail,
-              creatorId: postData.creator,
-              errorMessage: "Name, allias or description can't be empty!"
-            }, "disc_form", 0, 0);
-          }
-          console.log("allias: " + disc_detail.allias);
-          if(/[А-яЁё]/gi.test(disc_detail.allias)){
-            return callback({
-              title: "Новая дисциплина",
-              discipline: disc_detail,
-              creatorId: postData.creator,
-              errorMessage: "Allias can't exist russian symbols"
-            }, "disc_form", 0, 0 );
-          }
-          db.collection("disciplines").insertOne({
-            name: disc_detail.name,
-            mnemo: disc_detail.mnemo,
-            allias: disc_detail.allias,
-            course: disc_detail.course,
-            description: disc_detail.description,
-            creator: postData.creator,
-            dateCreate: new Date(),
-            dateUpdate: new Date(),
-            lastEditor: postData.creator,
-            editors: [postData.creator],
-            files: []
-          }, function(err){
-            if(err) {
-              callback();
-              return router.bleed(500, null, response, err);
-            }
-            console.log("Discipline created!");
-            callback();
-            return router.bleed(301, "/disciplines/", response);
-          });
-        } catch(err){
-          console.log(`Processor error news_create: ${err}`);
-          callback();
-          return router.bleed(500, null, response, err);
-        }
-      }, 512);
-    }
-    db.collection("users").findOne({username : sessionContext.login}, {_id : 1}, function(err, userId){
+    db.collection("users").findOne({username : sessionContext.login}, {username : 1, securityRole: 1}, function(err, result){
       if(err){
         callback();
         router.bleed(500, null, response, err);
       }
-      callback({
-        title: "Новая дисциплина",
-        creatorId: userId._id,
-        errorMessage: ""
-      }, "disc_form", 0, 0);
-    })
+      const userInfo = result;
+      if(userInfo.securityRole.length == 0 || (!userInfo.securityRole.includes("superadmin") && !userInfo.securityRole.includes("teacher"))){
+        callback();
+        return router.bleed(403, null, response);
+      }
+      if(request.method == "POST"){
+        console.log(request);
+        return router.downloadClientPostData(request, function(err, data){
+          if(err){
+            callback();
+            return router.bleed(400, null, response, err);
+          }
+          try{
+            const postData = qs.parse(data);
+
+            console.log("allias: " + postData.allias);
+            if(/[А-яЁё]/gi.test(postData.allias)){
+              return callback({
+                title: "Новая дисциплина",
+                discipline: postData,
+                errorMessage: "Краткое имя ссылки должно быть на английском!"
+              }, "disc_form", 0, 0 );
+            }
+            db.collection("disciplines").insertOne({
+              name: postData.name,
+              mnemo: postData.mnemo,
+              allias: postData.allias,
+              description: postData.description,
+              creator: userInfo._id.toString(),
+              dateCreate: new Date(),
+              dateUpdate: new Date(),
+              lastEditor: userInfo._id.toString(),
+              editors: [userInfo._id.toString()],
+              files: []
+            }, function(err){
+              if(err) {
+                callback();
+                return router.bleed(500, null, response, err);
+              }
+              console.log("Discipline created!");
+              callback();
+              return router.bleed(301, "/disciplines/", response);
+            });
+          } catch(err){
+            console.log(`Processor error news_create: ${err}`);
+            callback();
+            return router.bleed(500, null, response, err);
+          }
+        }, 512);
+      } else {
+        return callback({
+          title: "Новая дисциплина",
+          errorMessage: ""
+        }, "disc_form", 0, 0);
+      }
+    });
   }
 }

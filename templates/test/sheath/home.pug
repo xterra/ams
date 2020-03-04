@@ -1,53 +1,10 @@
 doctype html
-html(lang='en')
+html
   head
-    meta(charset='utf-8')
-    meta(name='viewport', content='width=device-width,initial-scale=1,shrink-to-fit=no')
-    title Главная
-    style.
-      @keyframes hidePreloader {
-      0% {
-      width: 100%;
-      height: 100%
-      }
-      100% {
-      width: 0;
-      height: 0
-      }
-      }
-      body>div.preloader {
-      position: fixed;
-      background: #fff;
-      width: 100%;
-      height: 100%;
-      z-index: 1071;
-      opacity: 0;
-      transition: opacity .5s ease;
-      overflow: hidden;
-      pointer-events: none;
-      display: flex;
-      align-items: center;
-      justify-content: center
-      }
-      body:not(.loaded)>div.preloader {
-      opacity: 1
-      }
-      body:not(.loaded) {
-      overflow: hidden
-      }
-      body.loaded>div.preloader {
-      animation: hidePreloader .5s linear .5s forwards
-      }
-    script.
-      window.addEventListener("load", function() {
-      setTimeout(function() {
-      document.querySelector("body").classList.add("loaded")
-      }, 300)
-      })
-    link(rel='icon', href='../assets/img/brand/favicon.png', type='image/png')
+    title #{title}
+    include includes/head_html.pug
     link(rel='stylesheet', href='../assets/libs/fancyapps/fancybox/dist/jquery.fancybox.min.css')
     link(rel='stylesheet', href='../assets/libs/fortawesome/fontawesome-free/css/all.min.css')
-    link#stylesheet(rel='stylesheet', href='../assets/css/quick-website.css')
   body
     .preloader
       .spinner-border.text-primary(role='status')
@@ -56,9 +13,9 @@ html(lang='en')
       include includes/header_public.pug
     else
       include includes/header_private.pug
-    section.slice.slice-lg.bg-primary.pb-10
+    section.slice.slice-lg.bg-primary.pb-6
       div(data-offset-top='#navbar-main')
-        .container.pt-lg-5.pb-lg-9.pb-7
+        .container.pb-lg-9.pb-9
           .row.align-items-center.justify-content-center
             .col-lg-7.text-center
               h1.text-white Автоматизированные системы управления
@@ -111,11 +68,11 @@ html(lang='en')
           .col-lg-8.col-md-10
             h3.mt-4 Последние новости
         .row
-          for pieceOfNews in news
+          each pieceOfNews in news
             .col-lg-4
               .card.hover-translate-y-n3.hover-shadow-lg.overflow-hidden(style="min-height: 300px")
                 .card-body.py-4
-                  small.d-block.text-sm.mb-2 #{pieceOfNews.dateCreate.getDay()} #{pieceOfNews.dateCreate.getMonth()+1}, #{pieceOfNews.dateCreate.getFullYear()}
+                  small.d-block.text-sm.mb-2 #{pieceOfNews.formatedDate}
                   a.h5.stretched-link.lh-150(href='/news/'+pieceOfNews.url+"/") #{pieceOfNews.title}
                   p.mt-3.mb-0.lh-170 #{pieceOfNews.short}
                 .card-footer.border-0.delimiter-top
@@ -123,8 +80,9 @@ html(lang='en')
                     .col-auto
                       span.avatar.avatar-sm.bg-primary.rounded-circle ПС
                       span.text-sm.mb-0.avatar-content Пользователь сайта
+          else
+            p.text-center Новостей пока нет.
     include includes/footer.pug
-
     script(src='../assets/libs/jquery/dist/jquery.min.js')
     script(src='../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js')
     script(src='../assets/libs/svg-injector/dist/svg-injector.min.js')
@@ -139,3 +97,4 @@ html(lang='en')
       width: "1em",
       height: "1em"
       })
+    include includes/yandex_metrika.pug

@@ -1,23 +1,106 @@
 doctype html
 html
   head
+    include includes/head_html.pug
     title #{title}
+    script(src="../../../../disc_script.js" type="text/javascript")
+    link(rel='stylesheet', href='../../../assets/libs/fortawesome/fontawesome-free/css/all.min.css')
   body
-    h1 #{title}
-    form(method='POST' action='')
-      p
-        label(for=name) Name:
-        input#name(type="text", placeholder="Name of discipline", name="name", required, value=(discipline===undefined ? "" : discipline.name))
-        br
-        label(for=mnemo) Mnemo:
-        input#mnemo(type="text", placeholder="Short name discipline", name="mnemo", required, value=(discipline===undefined ? "" : discipline.mnemo))
-        br
-        label(for=allias) Allias:
-        input#allias(type="text", placeholder="Allias discipline for URL", name="allias", required, value=(discipline===undefined ? "" : discipline.allias))
-        br
-        label(for=description) Description:
-        textarea#description(type="textarea", placeholder="About discipline", name="description") #{discipline===undefined ? "" : discipline.description}
-        input#creator(type="hidden", name="creator", value=creatorId)
-      if errorMessage.length
-        p(style="color: red") #{errorMessage}
-      input(type="submit", value="Confirm")
+    a.btn.btn-neutral.btn-icon-only.rounded-circle.position-absolute.left-4.top-4.d-none.d-lg-inline-flex(href=(discipline===undefined ? "/disciplines/" : "/disciplines/"+discipline.allias+"/"), data-toggle='tooltip', data-placement='right', title=(discipline===undefined ? 'Вернуться к дисциплинам' : 'Вернуться к дисциплинe'))
+      span.btn-inner--icon
+        i(data-feather='arrow-left')
+    section
+      .container.d-flex.flex-column
+        .row.align-items-center.justify-content-center.min-vh-100
+          .col-md-6.col-lg-7.col-xl-8.py-6.py-md-0
+            div
+              .mb-5.text-center
+                h6.h3.mb-1 #{title}
+              span.clearfix
+              if errorMessage.length
+                p.mb-0(style=" color: red")=errorMessage
+              form(action='.', method='POST')
+                .form-group.mb-0
+                    .d-flex.align-items-center.justify-content-between
+                      div
+                        label.form-control-label Имя дисциплины
+                          span.text-danger *
+                    .input-group.input-group-merge
+                      input#name.form-control.form-control-prepend(type='text', name="name", placeholder='Имя', required, value=(discipline===undefined ? "" : discipline.name))
+                      .input-group-prepend
+                        span.input-group-text
+                          i(data-feather='align-left')
+                .row
+                  .col.form-group.mb-0
+                    .d-flex.align-items-center.justify-content-between
+                      div
+                        label.form-control-label Аббревиатура
+                          span.text-danger *
+                    .input-group.input-group-merge
+                      input#mnemo.form-control.form-control-prepend(type='text', name="mnemo", placeholder='Краткое имя', required, value=(discipline===undefined ? "" : discipline.mnemo))
+                      .input-group-prepend
+                        span.input-group-text
+                          i(data-feather='minimize-2')
+                  .col.form-group.mb-0
+                    .d-flex.align-items-center.justify-content-between
+                      div
+                        label.form-control-label Имя для ссылки(URL)
+                          span.text-danger *
+                    .input-group.input-group-merge
+                      input#allias.form-control.form-control-prepend(type='text', name="allias", placeholder='Короткое имя для ссылки', required, value=(discipline===undefined ? "" : discipline.allias))
+                      .input-group-prepend
+                        span.input-group-text
+                          i(data-feather='link')
+                .row
+                  .col.form-group.mb-0
+                    .d-flex.align-items-center.justify-content-between
+                      div
+                        label.form-control-label Группа
+                          span.text-danger *
+                    select#group.custom-select(type='select', name="group", placeholder='Группа', onChange="selectedGroup();" required)
+                      -let groups = ['УВА', 'УИС', "УВВ"]
+                      for group in groups
+                        if discipline !== undefined && group == discipline.group
+                          option(value=group selected) #{group}
+                        else
+                          option(value=group) #{group}
+                  .col.form-group.mb-0
+                    .d-flex.align-items-center.justify-content-between
+                      div
+                        label.form-control-label Номер курса
+                          span.text-danger *
+                    select#course.custom-select(type='select', name="course", placeholder='Номер курса', required)
+                      -let courses;
+                      if discipline !== undefined && discipline.group == 'УВВ'
+                        -courses = [1, 2]
+                      else
+                        -courses = [1, 2, 3, 4]
+                      for course in courses
+                        if discipline !== undefined && course == discipline.course
+                          option(value=course selected) #{course}
+                        else
+                          option(value=course) #{course}
+                .form-group.mb-0
+                  .d-flex.align-items-center.justify-content-between
+                    div
+                      label.form-control-label Описание дисциплины
+                  .input-group.input-group-merge
+                    textarea#description.form-control.form-control-prepend(type='textarea', placeholder='Добавьте описание дисциплины', name='description', rows="4") #{discipline===undefined ? "" : discipline.description}
+                    .input-group-prepend
+                      span.input-group-text
+                        i(data-feather='align-justify')    
+                .mt-4  
+                  button.btn.btn-block.btn-primary(type='submit') Подтвердить
+    script(src='../../../assets/libs/jquery/dist/jquery.min.js')
+    script(src='../../../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js')
+    script(src='../../../assets/libs/svg-injector/dist/svg-injector.min.js')
+    script(src='../../../assets/libs/feather-icons/dist/feather.min.js')
+    script(src='../../../assets/libs/in-view/dist/in-view.min.js')
+    script(src='../../../assets/libs/sticky-kit/dist/sticky-kit.min.js')
+    script(src='../../../assets/libs/imagesloaded/imagesloaded.pkgd.min.js')
+    script(src='../../../assets/js/quick-website.js')
+    script.
+      feather.replace({
+      width: "1em",
+      height: "1em"
+      })

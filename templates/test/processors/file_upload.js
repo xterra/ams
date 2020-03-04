@@ -1,6 +1,8 @@
 const fs = require("fs"),
       router = require('../../../router'),
-      formidable = require('formidable');
+      formidable = require('formidable'),
+      ini = require('ini'),
+      path = require('path');
 module.exports= {
   path: new RegExp("^\/file\/upload\/[^\/]+\/$"),
   processor: function(request, response, callback, sessionContext, sessionToken, db){
@@ -33,13 +35,19 @@ module.exports= {
             return router.bleed(301, "/disciplines/", response);
         }
         if(request.method == "POST"){
-          const PATH_TO_FILES = "D:/1_swenkal/Projects/ams/data/private/files"; // move to the ENV
+          const storageConfigurations = ini.parse(fs.readFileSync(path.join(__dirname, "../../../" , "configurations", "storage.ini"), "utf-8"));
+          console.log(storageConfigurations['data']['location']);
+          const STORAGE_DATA_LOCATION = process.env['STORAGE_DATA_LOCATION'] ? `${process.env['STORAGE_DATA_LOCATION']}/private` : '';
+          console.log(`STORAGE_DATA_LOCATION: ${STORAGE_DATA_LOCATION}`);
+          const PATH_TO_FILES = STORAGE_DATA_LOCATION || storageConfigurations['data']['location'] || path.join(__dirname, "../../../", "/data/private");
           let form = new formidable.IncomingForm();
           let randomFileName = generateRandomString();
           let dirName = randomFileName.substr(0,2);
           let pathToCurrentFile = `${PATH_TO_FILES}/${dirName}`;
           try{
-            fs.mkdirSync(pathToCurrentFile);
+            if (!(fs.existsSync(pathToCurrentFile))) {
+              fs.mkdirSync(pathToCurrentFile);
+            }
           } catch(err){
             callback();
             return router.bleed(500, null, response, err);
@@ -81,7 +89,7 @@ module.exports= {
                 title: "Загрузка файла",
                 discipline: discipline,
                 userInfo: userInfo,
-                message: `File uploaded to the server. Added to discipline ${disciplineAllias}`,
+                message: `Файл загружен на сервер. Добавлен к дициплине ${discipline.name}`,
               }, "file_upload", 0, 0);
             });
           });

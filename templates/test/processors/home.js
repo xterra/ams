@@ -1,4 +1,5 @@
-const router = require('../../../router');
+const router = require('../../../router'),
+      beautyDate = require('../../../beautyDate');
 
 module.exports = {
     path: new RegExp("^\/$"),
@@ -11,15 +12,21 @@ module.exports = {
             return router.bleed(500, null, response)
           }
           let news = result;
+          console.log(news);
+          for (let pieceOfNews in news){
+            console.log(JSON.stringify(news[pieceOfNews]));
+            news[`${pieceOfNews}`].formatedDate = beautyDate(news[pieceOfNews].dateUpdate);
+          }
+          console.log(JSON.stringify(news));
           if(sessionToken == null || sessionContext == undefined || sessionContext == null){
             callback({
-                title: "Главная страница",
+                title: "Главная",
                 news: news,
                 user: null
             }, "home", 5, 5);
           }else{
             callback({
-                title: "Главная страница",
+                title: "Главная",
                 news: news,
                 user: sessionContext.login
             }, "home", 5, 5);
@@ -28,4 +35,29 @@ module.exports = {
         });
 
     }
-};
+}
+
+function formateDate(date){
+  const months = {
+    0: "Января",
+    1: "Февраля",
+    2: "Марта",
+    3: "Апреля",
+    4: "Мая",
+    5: "Июня",
+    6: "Июля",
+    7: "Августа",
+    8: "Сентября",
+    9: "Октября",
+    10: "Ноября",
+    11: "Декабря"
+  };
+  console.log(date);
+  let passedDate = new Date(date);
+  let todaysDate = new Date();
+
+  let passedDateStr = `${passedDate.getDate()} ${months[passedDate.getMonth()]} ${passedDate.getFullYear()}`;
+  let todaysDateStr = `${todaysDate.getDate()} ${months[todaysDate.getMonth()]} ${todaysDate.getFullYear()}`;
+  if(passedDateStr == todaysDateStr) return "Сегодня"
+  return passedDateStr;
+}

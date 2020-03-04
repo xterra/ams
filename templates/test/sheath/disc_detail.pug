@@ -1,60 +1,20 @@
 doctype html
-html(lang='en')
+html
   head
-    meta(http-equiv='content-type', content='text/html;charset=utf-8')
-    meta(charset='utf-8')
-    meta(name='viewport', content='width=device-width,initial-scale=1,shrink-to-fit=no')
     title #{title}
-    style.
-      @keyframes hidePreloader {
-      0% {
-      width: 100%;
-      height: 100%
-      }
-      100% {
-      width: 0;
-      height: 0
-      }
-      }
-      body>div.preloader {
-      position: fixed;
-      background: #fff;
-      width: 100%;
-      height: 100%;
-      z-index: 1071;
-      opacity: 0;
-      transition: opacity .5s ease;
-      overflow: hidden;
-      pointer-events: none;
-      display: flex;
-      align-items: center;
-      justify-content: center
-      }
-      body:not(.loaded)>div.preloader {
-      opacity: 1
-      }
-      body:not(.loaded) {
-      overflow: hidden
-      }
-      body.loaded>div.preloader {
-      animation: hidePreloader .5s linear .5s forwards
-      }
-    script.
-      window.addEventListener("load", function() {
-      setTimeout(function() {
-      document.querySelector("body").classList.add("loaded")
-      }, 300)
-      })
-    link(rel='icon', href='../../assets/img/brand/favicon.png', type='image/png')
+    include includes/head_html.pug
     link(rel='stylesheet', href='../../assets/libs/swiper/dist/css/swiper.min.css')
     link(rel='stylesheet', href='../../assets/libs/fancyapps/fancybox/dist/jquery.fancybox.min.css')
     link(rel='stylesheet', href='../../assets/libs/fortawesome/fontawesome-free/css/all.min.css')
-    link#stylesheet(rel='stylesheet', href='../../assets/css/quick-website.css')
   body
     .preloader
       .spinner-border.text-primary(role='status')
         span.sr-only Loading...
+    include includes/header_private.pug
     section.slice.slice-lg.delimiter-bottom
+      a.btn.btn-neutral.btn-icon-only.rounded-circle.position-absolute.left-4.top-90.d-none.d-lg-inline-flex(href="/disciplines/")
+        span.btn-inner--icon
+          i(data-feather='arrow-left')
       .container
         .row.justify-content-center.mb-3
           .col-lg-7.text-center
@@ -62,9 +22,9 @@ html(lang='en')
             p.lead.lh-190 #{discipline.description}
         if (userInfo.securityRole.includes("superadmin") || (userInfo.securityRole.includes("teacher") && discipline.editors.includes(userInfo._id.toString())))
           .row.justify-content-center.mb-3
-            a.mr-1(href="/disciplines/edit/"+discipline.allias, data-toggle='tooltip', title='Редактировать дисциплину')
+            a.mr-1(href="/disciplines/edit/"+discipline.allias+"/")
               button.btn.btn-outline-primary(type='button') Редактировать
-            a.ml-1(href="/disciplines/delete/"+discipline.allias, data-toggle='tooltip', title='Удалить дисциплину')
+            a.ml-1(href="/disciplines/delete/"+discipline.allias+"/")
               button.btn.btn-outline-danger(type='button') Удалить
         if (!userInfo.securityRole.includes("guest"))
           .mb-5
@@ -74,32 +34,41 @@ html(lang='en')
                   .col.col-lg.px-2
                     h5.h6.mb-0 Документы для дисциплины
                     p.text-sm.mb-0 Возможность загрузить все необходимые документы
-                  .col-auto.px-2
-                    a(href="/file/upload/"+discipline.allias+"/", data-toggle='tooltip', title='Добавить файл')
-                      button.btn.btn-secondary.px-3(type='button')
-                        i(data-feather='plus')
+                  if (userInfo.securityRole.includes("superadmin") || (userInfo.securityRole.includes("teacher") && discipline.editors.includes(userInfo._id.toString())))
+                    .col-auto.px-2
+                      a(href="/file/upload/"+discipline.allias+"/")
+                        button.btn.btn-secondary.px-3(type='button')
+                          i(data-feather='plus')
               ul.list-group.list-group-flush
-                for file in files
+                each file in files
                   li.list-group-item
                     .row.align-items-center
                       .col-auto
-                        i(data-feather='file-text')
+                        -var dirName = file._id.substr(0,2);
+                        a(href=href="/"+dirName+"/"+file._id download=file.name+"."+file.ext)
+                          i(data-feather='file-text')
                       .col.ml-n2
-                        h6.text-sm.mb-0 #{file.name}
+                        a(href=href="/"+dirName+"/"+file._id download=file.name+"."+file.ext)
+                          h6.text-sm.mb-0 #{file.name}
                         p.card-text.small.text-muted #{file.comment}
                       .col-md.d-none.d-md-block
-                        span.text-muted Изменен:
-                        |  2019-05-16 11:05:08
+                        span.text-muted Изменено:
+                        |  #{file.formatedDate}
                       .col-auto
                         .actions.text-right.ml-3
-                          -let dirName = file._id.substr(0,2);
-                          a.action-item.mr-2(href="/files/"+dirName+"/"+file._id download=file.name+"."+file.ext data-toggle='tooltip', title='Скачать')
+                          a.action-item.mr-2(href="/"+dirName+"/"+file._id download=file.name+"."+file.ext)
                             i(data-feather='download')
                           if (userInfo.securityRole.includes("superadmin") || (userInfo.securityRole.includes("teacher") && discipline.editors.includes(userInfo._id.toString())))
-                            a.action-item.mr-2(href="/file/edit/"+discipline.allias+"/"+file._id, data-toggle='tooltip', title='Редактировать')
+                            a.action-item.mr-2(href="/file/edit/"+discipline.allias+"/"+file._id+"/")
                               i(data-feather='edit')
-                            a.action-item.mr-2(href="/file/delete/"+discipline.allias+"/"+file._id, data-toggle='tooltip', title='Удалить')
+                            a.action-item.mr-2(href="/file/delete/"+discipline.allias+"/"+file._id+"/")
                               i(data-feather='trash-2')
+                else 
+                  br
+                  li.list-group-item
+                    .row.align-items-center
+                      .col-auto
+                       p Документов пока нет    
     script(src='../../assets/libs/jquery/dist/jquery.min.js')
     script(src='../../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js')
     script(src='../../assets/libs/svg-injector/dist/svg-injector.min.js')
@@ -115,13 +84,4 @@ html(lang='en')
       width: "1em",
       height: "1em"
       })
-    script.
-      ! function(e, t, a, n, g) {
-      e[n] = e[n] || [], e[n].push({
-      "gtm.start": (new Date).getTime(),
-      event: "gtm.js"
-      });
-      var m = t.getElementsByTagName(a)[0],
-      r = t.createElement(a);
-      r.async = !0, r.src = "../../../../www.googletagmanager.com/gtm4c6a.js?id=GTM-MF4DZVH", m.parentNode.insertBefore(r, m)
-      }(window, document, "script", "dataLayer")
+    include includes/yandex_metrika.pug

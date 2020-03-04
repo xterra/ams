@@ -1,0 +1,46 @@
+section.slice.py-5.bg-section-secondary
+  .container
+    .row
+      .col-md-3
+        .mb-4
+      .col-md-9
+        .row.align-items-center.mb-4
+          .col
+            h1.h5.mb-0 Ваши дисциплины
+          a(href="/disciplines/create/")  
+            .col-auto
+              button.btn.btn-sm.btn-primary.btn-icon(type='button')
+                span.btn-inner--text Новая дисциплина
+                span.btn-inner--icon
+                  i(data-feather='plus')
+        .row.mx-n2
+          each disc in teacherDisciplines 
+            .col-sm-6.col-lg-4.px-2
+              .card.mb-3(style="min-width: 175px; min-height: 150px")
+                a.action-item.mr-2(href=urlDiscDetail+disc.allias+"/", data-toggle='tooltip', title='Просмотр')
+                  .card-header.pb-3
+                    .d-flex.justify-content-between.align-items-center
+                      div
+                        h6.mb-0 #{disc.mnemo}
+                  .card-body.pt-0
+                    .mt-1
+                      p.mb-0.text-sm.text-muted #{disc.name}
+          else 
+            p Дисциплин пока ещё нет.
+        .row.align-items-center.mb-4
+          .col
+            h1.h5.mb-0 Другие дисциплины
+        .row.mx-n2
+          each otherDisc in otherDisciplines 
+            .col-sm-6.col-lg-4.px-2
+              .card.mb-3(style="min-width: 175px; min-height: 150px")
+                a.action-item.mr-2(href=urlDiscDetail+otherDisc.allias+"/", data-toggle='tooltip', title='Просмотр')
+                  .card-header.pb-3
+                    .d-flex.justify-content-between.align-items-center
+                      div
+                        h6.mb-0 #{otherDisc.mnemo}
+                  .card-body.pt-0
+                    .mt-1
+                      p.mb-0.text-sm.text-muted #{otherDisc.name}
+          else 
+            p Дисциплин пока ещё нет.

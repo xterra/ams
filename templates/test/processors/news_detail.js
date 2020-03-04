@@ -1,4 +1,5 @@
-const router = require('../../../router');
+const router = require('../../../router'),
+      beautyDate = require('../../../beautyDate');
 
 module.exports = {
   path: new RegExp("^\/news\/[^\/]+\/$"),
@@ -16,42 +17,33 @@ module.exports = {
         callback();
         return router.bleed(404, requsetedURL, response);
       }
-      const news_detail = result,
-            newsDateString = getDateString(news_detail.dateUpdate);
+      let news_detail = result;
+            news_detail.formatedDate = beautyDate(news_detail.dateUpdate);
       if(sessionToken == null || sessionContext == undefined || sessionContext == null){
         callback({
           title: "Новость",
           news_detail: news_detail,
-          newsDateString: newsDateString,
-          user: null
+          userInfo: null
         }, "news_detail", 5, 5);
       } else{
-        callback({
-          title: "Новость",
-          news_detail: news_detail,
-          newsDateString: newsDateString,
-          user: sessionContext.login
-        }, "news_detail", 5, 5);
+        db.collection("users").findOne({username: sessionContext.login}, {username:1, securityRole: 1}, function(err, result){
+          if(err){
+            callback();
+            return router.bleed(500, null, response);
+          }
+          if(result == null){
+            callback();
+            return router.bleed(404, null, response);
+          }
+          let userInfo = result;
+          return callback({
+            title: "Новость",
+            news_detail: news_detail,
+            userInfo: userInfo
+          }, "news_detail", 0, 0);
+        });
       }
     });
 
   }
-}
-function getDateString(date){
-  const months = {
-    0: "Январь",
-    1: "Февраль",
-    2: "Март",
-    3: "Апрель",
-    4: "Май",
-    5: "Июнь",
-    6: "Июль",
-    7: "Август",
-    8: "Сентябрь",
-    9: "Октябрь",
-    10: "Ноябрь",
-    11: "Декабрь"
-  };
-
-  return `${months[date.getMonth()]} ${date.getDay()}, ${date.getFullYear()}`;
 }

@@ -45,7 +45,7 @@ let pugCompilerOptions = {
     pretty: false
 };
 
-let renderTimeout = 5000;
+let renderTimeout = 50000;
 let bleedStacktraceAllowed = false;
 let currentTemplateName = "test";
 
@@ -53,9 +53,10 @@ const  PATHS_templateDir = path.join(__dirname, "templates", currentTemplateName
        PATHS_templateResourcesDir = path.join(PATHS_templateDir, "resources"),
        PATHS_templateSheathDir = path.join(PATHS_templateDir, "sheath"),
        PATHS_templatePreprocessorsDir = path.join(PATHS_templateDir, "processors"),
-       PATHS_dataDir = path.join(__dirname, "data"),
+       PATHS_dataDir = process.env['STORAGE_DATA_LOCATION'] || path.join(__dirname, "data"),
        PATHS_dataPublicDir = path.join(PATHS_dataDir, "public"),
        PATHS_dataPrivateDir = path.join(PATHS_dataDir, "private");
+
 
 function reloadMIMEs() {
     const oldSupportedFileTypes = supportedFileTypes;

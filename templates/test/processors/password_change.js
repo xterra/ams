@@ -32,6 +32,7 @@ module.exports = {
             if(err){
               return callback({
                 title: "Смена пароля",
+                userId: userFromDB._id.toString(),
                 errorMessage: "Плохие данные!"
               }, "password_change", 0, 0);
             }
@@ -41,18 +42,21 @@ module.exports = {
               if( userOldPass !== userFromDB.password){
                 return callback({
                   title: "Смена пароля",
+                  userId: userFromDB._id.toString(),
                   errorMessage: "Старый пароль введён неправильно!"
                 }, "password_change", 0, 0);
               }
               if( postData.newpass1.length < 8){
                 return callback({
                   title: "Смена пароля",
+                  userId: userFromDB._id.toString(),
                   errorMessage: "Новый пароль слишком короткий!"
                 }, "password_change", 0, 0);
               }
               if( postData.newpass1.length > 16){
                 return callback({
                   title: "Смена пароля",
+                  userId: userFromDB._id.toString(),
                   errorMessage: "Новый пароль слишком длинный!"
                 }, "password_change", 0, 0);
               }
@@ -60,6 +64,7 @@ module.exports = {
               if( postData.newpass1 !==  postData.newpass2){
                 return callback({
                   title: "Смена пароля",
+                  userId: userFromDB._id.toString(),
                   errorMessage: "Новыe пароли не совпадают!"
                 }, "password_change", 0, 0);
               }
@@ -86,6 +91,7 @@ module.exports = {
               console.log(`Error in password_change -> POST in try: ${err}`);
               return callback({
                 title: "Смена пароля",
+                userId: userFromDB._id.toString(),
                 errorMessage: "Плохие данные. Попробуйте снова или обратитесь к администратору!"
               }, "password_change", 0, 0);
             }
@@ -93,6 +99,7 @@ module.exports = {
         }else{
           return callback({
             title: "Смена пароля",
+            userId: userFromDB._id.toString(),
             errorMessage: ""
           }, "password_change", 0, 0);
         }

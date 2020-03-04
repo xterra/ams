@@ -1,57 +1,17 @@
 doctype html
 html
   head
-    meta(http-equiv='content-type', content='text/html;charset=utf-8')
-    meta(charset='utf-8')
-    meta(name='viewport', content='width=device-width,initial-scale=1,shrink-to-fit=no')
     title #{title}
-    style.
-      @keyframes hidePreloader {
-      0% {
-      width: 100%;
-      height: 100%
-      }
-      100% {
-      width: 0;
-      height: 0
-      }
-      }
-      body>div.preloader {
-      position: fixed;
-      background: #fff;
-      width: 100%;
-      height: 100%;
-      z-index: 1071;
-      opacity: 0;
-      transition: opacity .5s ease;
-      overflow: hidden;
-      pointer-events: none;
-      display: flex;
-      align-items: center;
-      justify-content: center
-      }
-      body:not(.loaded)>div.preloader {
-      opacity: 1
-      }
-      body:not(.loaded) {
-      overflow: hidden
-      }
-      body.loaded>div.preloader {
-      animation: hidePreloader .5s linear .5s forwards
-      }
-    script.
-      window.addEventListener("load", function() {
-      setTimeout(function() {
-      document.querySelector("body").classList.add("loaded")
-      }, 300)
-      })
-    link(rel='icon', href='../../../assets/img/brand/favicon.png', type='image/png')
+    include includes/head_html.pug
     link(rel='stylesheet', href='../../../assets/libs/fortawesome/fontawesome-free/css/all.min.css')
-    link#stylesheet(rel='stylesheet', href='../../../assets/css/quick-website.css')
   body
-    section
+    include includes/header_private.pug
+    section.slice.slice-lg.delimiter-bottom
+      a.btn.btn-neutral.btn-icon-only.rounded-circle.position-absolute.left-4.top-90.d-none.d-lg-inline-flex(href="/profiles/")
+        span.btn-inner--icon
+          i(data-feather='arrow-left')
       .container.d-flex.flex-column
-        .row.align-items-center.justify-content-center.min-vh-100
+        .row.align-items-center.justify-content-center
           .col-md-6.col-lg-7.col-xl-8.py-6.py-md-0
             div
               .mb-5.text-center
@@ -64,7 +24,7 @@ html
                   .col.form-group
                     label.form-control-label Фамилия
                     .input-group.input-group-merge
-                      input#lastname.form-control.form-control-prepend(type='text', name="lastname", placeholder='Фамилия', required, value=(userInfo===undefined ? "" : userInfo.lastName))
+                      input#lastname.form-control.form-control-prepend(type='text', name="lastname", placeholder='Фамилия', required, value=(userInfo===undefined ? "" : userInfo.lastName), maxlength=50)
                       .input-group-prepend
                         span.input-group-text
                           i(data-feather='align-left')
@@ -72,8 +32,9 @@ html
                     .d-flex.align-items-center.justify-content-between
                       div
                         label.form-control-label Имя
+                        span.text-danger *
                     .input-group.input-group-merge
-                      input#name.form-control.form-control-prepend(type='text', name="name", placeholder='Имя', required, value=(userInfo===undefined ? "" : userInfo.name))
+                      input#name.form-control.form-control-prepend(type='text', name="name", placeholder='Имя', required, value=(userInfo===undefined ? "" : userInfo.name), maxlength=40)
                       .input-group-prepend
                         span.input-group-text
                           i(data-feather='align-left')
@@ -83,26 +44,41 @@ html
                       div
                         label.form-control-label Отчество
                     .input-group.input-group-merge
-                      input#fathername.form-control.form-control-prepend(type='text', name="fathername", placeholder='Отчество', required, value=(userInfo===undefined ? "" : userInfo.fatherName))
+                      input#fathername.form-control.form-control-prepend(type='text', name="fathername", placeholder='Отчество', value=(userInfo===undefined ? "" : userInfo.fatherName), maxlength=50)
                       .input-group-prepend
                         span.input-group-text
                           i(data-feather='align-left')
+                  if !userInfo.securityRole.includes("superadmin")
+                    .col.form-group.mb-0
+                      .d-flex.align-items-center.justify-content-between
+                        div
+                          label.form-control-label Роль
+                          span.text-danger *
+                      select#securityRole.custom-select(type="select" name="securityRole" placeholder="Роль пользователя" required)
+                        -let roles = ['teacher', 'student', 'superadmin', 'admin']
+                        for role in roles
+                          if role == userInfo.securityRole
+                            option(value=role selected) #{role}
+                          else
+                            option(value=role) #{role}
+                .row.mt-2
                   .col.form-group.mb-0
                     .d-flex.align-items-center.justify-content-between
                       div
                         label.form-control-label Логин
+                        span.text-danger *
                     .input-group.input-group-merge
-                      input#username.form-control.form-control-prepend(type='text', name="username", placeholder='Логин', required, value=(userInfo===undefined ? "" : userInfo.username))
+                      input#username.form-control.form-control-prepend(type='text', name="username", placeholder='Логин', required, value=(userInfo===undefined ? "" : userInfo.username), maxlength=19)
                       .input-group-prepend
                         span.input-group-text
                           i(data-feather='user')
-                .row
+                .row.mt-2
                   .col.form-group.mb-0
                     .d-flex.align-items-center.justify-content-between
                       div
                         label.form-control-label Почта
                     .input-group.input-group-merge
-                      input#email.form-control.form-control-prepend(type="email" name="email" placeholder="Почта" value=(userInfo===undefined ? "" : userInfo.email))
+                      input#email.form-control.form-control-prepend(type="email" name="email" placeholder="Почта" value=(userInfo===undefined ? "" : userInfo.email), maxlength=60)
                       .input-group-prepend
                         span.input-group-text
                           i(data-feather='at-sign')
@@ -111,27 +87,16 @@ html
                       div
                         label.form-control-label Телефон
                     .input-group.input-group-merge
-                      input#phone.form-control.form-control-prepend(type="tel" name="phone" placeholder="Телефон" value=(userInfo===undefined ? "" : userInfo.phone))
+                      input#phone.form-control.form-control-prepend(type="tel" name="phone" placeholder="Телефон" value=(userInfo===undefined ? "" : userInfo.phone), maxlength=24)
                       .input-group-prepend
                         span.input-group-text
                           i(data-feather='phone')
-                .row
+                .row.mt-3
                   .col.form-group.mb-0
-                    .d-flex.align-items-center.justify-content-between
-                      div
-                        label.form-control-label Роль
-                    select#securityRole.custom-select(type="select" name="securityRole" placeholder="Роль пользователя" required)
-                      -let roles = ['teacher', 'student', 'superadmin', 'admin']
-                      for role in roles
-                        if role == userInfo.securityRole
-                          option(value=role selected) #{role}
-                        else
-                          option(value=role) #{role}    
-                  .col.form-group.mb-0
-                    .d-flex.align-items-center.justify-content-between
-                      div
-                        label.form-control-label
                     button.btn.btn-block.btn-primary(type='submit') Изменить
+                  .col.form-group.mb-0
+                    a(href="/profiles/")
+                      button.btn.btn-block.btn-secondary(type="button") Отмена
     script(src='../../../assets/libs/jquery/dist/jquery.min.js')
     script(src='../../../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js')
     script(src='../../../assets/libs/svg-injector/dist/svg-injector.min.js')
@@ -145,3 +110,4 @@ html
       width: "1em",
       height: "1em"
       })
+    include includes/yandex_metrika.pug

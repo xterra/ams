@@ -1,9 +1,11 @@
 const formidable = require('formidable'),
       fs = require('fs'),
       router = require('../../../router'),
-      qs = require('querystring');
+      qs = require('querystring'),
+      path = require("path"),
+      ini = require('ini');
 module.exports = {
-  path: new RegExp("^\/file\/edit\/[^\/]+\/[^\/]+$"),
+  path: new RegExp("^\/file\/edit\/[^\/]+\/[^\/]+\/$"),
   processor: function(request, response, callback, sessionContext, sessionToken, db){
     if(sessionToken == null || sessionContext == undefined || sessionContext == null){
       callback();
@@ -21,8 +23,8 @@ module.exports = {
       }
       let requestedUrl = decodeURI(request.url);
       let delimeteredUrl = requestedUrl.split("/");
-      const requestFileName = delimeteredUrl[delimeteredUrl.length - 1];
-      let disciplineAllias = delimeteredUrl[delimeteredUrl.length - 2];
+      const requestFileName = delimeteredUrl[delimeteredUrl.length - 2];
+      let disciplineAllias = delimeteredUrl[delimeteredUrl.length - 3];
       console.log(requestFileName);
       return db.collection("disciplines").findOne({allias: disciplineAllias}, {allias: 1, name: 1}, function(err, result){
         if(err){
@@ -34,7 +36,7 @@ module.exports = {
           console.log(`File not found: ${requestFileName}`);
           return router.bleed(400, null, response);
         }
-        const discpline = result;
+        const discipline = result;
         return db.collection("files").findOne({_id: requestFileName}, function(err, result){
           if(err){
             callback();
@@ -70,16 +72,16 @@ module.exports = {
                     }
                     if(result.value == null){
                       return callback({
-                        title: "Edit File",
+                        title: "Редактирование файла",
                         fileInfo: editedFileInfo,
-                        discpline: discpline,
+                        discipline: discipline,
                         userInfo: userInfo,
-                        errorMessage: "Something wrong with update - try again."
+                        errorMessage: "Что-то не так с обновлением - попробуйте снова"
                       }, "file_edit", 0, 0);
                     }
                     console.log(`File info ${requestFileName} updated!`);
                     callback();
-                    return router.bleed(301, `/disciplines/${disciplineAllias}`, response);
+                    return router.bleed(301, `/disciplines/${disciplineAllias}/`, response);
                   });
                 } catch(err){
                   callback();
@@ -88,7 +90,9 @@ module.exports = {
               });
             }
             if(firstPartContentType == "multipart/form-data"){
-              const PATH_TO_FILES = "D:/1_swenkal/Projects/ams/data/private/files";
+              const storageConfigurations = ini.parse(fs.readFileSync(path.join(__dirname, "../../../" , "configurations", "storage.ini"), "utf-8"));
+              console.log(storageConfigurations['data']['location']);
+              const PATH_TO_FILES = storageConfigurations['data']['location'] || path.join(__dirname, "../../../", "/data/private");
               let form = new formidable.IncomingForm();
               let dirName = requestFileName.substr(0,2);
               let pathToCurrentFile = `${PATH_TO_FILES}/${dirName}`;
@@ -101,7 +105,7 @@ module.exports = {
                 }
                 console.log("Refreshing file");
                 let delimeteredFileName = files.myfile.name.split(".");
-                let fileExtension = delimeteredFileName[delimeteredFileName.length -1];
+                let fileExtension = delimeteredFileName[delimeteredFileName.length -1].toLowerCase();
                 db.collection("files").update({_id: requestFileName},{ $set:{
                   name: fields.filename,
                   ext: fileExtension,
@@ -117,7 +121,7 @@ module.exports = {
                   }
                   console.log(`Info for file ${requestFileName} updated in DB`);
                   callback();
-                  return router.bleed(301, `/disciplines/${disciplineAllias}`, response);
+                  return router.bleed(301, `/disciplines/${disciplineAllias}/`, response);
                 });
               });
               form.on("file", function(err, file){
@@ -132,9 +136,9 @@ module.exports = {
             }
           } else {
             return callback({
-              title: "Edit File bl",
+              title: "Редактирование файла",
               fileInfo: fileInfo,
-              discpline: discpline,
+              discipline: discipline,
               userInfo: userInfo,
               errorMessage: ""
             }, "file_edit", 0, 0);

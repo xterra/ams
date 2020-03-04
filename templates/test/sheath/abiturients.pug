@@ -1,54 +1,10 @@
 doctype html
 html
   head
-    meta(http-equiv='content-type', content='text/html;charset=utf-8')
-    meta(charset='utf-8')
-    meta(name='viewport', content='width=device-width,initial-scale=1,shrink-to-fit=no')
     title #{title}
-    style.
-      @keyframes hidePreloader {
-      0% {
-      width: 100%;
-      height: 100%
-      }
-      100% {
-      width: 0;
-      height: 0
-      }
-      }
-      body>div.preloader {
-      position: fixed;
-      background: #fff;
-      width: 100%;
-      height: 100%;
-      z-index: 1071;
-      opacity: 0;
-      transition: opacity .5s ease;
-      overflow: hidden;
-      pointer-events: none;
-      display: flex;
-      align-items: center;
-      justify-content: center
-      }
-      body:not(.loaded)>div.preloader {
-      opacity: 1
-      }
-      body:not(.loaded) {
-      overflow: hidden
-      }
-      body.loaded>div.preloader {
-      animation: hidePreloader .5s linear .5s forwards
-      }
-    script.
-      window.addEventListener("load", function() {
-      setTimeout(function() {
-      document.querySelector("body").classList.add("loaded")
-      }, 300)
-      })
-    link(rel='icon', href='../../assets/img/brand/favicon.png', type='image/png')
-    link(rel='stylesheet', href='../../assets/libs/%40fancyapps/fancybox/dist/jquery.fancybox.min.css')
-    link(rel='stylesheet', href='../../assets/libs/%40fortawesome/fontawesome-free/css/all.min.css')
-    link#stylesheet(rel='stylesheet', href='../../assets/css/quick-website.css')
+    include includes/head_html.pug
+    link(rel='stylesheet', href='../../assets/libs/fancyapps/fancybox/dist/jquery.fancybox.min.css')
+    link(rel='stylesheet', href='../../assets/libs/fortawesome/fontawesome-free/css/all.min.css')
   body
     .preloader
       .spinner-border.text-primary(role='status')
@@ -57,10 +13,9 @@ html
       include includes/header_public.pug
     else
       include includes/header_private.pug
-    section.slice.slice-lg.py-7.bg-cover.bg-size--cover
-      span.mask.bg-primary.opacity-8
+    section.slice.slice-lg.py-2.bg-cover.bg-size--cover.bg-primary
       .container.d-flex.align-items-center(data-offset-top='#navbar-main')
-        .col.py-5
+        .col
           .row.align-items-center.justify-content-center.mb-4
             .col-md-7.col-lg-7.text-center
               h1.display-4.text-white.mb-2
@@ -70,7 +25,7 @@ html
         .row.row-grid.align-items-center
           .col-xl-8.col-lg-10.offset-xl-2.offset-lg-1
             h5.h3.text-center Направления бакалавриата
-            .row
+            .row.mt-5
               .col-lg-6
                 .card
                   .card-body.py-4
@@ -95,21 +50,21 @@ html
               .row
                 .col-lg-6
                   .card
-                    .card-body.py-4
+                    .card-body.py-4.text-left
                       small.d-block.text-sm.mb-2 09.03.01
                       p.mt-3.mb-0.lh-170
                         | Технологии сбора, хранения и преобразования информации, алгоритмические аспекты вычислений, мультимедиа-технологии
                 .col-lg-6
                   .card
-                    .card-body.py-4
+                    .card-body.py-4.text-left
                       small.d-block.text-sm.mb-2 09.03.02
                       p.mt-3.mb-0.lh-170
                         | Методы организации и планирования перевозок (логистику) и информационные технологии на транспорте и в транспортном деле
               p.mt-2
                 | III и IV курс — профессиональные тонкости современных информационных технологий, такие дисциплины, как: Архитектура информационных систем,
-                | Сети и сетевые технологии, Управление данными и базы данных, Теория и технологии искусственного интеллекта, Качество информационных систем,Корпоративные информационные системы, Математическое моделирование и др.
+                | Сети и сетевые технологии, Управление данными и базы данных, Теория и технологии искусственного интеллекта, Качество информационных систем, Корпоративные информационные системы, Математическое моделирование и др.
               h5.h3.text-center Направление магистратуры
-              .row.justify-content-center
+              .row.justify-content-center.mt-5
                 .col-lg-8
                   .card
                     .card-body.py-4
@@ -122,11 +77,11 @@ html
                 | При поступлении в магистратуру действующие правила не требуют соответствия направления магистерской подготовки и специальности или направления предыдущего образования
               span.badge.badge-primary.badge-pill.mb-4 Дисциплины
               p.mt-4
-                | Будущие магистры изучают: Cognitive Science и модели знаний, Анализ данных(диагностика и прогностика), Методы и инструментальные средства информационной аналитики,
+                | Будущие магистры изучают: Cognitive Science и модели знаний, Анализ данных (диагностика и прогностика), Методы и инструментальные средства информационной аналитики,
                 | Проектирование и оценка качества информационных систем и технологий, Моделирование (математическое и имитационное), Прикладные задачи аналитики
               h5.h3.text-center Перспективы обучения
               ul.list-unstyled.list-bullet
-                li.py-2
+                li
                   span.badge.badge-circle.rounded-circle.badge-soft-success.mr-2
                     i(data-feather='check')
                   |  Сотрудничество с разработчиками и поставщиками IT (IBM, SAS, SAP, ORACLE и др.)
@@ -137,7 +92,7 @@ html
                 li.py-2
                   span.badge.badge-circle.rounded-circle.badge-soft-success.mr-2
                     i(data-feather='check')
-                  |  Расширение сферы образовательных услуг за счёт использования дистанционных технологий обучения
+                  |  Расширение сферы образования за счёт использования дистанционного обучения
                 li.py-2
                   span.badge.badge-circle.rounded-circle.badge-soft-success.mr-2
                     i(data-feather='check')
@@ -146,6 +101,7 @@ html
                   span.badge.badge-circle.rounded-circle.badge-soft-success.mr-2
                     i(data-feather='check')
                   |  Хорошие специалисты по информационным технологиям нужны во всём мире
+      
     include includes/footer.pug
     script(src='../../assets/libs/jquery/dist/jquery.min.js')
     script(src='../../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js')
@@ -154,10 +110,11 @@ html
     script(src='../../assets/libs/in-view/dist/in-view.min.js')
     script(src='../../assets/libs/sticky-kit/dist/sticky-kit.min.js')
     script(src='../../assets/libs/imagesloaded/imagesloaded.pkgd.min.js')
-    script(src='../../assets/libs/%40fancyapps/fancybox/dist/jquery.fancybox.min.js')
+    script(src='../../assets/libs/fancyapps/fancybox/dist/jquery.fancybox.min.js')
     script(src='../../assets/js/quick-website.js')
     script.
       feather.replace({
       width: "1em",
       height: "1em"
       })
+    include includes/yandex_metrika.pug

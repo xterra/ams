@@ -1,57 +1,17 @@
 doctype html
 html
   head
-    meta(http-equiv='content-type', content='text/html;charset=utf-8')
-    meta(charset='utf-8')
-    meta(name='viewport', content='width=device-width,initial-scale=1,shrink-to-fit=no')
-    title Login
-    style.
-      @keyframes hidePreloader {
-      0% {
-      width: 100%;
-      height: 100%
-      }
-      100% {
-      width: 0;
-      height: 0
-      }
-      }
-      body>div.preloader {
-      position: fixed;
-      background: #fff;
-      width: 100%;
-      height: 100%;
-      z-index: 1071;
-      opacity: 0;
-      transition: opacity .5s ease;
-      overflow: hidden;
-      pointer-events: none;
-      display: flex;
-      align-items: center;
-      justify-content: center
-      }
-      body:not(.loaded)>div.preloader {
-      opacity: 1
-      }
-      body:not(.loaded) {
-      overflow: hidden
-      }
-      body.loaded>div.preloader {
-      animation: hidePreloader .5s linear .5s forwards
-      }
-    script.
-      window.addEventListener("load", function() {
-      setTimeout(function() {
-      document.querySelector("body").classList.add("loaded")
-      }, 300)
-      })
-    link(rel='icon', href='../assets/img/brand/favicon.png', type='image/png')
+    title #{title}
+    include includes/head_html.pug
     link(rel='stylesheet', href='../assets/libs/fortawesome/fontawesome-free/css/all.min.css')
-    link#stylesheet(rel='stylesheet', href='../assets/css/quick-website.css')
-  body
-    section
+  body.bg-section-secondary
+    include includes/header_public.pug
+    section.slice.slice-lg
+      a.btn.btn-neutral.btn-icon-only.rounded-circle.position-absolute.left-4.top-90.d-none.d-lg-inline-flex(href="/")
+        span.btn-inner--icon
+          i(data-feather='arrow-left')
       .container.d-flex.flex-column
-        .row.align-items-center.justify-content-center.min-vh-100
+        .row.align-items-center.justify-content-center
           .col-md-6.col-lg-5.col-xl-4.py-6.py-md-0
             div
               .mb-5.text-center
@@ -64,7 +24,7 @@ html
                 .form-group
                   label.form-control-label Логин
                   .input-group.input-group-merge
-                    input#login.form-control.form-control-prepend(type='text', name="login", placeholder='example_name')
+                    input#login.form-control.form-control-prepend(type='text', name="login", placeholder='Логин', maxlength=17)
                     .input-group-prepend
                       span.input-group-text
                         i(data-feather='user')
@@ -73,14 +33,20 @@ html
                     div
                       label.form-control-label Пароль
                     .mb-2
+                      i(data-feather='eye').mr-1
                       a.small.text-muted.text-underline--dashed.border-primary(href='#', data-toggle='password-text', data-target='#password') Показать пароль
                   .input-group.input-group-merge
-                    input#password.form-control.form-control-prepend(type='password', name="password", placeholder='Пароль')
+                    input#password.form-control.form-control-prepend(type='password', name="password", placeholder='Пароль', maxlength=65)
                     .input-group-prepend
                       span.input-group-text
                         i(data-feather='key')
-                .mt-4
-                  button.btn.btn-block.btn-primary(type='submit') Войти
+                .row.mt-4
+                  .col.form-group.mb-0
+                    button.btn.btn-block.btn-primary(type='submit') Войти
+                  .col.form-group.mb-0
+                    a(href="/")
+                      button.btn.btn-block.btn-secondary(type='button') На главную
+    include includes/footer.pug
     script(src='../assets/libs/jquery/dist/jquery.min.js')
     script(src='../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js')
     script(src='../assets/libs/svg-injector/dist/svg-injector.min.js')
@@ -94,3 +60,4 @@ html
       width: "1em",
       height: "1em"
       })
+    include includes/yandex_metrika.pug
