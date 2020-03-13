@@ -50,7 +50,7 @@ module.exports = {
               return callback({
                 title: "Изменение дисциплины",
                 discipline: disc_detail,
-                errorMessage: "Something wrong with update - try again."
+                errorMessage: "Что-то не так с обновлением, попробуйте снова."
               }, "disc_form", 0, 0 );
             }
             console.log(result);

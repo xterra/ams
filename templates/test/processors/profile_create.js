@@ -18,94 +18,118 @@ module.exports = {
         callback();
         return router.bleed(403, null, response);
       }
-      if(request.method == "POST"){
-        router.downloadClientPostData(request, function(err, data){
-          if(err){
-            callback();
-            return router.bleed(400, null, response);
-          }
-          const postData = qs.parse(data);
-          if(postData.username.length < 5 || postData.password.length < 8){
-            return callback({
-              title: "Новый профиль",
-              adminName: adminInfo.username,
-              userInfo: postData,
-              errorMessage: "Логин или пароль короткие!"
-            }, "profile_create", 0, 0);
-          }
-
-          if(postData.username.length > 16 || postData.password.length > 64){
-            return callback({
-              title: "Новый профиль",
-              adminName: adminInfo.username,
-              userInfo: postData,
-              errorMessage: "Логин или пароль слишком длинные!"
-            }, "profile_create", 0, 0);
-          }
-          const cryptoPass = md5(postData.password);
-          return db.collection("users").findOne({username: postData.username}, {_id:1}, null, function(err, foundUser){
+      db.collection("groups").find({}, {fullname: 1, url: 1}).toArray(function(err, result){
+        if(err){
+          callback();
+          return router.bleed(500, null, response, err);
+        }
+        const groups = result;
+        if(request.method == "POST"){
+          router.downloadClientPostData(request, function(err, data){
             if(err){
               callback();
-              return router.bleed(500, null, response, err);
+              return router.bleed(400, null, response);
             }
-            if(foundUser){
+            const postData = qs.parse(data);
+            if(postData.username.length < 5 || postData.password.length < 8){
               return callback({
                 title: "Новый профиль",
                 adminName: adminInfo.username,
                 userInfo: postData,
-                errorMessage: "Такой пользователь уже существует!"
+                groups: groups,
+                errorMessage: "Логин или пароль короткие!"
               }, "profile_create", 0, 0);
-            }else{
-              db.collection("users").insertOne({
-                email: postData.email,
-                phone: postData.phone,
-                lastName: postData.lastname,
-                name: postData.name,
-                fatherName: postData.fathername,
-                username: postData.username,
-                password: cryptoPass,
-                accountCreated: new Date(),
-                passwordChanged: new Date(),
-                passwordChangesHistory: [],
-                loginHistory: [],
-                bannedTill: null,
-                bannedReason: null,
-                securityGrants: [],
-                securityRole: [postData.securityRole],
-                personalDataUsageAgreed: new Date(),
-                accountActivated: new Date()
-              }, null, function(err, result){ //TODO:ПЕРЕДЕЛАТЬ!!!
-                if (!err) {
-                  console.log(`User created with id: ${result.insertedId}`);
-                  callback();
-                  return router.bleed(301, "/profiles/", response);
-                } else {
-                    if(result.result.ok === 1) {
-                      return callback({
-                        title: "Новый профиль",
-                        adminName: adminInfo.username,
-                        userInfo: postData,
-                        errorMessage: "Пользователь не создан... Попробуйте ещё раз!"
-                      }, "profile_create", 0, 0);
-                    } else {
-                        callback();
-                        return router.bleed(500, null, response, new Error("Unknown problem: db insert is non-ok"));
-                    }
-                }
+            }
+
+            if(postData.username.length > 16 || postData.password.length > 64){
+              return callback({
+                title: "Новый профиль",
+                adminName: adminInfo.username,
+                userInfo: postData,
+                groups: groups,
+                errorMessage: "Логин или пароль слишком длинные!"
+              }, "profile_create", 0, 0);
+            }
+            const cryptoPass = md5(postData.password);
+            return db.collection("users").findOne({username: postData.username}, {_id:1}, null, function(err, foundUser){
+              if(err){
                 callback();
                 return router.bleed(500, null, response, err);
-              });
-            }
+              }
+
+
+              if(foundUser){
+                return callback({
+                  title: "Новый профиль",
+                  adminName: adminInfo.username,
+                  userInfo: postData,
+                  groups: groups,
+                  errorMessage: "Такой пользователь уже существует!"
+                }, "profile_create", 0, 0);
+              }else{
+                let positionOrGroupKey,
+                    positionOrGroupValue;
+                if(postData.securityRole == "student"){
+                  positionOrGroupKey = "group";
+                  positionOrGroupValue = postData.group;
+                } else{
+                  positionOrGroupKey = "position";
+                  positionOrGroupValue = postData.position;
+                }
+                db.collection("users").insertOne({
+                  email: postData.email,
+                  phone: postData.phone,
+                  lastName: postData.lastname,
+                  name: postData.name,
+                  fatherName: postData.fathername,
+                  username: postData.username,
+                  password: cryptoPass,
+                  accountCreated: new Date(),
+                  passwordChanged: new Date(),
+                  passwordChangesHistory: [],
+                  [positionOrGroupKey]: positionOrGroupValue,
+                  loginHistory: [],
+                  bannedTill: null,
+                  bannedReason: null,
+                  securityGrants: [],
+                  securityRole: [postData.securityRole],
+                  personalDataUsageAgreed: new Date(),
+                  accountActivated: new Date()
+                }, null, function(err, result){ //TODO:ПЕРЕДЕЛАТЬ!!!
+                  if (!err) {
+                    console.log(`User created with id: ${result.insertedId}`);
+                    callback();
+                    return router.bleed(301, "/profiles/", response);
+                  } else {
+                      if(result.result.ok === 1) {
+                        return callback({
+                          title: "Новый профиль",
+                          adminName: adminInfo.username,
+                          userInfo: postData,
+                          groups: groups,
+                          errorMessage: "Пользователь не создан... Попробуйте ещё раз!"
+                        }, "profile_create", 0, 0);
+                      } else {
+                          callback();
+                          return router.bleed(500, null, response, new Error("Unknown problem: db insert is non-ok"));
+                      }
+                  }
+                  callback();
+                  return router.bleed(500, null, response, err);
+                });
+              }
+            });
           });
-        });
-      } else{
-          return callback({
-            title: "Новый профиль",
-            adminName: adminInfo.username,
-            userInfo: {},
-            errorMessage: ""
-          }, "profile_create", 0, 0);
-      }
+        } else{
+            return callback({
+              title: "Новый профиль",
+              adminName: adminInfo.username,
+              userInfo: {},
+              groups: groups,
+              errorMessage: ""
+            }, "profile_create", 0, 0);
+        }
+      });
     });
   }
 }

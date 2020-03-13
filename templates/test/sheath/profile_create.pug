@@ -3,6 +3,7 @@ html
   head
     title #{title}
     include includes/head_html.pug
+    script(src="../../../../profiles_form_script.js" type="text/javascript")
     link(rel='stylesheet', href='../../assets/libs/fortawesome/fontawesome-free/css/all.min.css')
   body
     include includes/header_private.pug
@@ -54,11 +55,29 @@ html
                       div
                         label.form-control-label Роль
                           span.text-danger *
-                    select#securityRole.custom-select(type="select" name="securityRole" placeholder="Роль пользователя" required)
+                    select#securityRole.custom-select(type="select" name="securityRole" placeholder="Роль пользователя" onchange="selectedRole();" required)
                       option(value="teacher") teacher
                       option(value="student") student
                       option(value="superadmin") superadmin
                       option(value="admin") admin
+                .row.mt-2#position
+                  .col.form-group.mb-0
+                    .d-flex.align-items-center.justify-content-between
+                      div
+                        label.form-control-label Должность
+                    select.custom-select(type="select" name="position" placeholder="Должность преподавателя" )
+                      option(value="Доцент") Доцент
+                      option(value="Преподаватель") Преподаватель
+                      option(value="Профессор") Профессор
+                      option(value="Старший преподаватель") Старший преподаватель
+                .row.mt-2#group(hidden="true")
+                  .col.form-group.mb-0
+                    .d-flex.align-items-center.justify-content-between
+                      div
+                        label.form-control-label Группа
+                    select.custom-select(type="select" name="group" placeholder="Группа студента")
+                      for group in groups
+                        option(value=group._id) #{group.fullname}
                 .row.mt-2
                   .col.form-group.mb-0
                     .d-flex.align-items-center.justify-content-between

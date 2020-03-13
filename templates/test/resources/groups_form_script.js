@@ -1,8 +1,8 @@
 function selectedGroup(){
-  let group = document.getElementById('group');
-  let valueGroup = group.options[group.selectedIndex].value;
+  let typeEducation = document.getElementById('typeEducation');
+  let typeEducationValue = typeEducation.options[typeEducation.selectedIndex].value;
   let course = document.getElementById('course');
-  if  (valueGroup == "УВВ"){
+  if  (typeEducationValue == "Магистратура"){
     course.options.length = 0;
     for(let i = 1; i < 3; i++){
       course.options[i-1] = new Option(i, i);
