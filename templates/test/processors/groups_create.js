@@ -29,7 +29,7 @@ module.exports = {
               if(/[А-яЁё]/gi.test(postData.url)){
                 return callback({
                   title: "Новая группа",
-                  group: postData,
+                  groupInfo: postData,
                   errorMessage: "Имя группы для ссылки должно быть на английском!"
                 }, "groups_form", 0, 0 );
               }
@@ -41,7 +41,7 @@ module.exports = {
                 if(foundGroup){
                   return callback({
                     title: "Новая группа",
-                    group: postData,
+                    groupInfo: postData,
                     errorMessage: "Группа с таким URL уже существует!"
                   }, "groups_form", 0, 0);
                 } else{

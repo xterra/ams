@@ -1,6 +1,7 @@
 const md5 = require("md5"),
       router = require('../../../router'),
-      qs = require('querystring');
+      qs = require('querystring'),
+      ObjectID = require('mongodb').ObjectID
 module.exports = {
   path: new RegExp("^\/profiles\/new\/$"),
   processor: function(request, response, callback, sessionContext, sessionToken, db){
@@ -71,7 +72,7 @@ module.exports = {
                     positionOrGroupValue;
                 if(postData.securityRole == "student"){
                   positionOrGroupKey = "group";
-                  positionOrGroupValue = postData.group;
+                  positionOrGroupValue = new ObjectID(postData.group);
                 } else{
                   positionOrGroupKey = "position";
                   positionOrGroupValue = postData.position;

@@ -89,7 +89,7 @@ module.exports= {
                 title: "Загрузка файла",
                 discipline: discipline,
                 userInfo: userInfo,
-                message: `Файл загружен на сервер. Добавлен к дициплине ${discipline.name}`,
+                message: `Файл загружен на сервер. Добавлен к дисциплине ${discipline.name}`,
               }, "file_upload", 0, 0);
             });
           });

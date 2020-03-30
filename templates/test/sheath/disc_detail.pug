@@ -45,10 +45,10 @@ html
                     .row.align-items-center
                       .col-auto
                         -var dirName = file._id.substr(0,2);
-                        a(href=href="/"+dirName+"/"+file._id download=file.name+"."+file.ext)
+                        a(href=href="/"+dirName+"/"+file._id download=discipline.mnemo+"_"+file.name+"."+file.ext)
                           i(data-feather='file-text')
                       .col.ml-n2
-                        a(href=href="/"+dirName+"/"+file._id download=file.name+"."+file.ext)
+                        a(href=href="/"+dirName+"/"+file._id download=discipline.mnemo+"_"+file.name+"."+file.ext)
                           h6.text-sm.mb-0 #{file.name}
                         p.card-text.small.text-muted #{file.comment}
                       .col-md.d-none.d-md-block
@@ -56,7 +56,7 @@ html
                         |  #{file.formatedDate}
                       .col-auto
                         .actions.text-right.ml-3
-                          a.action-item.mr-2(href="/"+dirName+"/"+file._id download=file.name+"."+file.ext)
+                          a.action-item.mr-2(href="/"+dirName+"/"+file._id download=discipline.mnemo+"_"+file.name+"."+file.ext)
                             i(data-feather='download')
                           if (userInfo.securityRole.includes("superadmin") || (userInfo.securityRole.includes("teacher") && discipline.editors.includes(userInfo._id.toString())))
                             a.action-item.mr-2(href="/file/edit/"+discipline.allias+"/"+file._id+"/")
@@ -69,6 +69,7 @@ html
                     .row.align-items-center
                       .col-auto
                        p Документов пока нет    
+    include includes/footer.pug 
     script(src='../../assets/libs/jquery/dist/jquery.min.js')
     script(src='../../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js')
     script(src='../../assets/libs/svg-injector/dist/svg-injector.min.js')

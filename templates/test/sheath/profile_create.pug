@@ -66,8 +66,9 @@ html
                       div
                         label.form-control-label Должность
                     select.custom-select(type="select" name="position" placeholder="Должность преподавателя" )
+                      option(value=null selected) Не назначена
+                      option(value="Ассистент") Ассистент
                       option(value="Доцент") Доцент
-                      option(value="Преподаватель") Преподаватель
                       option(value="Профессор") Профессор
                       option(value="Старший преподаватель") Старший преподаватель
                 .row.mt-2#group(hidden="true")
@@ -76,6 +77,7 @@ html
                       div
                         label.form-control-label Группа
                     select.custom-select(type="select" name="group" placeholder="Группа студента")
+                      option(value=null selected) Не назначена
                       for group in groups
                         option(value=group._id) #{group.fullname}
                 .row.mt-2
@@ -126,6 +128,7 @@ html
                   .col.form-group.mb-0
                     a(href="/profiles/")
                       button.btn.btn-block.btn-secondary(type="button") Отмена
+    include includes/footer.pug 
     script(src='../../assets/libs/jquery/dist/jquery.min.js')
     script(src='../../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js')
     script(src='../../assets/libs/svg-injector/dist/svg-injector.min.js')

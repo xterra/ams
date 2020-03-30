@@ -1,0 +1,19 @@
+doctype html
+html
+  head
+    title #{title}
+    script(src="../../../../multiple_select.js" type="text/javascript")
+    link(rel='stylesheet', href='../../../../assets/libs/select2/dist/css/select2.min.css')
+  body
+    form#FormMyLove(name='FormMyLove' action='', method='POST')
+      select#multiple_select.form-control(data-toggle='select' name="multiple_select" multiple='', size='3', onchange='SelectShow()')
+        option(value='Айва') Айва
+        option(selected="true" value='Абрикос') Абрикос
+        option(value='Персик') Персик
+        option(selected="true" value='Слива') Слива
+        option(value='Груша') Груша
+      button(type='submit') Применить 
+    #selectedValue Выбранное значение: Абрикос; Слива
+    script(src='../../assets/libs/select2/dist/js/select2.min.js')
+  
+    

@@ -61,14 +61,14 @@ html
                           if role == userInfo.securityRole
                             option(value=role selected) #{role}
                           else
-                            option(value=role) #{role}
-                .row.mt-2#position
+                            option(value=role) #{role}      
+                .row.mt-2#position(hidden=userInfo.securityRole.includes('teacher') ? false : true)
                   .col.form-group.mb-0
                     .d-flex.align-items-center.justify-content-between
                       div
                         label.form-control-label Должность
                     select.custom-select(type="select" name="position" placeholder="Должность преподавателя" )
-                      -let positions = ["Доцент", "Преподаватель", "Профессор", "Старший преподаватель"]
+                      -let positions = ["Ассистент", "Доцент", "Профессор", "Старший преподаватель"]
                         if(userInfo.securityRole.includes("teacher"))
                           for position in positions
                             if(userInfo.position==position)
@@ -76,9 +76,10 @@ html
                             else
                               option(value=position) #{position}
                         else
+                          option(value=null selected) Не назначена
                           for position in positions
                             option(value=position) #{position}
-                .row.mt-2#group
+                .row.mt-2#group(hidden=userInfo.securityRole.includes('teacher') ? true : false)
                   .col.form-group.mb-0
                     .d-flex.align-items-center.justify-content-between
                       div
@@ -86,13 +87,15 @@ html
                     select.custom-select(type="select" name="group" placeholder="Группа студента")
                       if(userInfo.securityRole.includes("student"))
                         for group in groups
-                          if(userInfo.group==group.url.toString())
-                            option(value=group.url.toString() selected) #{group.fullname}
+                          if(userInfo.group.toString()==group._id.toString())
+                            option(value=group._id.toString() selected) #{group.fullname}
                           else
-                            option(value=group.url.toString()) #{group.fullname}
+                            option(value=group._id.toString()) #{group.fullname}
+                        option(value=null) Не назначена
                       else
+                        option(value=null selected) Не назначена
                         for group in groups
-                          option(value=group.url.toString()) #{group.fullname}
+                          option(value=group._id.toString()) #{group.fullname}
                 .row.mt-2
                   .col.form-group.mb-0
                     .d-flex.align-items-center.justify-content-between
@@ -129,6 +132,7 @@ html
                   .col.form-group.mb-0
                     a(href="/profiles/")
                       button.btn.btn-block.btn-secondary(type="button") Отмена
+    include includes/footer.pug 
     script(src='../../../assets/libs/jquery/dist/jquery.min.js')
     script(src='../../../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js')
     script(src='../../../assets/libs/svg-injector/dist/svg-injector.min.js')

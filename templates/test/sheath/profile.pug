@@ -21,9 +21,14 @@ html
                 h2.mb-0
                   b #{profileInfo.lastName}
                   |  #{profileInfo.name} #{profileInfo.fatherName}
-                -let role = { "student": "Студент", "teacher": "Сотрудник кафедры", "admin": "admin", "superadmin": "superadmin"}
-                span.text-muted.d-block #{role[profileInfo.securityRole[0]]}
-    section.slice.slice-sm.bg-section-secondary
+                if profileInfo.securityRole.includes("teacher")
+                  span.text-muted.d-block #{profileInfo.position}
+                else if profileInfo.securityRole.includes("student")
+                  span.text-muted.d-block Студент группы #{profileInfo.groupInfo[0].fullname}
+                else
+                  #{profileInfo.securityRole[0]}
+                
+    section.slice.slice-sm.bg-section-secondary(style="min-height: 380px")
       .container
         .row.justify-content-center
           .col-lg-7

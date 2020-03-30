@@ -9,7 +9,7 @@ html
       .spinner-border.text-primary(role='status')
         span.sr-only Loading...
     include includes/header_private.pug
-    section.slice.slice-lg.delimiter-bottom
+    section.slice.slice-lg.delimiter-bottom(style="min-height: 580px")
       a.btn.btn-neutral.btn-icon-only.rounded-circle.position-absolute.left-4.top-90.d-none.d-lg-inline-flex(href="/")
         span.btn-inner--icon
           i(data-feather='arrow-left')
@@ -51,7 +51,7 @@ html
                             a.name.h6.mb-0.text-sm(href="/groups/"+group.url+"/") #{group.fullname}
                             small.d-block.font-weight-bold #{group.name}, #{group.course} курс 
                           td
-                              if group.elderInfo.length == 0
+                              if group.elder==undefined
                                 p.text-sm.font-weight-bold Не назначен
                               else
                                 p.text-sm.font-weight-bold #{group.elderInfo[0].lastName} #{group.elderInfo[0].name}

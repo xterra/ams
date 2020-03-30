@@ -11,13 +11,23 @@ html
     include includes/header_private.pug
     if userInfo.securityRole.includes("teacher")
       include includes/disciplines_for_teacher.pug
+    else if userInfo.securityRole.includes("student")
+      include includes/disciplines_for_student.pug
     else
-      section.slice.py-5.bg-section-secondary
+      section.slice.py-5.bg-section-secondary(style="min-height: 580px")
         .container
           .row
             .col-md-3
               .mb-4
+                include includes/filter_disciplines.pug
             .col-md-9
+              .row.align-items-center.mb-4
+                .col
+                  .input-group.input-group-merge
+                    input#search.form-control.form-control-prepend(type='text', name="search", placeholder='Поиск по дисциплинам')
+                    .input-group-prepend
+                        span.input-group-text
+                          i(data-feather='search')
               .row.align-items-center.mb-4
                 .col
                   h1.h5.mb-0 Дисциплины
@@ -40,8 +50,15 @@ html
                         .card-body.pt-0
                           .mt-1
                             p.mb-0.text-sm.text-muted #{disc.name}
+                          .mt-1
+                            for group in disc.groupsInfo
+                              p.badge.badge-primary.badge-pill.mb-2.text-center  #{group.fullname}
+                              label(hidden="true") #{group.typeEducation}, #{group.course} курс
                 else 
                   p Дисциплин пока ещё нет.
+    include includes/footer.pug 
+    script(src="../../../../disciplines_search.js" type="text/javascript")
+    script(src="../../../../disciplines_filter.js" type="text/javascript")
     script(src='../assets/libs/jquery/dist/jquery.min.js')
     script(src='../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js')
     script(src='../assets/libs/svg-injector/dist/svg-injector.min.js')

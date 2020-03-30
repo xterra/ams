@@ -7,10 +7,8 @@ module.exports = {
   path: new RegExp("^\/disciplines\/[^\/]+\/$"),
   processor: function(request, response, callback, sessionContext, sessionToken, db){
     requestedUrl = decodeURI(request.url);
-    console.log(requestedUrl);
     delimeteredUrl = requestedUrl.split("/");
     disciplineAllias = delimeteredUrl[delimeteredUrl.length-2];
-    console.log(disciplineAllias);
     db.collection("disciplines").findOne({allias : disciplineAllias}, function(err, result){
       if(err){
         callback();

@@ -71,7 +71,7 @@ module.exports = {
                     positionOrGroupValue;
                 if(postData.securityRole == "student"){
                   positionOrGroupKey = "group";
-                  positionOrGroupValue = postData.group;
+                  positionOrGroupValue = new ObjectID(postData.group);
                 } else{
                   positionOrGroupKey = "position";
                   positionOrGroupValue = postData.position;

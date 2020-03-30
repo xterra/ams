@@ -13,6 +13,11 @@ module.exports = {
         return router.bleed(500, null, response, err);
       }
       const userInfo = result;
+      db.collection("groups").find().toArray(function(err, result){
+        const test = result;
+        console.log(`\n GROUPS \n ${test}`);
+        console.log(test);
+      });
       db.collection("groups").aggregate([
    {
      $lookup:
