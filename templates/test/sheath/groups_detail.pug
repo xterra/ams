@@ -9,7 +9,7 @@ html
       .spinner-border.text-primary(role='status')
         span.sr-only Loading...
     include includes/header_private.pug
-    section.slice.slice-lg.delimiter-bottom
+    section.slice.slice-lg.delimiter-bottom(style="min-height: 580px")
       a.btn.btn-neutral.btn-icon-only.rounded-circle.position-absolute.left-4.top-90.d-none.d-lg-inline-flex(href="/")
         span.btn-inner--icon
           i(data-feather='arrow-left')
@@ -35,7 +35,7 @@ html
                   ul.list-group
                     -groupList.sort((a,b) => {let textA = a.lastName.toUpperCase(); let textB = b.lastName.toUpperCase(); return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;});
                     each student in groupList
-                      if student._id.toString()===groupInfo.elder.toString()
+                      if groupInfo.elder !== undefined && student._id.toString()===groupInfo.elder.toString()
                         a.list-group-item.list-group-item-action.d-flex.justify-content-between.align-items-centeractive(href='/profiles/'+student._id+'/')
                           | #{student.lastName} #{student.name}
                           span.badge.badge-primary.badge-pill староста

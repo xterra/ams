@@ -75,7 +75,7 @@ html
                         option(value=group._id.toString()) #{group.fullname}
                     else
                       for group in groupsInfo
-                        if discipline.groups.includes(group._id.toString())
+                        if discipline.groups !== undefined && discipline.groups.includes(group._id.toString())
                           option(selected=true value=group._id.toString()) #{group.fullname}
                           -selectedGroups.push(group.fullname);
                         else
