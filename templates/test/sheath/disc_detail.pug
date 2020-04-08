@@ -37,8 +37,9 @@ html
                   if (userInfo.securityRole.includes("superadmin") || (userInfo.securityRole.includes("teacher") && discipline.editors.includes(userInfo._id.toString())))
                     .col-auto.px-2
                       a(href="/file/upload/"+discipline.allias+"/")
-                        button.btn.btn-secondary.px-3(type='button')
-                          i(data-feather='plus')
+                        button.btn.btn-sm.btn-primary.btn-icon-only.rounded-circle(type='button')
+                          span.btn-inner--icon
+                            i.fas.fa-plus
               ul.list-group.list-group-flush
                 each file in files
                   li.list-group-item

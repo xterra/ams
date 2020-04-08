@@ -32,7 +32,6 @@ module.exports = {
           }
           const teachersList = result;
           if(request.method == "POST"){
-            console.log(request);
             return router.downloadClientPostData(request, function(err, data){
               if(err){
                 callback();

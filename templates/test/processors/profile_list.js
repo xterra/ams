@@ -20,9 +20,25 @@ module.exports = {
           return false;
         }
       });
+      let teachers = users.filter((curUser) => {
+          if(curUser.securityRole.includes('teacher')){
+            return true;
+          } else {
+            return false;
+          }
+        });
+        console.log(teachers);
+      let students = users.filter((curUser) => {
+          if(curUser.securityRole.includes('student')){
+            return true;
+          } else {
+            return false;
+          }
+        });
       return callback({
         title: "Список пользователей",
-        profiles: users,
+        teachers: teachers,
+        students: students,
         currentUser: currentUser
       }, "profile_list", 0, 0);
     });

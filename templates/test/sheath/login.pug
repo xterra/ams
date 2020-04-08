@@ -19,7 +19,8 @@ html
                 p.text-muted.mb-0 Войдите в свой аккаунт.
               span.clearfix
               if errorMessage.length
-                p.mb-0(style=" color: red")=errorMessage
+                .alert.alert-danger(role='alert')
+                  | #{errorMessage}
               form(action='.', method='POST')
                 .form-group
                   label.form-control-label Логин
@@ -34,7 +35,7 @@ html
                       label.form-control-label Пароль
                     .mb-2
                       i(data-feather='eye').mr-1
-                      a.small.text-muted.text-underline--dashed.border-primary(href='#', data-toggle='password-text', data-target='#password') Показать пароль
+                      a.small.text-muted.text-underline--dashed.border-primary(href='#', data-toggle='password-text', data-target='#password', onclick='this.innerHTML=="Показать пароль" ? this.innerHTML="Скрыть пароль" : this.innerHTML="Показать пароль"') Показать пароль
                   .input-group.input-group-merge
                     input#password.form-control.form-control-prepend(type='password', name="password", placeholder='Пароль', maxlength=65)
                     .input-group-prepend
@@ -60,4 +61,6 @@ html
       width: "1em",
       height: "1em"
       })
+    script.
+      
     include includes/yandex_metrika.pug

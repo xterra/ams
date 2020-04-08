@@ -13,13 +13,14 @@ html
           i(data-feather='arrow-left')
       .container.d-flex.flex-column
         .row.align-items-center.justify-content-center
-          .col-md-6.col-lg-7.col-xl-8.py-6.py-md-0
+          .col-lg-7.col-xl-8.py-6.py-md-0
             div
-              .mb-5.text-center
+              .mb-3.text-center
                 h6.h3.mb-1 #{title}
               span.clearfix
               if errorMessage.length
-                p.mb-0(style=" color: red")=errorMessage
+                .alert.alert-danger(role='alert')
+                  | #{errorMessage}
               form(action='.', method='POST')
                 .form-group.mb-0
                     .d-flex.align-items-center.justify-content-between
@@ -32,11 +33,9 @@ html
                         span.input-group-text
                           i(data-feather='align-left')
                 .row
-                  .col.form-group.mb-0
-                    .d-flex.align-items-center.justify-content-between
-                      div
-                        label.form-control-label Тип обучения
-                          span.text-danger *
+                  .col.form-group.my-3
+                    label.form-control-label Тип обучения
+                      span.text-danger *
                     select#typeEducation.custom-select(type='select', name="typeEducation", placeholder='Группа', onChange="selectedGroup();" required)
                       -let types = ["Бакалавриат", "Магистратура"]
                       for type in types
@@ -44,11 +43,9 @@ html
                           option(value=type selected) #{type}
                         else
                           option(value=type) #{type}
-                  .col.form-group.mb-0
-                    .d-flex.align-items-center.justify-content-between
-                      div
-                        label.form-control-label Курс
-                          span.text-danger *
+                  .col.form-group.my-3
+                    label.form-control-label Курс
+                      span.text-danger *  
                     select#course.custom-select(type='select', name="course", placeholder='Номер курса', required)
                       -let courses;
                       if groupInfo !== undefined && groupInfo.typeEducation == 'Магистратура'
@@ -61,31 +58,25 @@ html
                         else
                           option(value=course) #{course}
                 .row
-                  .col.form-group.mb-0
-                    .d-flex.align-items-center.justify-content-between
-                      div
-                        label.form-control-label Полное наименование
-                          span.text-danger *
+                  .col.form-group.my-3
+                    label.form-control-label Полное наименование
+                      span.text-danger *  
                     .input-group.input-group-merge
                       input#fullname.form-control.form-control-prepend(type='text', name="fullname", placeholder='Наименования с цифрами', required, value=(groupInfo==undefined ? "" : groupInfo.fullname), maxlength=20)
                       .input-group-prepend
                         span.input-group-text
                           i(data-feather='minimize-2')
-                  .col.form-group.mb-0
-                    .d-flex.align-items-center.justify-content-between
-                      div
-                        label.form-control-label Имя для ссылки(URL)
-                          span.text-danger *
+                  .col.form-group.my-3
+                    label.form-control-label Имя для ссылки(URL)
+                      span.text-danger *
                     .input-group.input-group-merge
                       input#url.form-control.form-control-prepend(type='text', name="url", placeholder='Короткое имя для ссылки', required, value=(groupInfo==undefined ? "" : groupInfo.url), , maxlength=15)
                       .input-group-prepend
                         span.input-group-text
                           i(data-feather='link')  
                 if groupList!==undefined
-                  .form-group.mb-0
-                      .d-flex.align-items-center.justify-content-between
-                        div
-                          label.form-control-label Староста группы
+                  .form-group.my-3
+                      label.form-control-label Староста группы
                       select#elder.custom-select(type='select', name="elder", placeholder='Староста группы')
                         -groupList.sort((a,b) => {let textA = a.fullname.toUpperCase(); let textB = b.lastName.toUpperCase(); return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;});
                         if groupInfo.elder==undefined

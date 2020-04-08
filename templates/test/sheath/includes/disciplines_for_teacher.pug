@@ -12,6 +12,8 @@ section.slice.py-5.bg-section-secondary(style="min-height: 580px")
               .input-group-prepend
                   span.input-group-text
                     i(data-feather='search')
+              a.input-group-text#cleanerText
+                i(data-feather='x')
         .row.align-items-center.mb-4
           .col
             h1.h5.mb-0 Ваши дисциплины
@@ -25,7 +27,7 @@ section.slice.py-5.bg-section-secondary(style="min-height: 580px")
           each disc in teacherDisciplines 
             .col-sm-6.col-lg-4.px-2
               .card.mb-3(style="min-width: 175px; min-height: 150px")
-                a.action-item.mr-2(href=urlDiscDetail+disc.allias+"/", data-toggle='tooltip', title='Просмотр')
+                a.mr-2(href=urlDiscDetail+disc.allias+"/")
                   .card-header.pb-3
                     .d-flex.justify-content-between.align-items-center
                       div
@@ -46,7 +48,7 @@ section.slice.py-5.bg-section-secondary(style="min-height: 580px")
           each otherDisc in otherDisciplines 
             .col-sm-6.col-lg-4.px-2
               .card.mb-3(style="min-width: 175px; min-height: 150px")
-                a.action-item.mr-2(href=urlDiscDetail+otherDisc.allias+"/", data-toggle='tooltip', title='Просмотр')
+                a.mr-2(href=urlDiscDetail+otherDisc.allias+"/")
                   .card-header.pb-3
                     .d-flex.justify-content-between.align-items-center
                       div

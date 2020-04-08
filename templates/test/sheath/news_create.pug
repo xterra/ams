@@ -9,19 +9,20 @@ html
       .spinner-border.text-primary(role='status')
         span.sr-only Loading...
     include includes/header_private.pug
-    section
+    section.slice.slice-lg.delimiter-bottom
       a.btn.btn-neutral.btn-icon-only.rounded-circle.position-absolute.left-4.top-90.d-none.d-lg-inline-flex(href="/news/")
         span.btn-inner--icon
           i(data-feather='arrow-left')
       .container.d-flex.flex-column
-        .row.align-items-center.justify-content-center.min-vh-100
-          .col-md-6.col-lg-6.col-xl-6.py-6.py-md-0
+        .row.align-items-center.justify-content-center
+          .col-lg-6.col-xl-6.py-6.py-md-0
             div
-              .mb-5.text-center
+              .mb-3.text-center
                 h6.h3.mb-1 Создание новости
               span.clearfix
               if errorMessage.length
-                p.mb-0(style=" color: red")=errorMessage
+                .alert.alert-danger(role='alert')
+                  | #{errorMessage}
               form(action='.', method='POST')
                 .form-group
                   label.form-control-label Заголовок
@@ -31,30 +32,24 @@ html
                     .input-group-prepend
                       span.input-group-text
                         i(data-feather='align-left')
-                .form-group.mb-0
-                  .d-flex.align-items-center.justify-content-between
-                    div
-                      label.form-control-label Имя для ссылки
-                        span.text-danger *
+                .form-group.my-3
+                  label.form-control-label Имя для ссылки
+                    span.text-danger *  
                   .input-group.input-group-merge
                     input#url.form-control.form-control-prepend(type='text', placeholder='Короткое имя для URL', name='url', value='', required, maxlength=60)
                     .input-group-prepend
                       span.input-group-text
                         i(data-feather='at-sign')
-                .form-group.mb-0
-                  .d-flex.align-items-center.justify-content-between
-                    div
-                      label.form-control-label Краткое описание
+                .form-group.my-3
+                  label.form-control-label Краткое описание
                   .input-group.input-group-merge
                     textarea#short.form-control.form-control-prepend(type='textarea', placeholder='Краткое описание новости', name='short', value='', rows="2", maxlength=140)
                     .input-group-prepend
                       span.input-group-text
                         i(data-feather='align-justify')
-                .form-group.mb-0
-                  .d-flex.align-items-center.justify-content-between
-                    div
-                      label.form-control-label Основной текст
-                        span.text-danger *
+                .form-group.my-3
+                  label.form-control-label Основной текст
+                    span.text-danger *
                   .input-group.input-group-merge
                     textarea#text.form-control.form-control-prepend(type='textarea', placeholder='Текст новости', name='text', value='', rows="4" required, maxlength=600)
                     .input-group-prepend

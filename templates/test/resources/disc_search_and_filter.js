@@ -51,3 +51,14 @@ let searchAndFilter = function() {
   }
 }
 searchAndFilter();
+
+let deleteSearchText = function clearSearchText() {
+  let cleanerText = document.getElementById('cleanerText');
+  cleanerText.addEventListener('click', function(){
+    searchInput = document.getElementById("search");
+    searchInput.value = '';
+    let event = new Event("input");
+    searchInput.dispatchEvent(event);
+  });
+}
+deleteSearchText();

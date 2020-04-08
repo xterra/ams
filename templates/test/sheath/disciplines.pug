@@ -4,6 +4,7 @@ html
     title #{title}
     include includes/head_html.pug
     link(rel='stylesheet', href='../assets/libs/fortawesome/fontawesome-free/css/all.min.css')
+    link(rel='stylesheet', href='../../../assets/libs/bootstrap/dist/css/bootstrap-select.css')
   body.bg-section-secondary
     .preloader
       .spinner-border.text-primary(role='status')
@@ -26,8 +27,11 @@ html
                   .input-group.input-group-merge
                     input#search.form-control.form-control-prepend(type='text', name="search", placeholder='Поиск по дисциплинам')
                     .input-group-prepend
-                        span.input-group-text
-                          i(data-feather='search')
+                      span.input-group-text
+                        i(data-feather='search')
+                    a.input-group-text#cleanerText
+                      i(data-feather='x')
+                    
               .row.align-items-center.mb-4
                 .col
                   h1.h5.mb-0 Дисциплины
@@ -42,7 +46,7 @@ html
                 each disc in disciplines 
                   .col-sm-6.col-lg-4.px-2
                     .card.mb-3(style="min-width: 175px; min-height: 150px")
-                      a.action-item.mr-2(href=urlDiscDetail+disc.allias+"/")
+                      a.mr-2(href=urlDiscDetail+disc.allias+"/")
                         .card-header.pb-3
                           .d-flex.justify-content-between.align-items-center
                             div
@@ -60,6 +64,7 @@ html
     script(src="../../../../disc_search_and_filter.js" type="text/javascript")
     script(src='../assets/libs/jquery/dist/jquery.min.js')
     script(src='../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js')
+    script(src='../../../assets/libs/bootstrap/dist/js/bootstrap-select.js')
     script(src='../assets/libs/svg-injector/dist/svg-injector.min.js')
     script(src='../assets/libs/feather-icons/dist/feather.min.js')
     script(src='../assets/libs/in-view/dist/in-view.min.js')

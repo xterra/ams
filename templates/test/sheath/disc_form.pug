@@ -6,6 +6,7 @@ html
     script(src="../../../../disc_script.js" type="text/javascript")
     script(src="../../../../multiple_select.js" type="text/javascript")
     link(rel='stylesheet', href='../../../assets/libs/fortawesome/fontawesome-free/css/all.min.css')
+    link(rel='stylesheet', href='../../../assets/libs/bootstrap/dist/css/bootstrap-select.css')
   body
     include includes/header_private.pug
     section.slice.slice-lg.delimiter-bottom
@@ -14,61 +15,52 @@ html
           i(data-feather='arrow-left')
       .container.d-flex.flex-column
         .row.align-items-center.justify-content-center
-          .col-md-6.col-lg-7.col-xl-8.py-6.py-md-0
+          .col-lg-7.col-xl-8.py-6.py-md-0
             div
-              .mb-5.text-center
+              .mb-3.text-center
                 h6.h3.mb-1 #{title}
               span.clearfix
               if errorMessage.length
-                p.mb-0(style=" color: red")=errorMessage
+                .alert.alert-danger(role='alert')
+                  | #{errorMessage}
               form(action='.', method='POST')
-                .form-group.mb-0
-                    .d-flex.align-items-center.justify-content-between
-                      div
-                        label.form-control-label Имя дисциплины
-                          span.text-danger *
+                .form-group.mb-3
+                    label.form-control-label Имя дисциплины
+                      span.text-danger *
                     .input-group.input-group-merge
                       input#name.form-control.form-control-prepend(type='text', name="name", placeholder='Имя', required, value=(discipline===undefined ? "" : discipline.name), maxlength=120)
                       .input-group-prepend
                         span.input-group-text
                           i(data-feather='align-left')
                 .row
-                  .col.form-group.mb-0
-                    .d-flex.align-items-center.justify-content-between
-                      div
-                        label.form-control-label Аббревиатура
-                          span.text-danger *
+                  .col.form-group.my-3
+                    label.form-control-label Аббревиатура
+                      span.text-danger *
                     .input-group.input-group-merge
                       input#mnemo.form-control.form-control-prepend(type='text', name="mnemo", placeholder='Краткое имя', required, value=(discipline===undefined ? "" : discipline.mnemo), maxlength=20)
                       .input-group-prepend
                         span.input-group-text
                           i(data-feather='minimize-2')
-                  .col.form-group.mb-0
-                    .d-flex.align-items-center.justify-content-between
-                      div
-                        label.form-control-label Имя ссылки(URL) для дисциплины
-                          span.text-danger *
+                  .col.form-group.my-3
+                    label.form-control-label Имя ссылки(URL) для дисциплины
+                      span.text-danger *
                     .input-group.input-group-merge
                       input#allias.form-control.form-control-prepend(type='text', name="allias", placeholder='Короткое имя для ссылки', required, value=(discipline===undefined ? "" : discipline.allias), , maxlength=30)
                       .input-group-prepend
                         span.input-group-text
                           i(data-feather='link')
-                .form-group.mb-0
-                  .d-flex.align-items-center.justify-content-between
-                    div
-                      label.form-control-label Описание дисциплины
+                .form-group.my-3
+                  label.form-control-label Описание дисциплины
                   .input-group.input-group-merge
-                    textarea#description.form-control.form-control-prepend(type='textarea', placeholder='Добавьте описание дисциплины', name='description', rows="4", maxlength=300) #{discipline===undefined ? "" : discipline.description}
+                    textarea#description.form-control.form-control-prepend(type='textarea', placeholder='Добавьте описание дисциплины', name='description', rows="4", maxlength=500) #{discipline===undefined ? "" : discipline.description}
                     .input-group-prepend
                       span.input-group-text
                         i(data-feather='align-justify') 
-                .form-group.mb-0
-                  .d-flex.align-items-center.justify-content-between
-                    div
-                      label.form-control-label Группы
-                        span.text-danger *    
+                .form-group.my-3
+                  label.form-control-label Группы
+                    span.text-danger *    
                   -let selectedGroups = [];
-                  select#groups.custom-select(type='select', name="groups", multiple='', size="1", onchange='SelectShow("groups")', required)  
+                  select#groups.selectpicker.form-control(name="groups",  data-live-search='true', title="Не выбраны", multiple='', size="1", onchange='SelectShow("groups")', required)  
                     -groupsInfo.sort((a,b) => {let textA = a.fullname.toUpperCase(); let textB = b.fullname.toUpperCase(); return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;});
                     if discipline===undefined
                       for group in groupsInfo
@@ -82,13 +74,11 @@ html
                           option(value=group._id.toString()) #{group.fullname}
                   #selectedgroups Выбранные значения: #{selectedGroups.join("; ")}  
                 if(userInfo.securityRole.includes("superadmin"))
-                  .form-group.mb-0
-                    .d-flex.align-items-center.justify-content-between
-                      div
-                        label.form-control-label Редакторы дисциплины  
-                          span.text-danger * 
+                  .form-group.my-3
+                    label.form-control-label Редакторы дисциплины  
+                      span.text-danger * 
                     -let selectedEditors = [];
-                    select#editors.custom-select(type='select', name="editors", multiple='', size="1", onchange='SelectShow("editors")', required)  
+                    select#editors.selectpicker.form-control(name="editors", data-live-search='true', title="Не выбраны", multiple='', size="1", onchange='SelectShow("editors")', required)  
                       -teachersList.sort((a,b) => {let textA = a.lastName.toUpperCase(); let textB = b.lastName.toUpperCase(); return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;});
                       if discipline===undefined
                         for teacher in teachersList
@@ -109,6 +99,7 @@ html
                       button.btn.btn-block.btn-secondary(type='button') Отмена
     script(src='../../../assets/libs/jquery/dist/jquery.min.js')
     script(src='../../../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js')
+    script(src='../../../assets/libs/bootstrap/dist/js/bootstrap-select.js')
     script(src='../../../assets/libs/svg-injector/dist/svg-injector.min.js')
     script(src='../../../assets/libs/feather-icons/dist/feather.min.js')
     script(src='../../../assets/libs/in-view/dist/in-view.min.js')

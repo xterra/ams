@@ -45,6 +45,7 @@ html
                           th(scope='col') Вид обучения
                           th(scope='col')
                       tbody
+                      -groups.sort((a,b) => {let textA = a.fullname.toUpperCase(); let textB = b.fullname.toUpperCase(); return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;});
                       each group in groups
                         tr
                           td(scope='row')
@@ -52,11 +53,11 @@ html
                             small.d-block.font-weight-bold #{group.name}, #{group.course} курс 
                           td
                               if group.elder==undefined
-                                p.text-sm.font-weight-bold Не назначен
+                                p.text-sm.font-weight-bold.pt-3 Не назначен
                               else
-                                p.text-sm.font-weight-bold #{group.elderInfo[0].lastName} #{group.elderInfo[0].name}
+                                p.text-sm.font-weight-bold.pt-3 #{group.elderInfo[0].lastName} #{group.elderInfo[0].name}
                           td
-                              p #{group.typeEducation}
+                              p.text-sm.font-weight-bold.pt-3 #{group.typeEducation}
                           td.text-right
                             .actions.ml-3
                               a.action-item.mr-2(href="/groups/"+group.url+"/")

@@ -13,16 +13,17 @@ html
           i(data-feather='arrow-left')
       .container.d-flex.flex-column
         .row.align-items-center.justify-content-center
-          .col-md-6.col-lg-7.col-xl-8.py-6.py-md-0
+          .col-lg-7.col-xl-8.py-6.py-md-0
             div
-              .mb-5.text-center
+              .mb-3.text-center
                 h6.h3.mb-1 Редактирование профиля
               span.clearfix
               if errorMessage.length
-                p.mb-0(style=" color: red")=errorMessage
+                .alert.alert-danger(role='alert')
+                  | #{errorMessage}
               form(action='.', method='POST')
                 .row
-                  .col.form-group
+                  .col.form-group.mb-0
                     label.form-control-label Фамилия
                     .input-group.input-group-merge
                       input#lastname.form-control.form-control-prepend(type='text', name="lastname", placeholder='Фамилия', required, value=(userInfo===undefined ? "" : userInfo.lastName), maxlength=50)
@@ -30,31 +31,25 @@ html
                         span.input-group-text
                           i(data-feather='align-left')
                   .col.form-group.mb-0
-                    .d-flex.align-items-center.justify-content-between
-                      div
-                        label.form-control-label Имя
-                        span.text-danger *
+                    label.form-control-label Имя
+                      span.text-danger *    
                     .input-group.input-group-merge
                       input#name.form-control.form-control-prepend(type='text', name="name", placeholder='Имя', required, value=(userInfo===undefined ? "" : userInfo.name), maxlength=40)
                       .input-group-prepend
                         span.input-group-text
                           i(data-feather='align-left')
                 .row
-                  .col.form-group.mb-0
-                    .d-flex.align-items-center.justify-content-between
-                      div
-                        label.form-control-label Отчество
+                  .col.form-group.my-3
+                    label.form-control-label Отчество
                     .input-group.input-group-merge
                       input#fathername.form-control.form-control-prepend(type='text', name="fathername", placeholder='Отчество', value=(userInfo===undefined ? "" : userInfo.fatherName), maxlength=50)
                       .input-group-prepend
                         span.input-group-text
                           i(data-feather='align-left')
                   if !userInfo.securityRole.includes("superadmin")
-                    .col.form-group.mb-0
-                      .d-flex.align-items-center.justify-content-between
-                        div
-                          label.form-control-label Роль
-                          span.text-danger *
+                    .col.form-group.my-3
+                      label.form-control-label Роль
+                        span.text-danger *    
                       select#securityRole.custom-select(type="select" name="securityRole" placeholder="Роль пользователя" onChange="selectedRole();" required)
                         -let roles = ['teacher', 'student', 'superadmin', 'admin']
                         for role in roles
@@ -62,11 +57,9 @@ html
                             option(value=role selected) #{role}
                           else
                             option(value=role) #{role}      
-                .row.mt-2#position(hidden=userInfo.securityRole.includes('teacher') ? false : true)
-                  .col.form-group.mb-0
-                    .d-flex.align-items-center.justify-content-between
-                      div
-                        label.form-control-label Должность
+                .row#position(hidden=userInfo.securityRole.includes('teacher') ? false : true)
+                  .col.form-group.my-3
+                    label.form-control-label Должность
                     select.custom-select(type="select" name="position" placeholder="Должность преподавателя" )
                       -let positions = ["Ассистент", "Доцент", "Профессор", "Старший преподаватель"]
                         if(userInfo.securityRole.includes("teacher"))
@@ -79,11 +72,9 @@ html
                           option(value=null selected) Не назначена
                           for position in positions
                             option(value=position) #{position}
-                .row.mt-2#group(hidden=userInfo.securityRole.includes('teacher') ? true : false)
-                  .col.form-group.mb-0
-                    .d-flex.align-items-center.justify-content-between
-                      div
-                        label.form-control-label Группа
+                .row#group(hidden=userInfo.securityRole.includes('teacher') ? true : false)
+                  .col.form-group.my-3
+                    label.form-control-label Группа
                     select.custom-select(type="select" name="group" placeholder="Группа студента")
                       if(userInfo.securityRole.includes("student"))
                         for group in groups
@@ -96,31 +87,25 @@ html
                         option(value=null selected) Не назначена
                         for group in groups
                           option(value=group._id.toString()) #{group.fullname}
-                .row.mt-2
-                  .col.form-group.mb-0
-                    .d-flex.align-items-center.justify-content-between
-                      div
-                        label.form-control-label Логин
-                        span.text-danger *
+                .row
+                  .col.form-group.my-3
+                    label.form-control-label Логин
+                      span.text-danger *
                     .input-group.input-group-merge
                       input#username.form-control.form-control-prepend(type='text', name="username", placeholder='Логин', required, value=(userInfo===undefined ? "" : userInfo.username), maxlength=19)
                       .input-group-prepend
                         span.input-group-text
                           i(data-feather='user')
-                .row.mt-2
-                  .col.form-group.mb-0
-                    .d-flex.align-items-center.justify-content-between
-                      div
-                        label.form-control-label Почта
+                .row
+                  .col.form-group.my-3
+                    label.form-control-label Почта
                     .input-group.input-group-merge
                       input#email.form-control.form-control-prepend(type="email" name="email" placeholder="Почта" value=(userInfo===undefined ? "" : userInfo.email), maxlength=60)
                       .input-group-prepend
                         span.input-group-text
                           i(data-feather='at-sign')
-                  .col.form-group.mb-0
-                    .d-flex.align-items-center.justify-content-between
-                      div
-                        label.form-control-label Телефон
+                  .col.form-group.my-3
+                    label.form-control-label Телефон
                     .input-group.input-group-merge
                       input#phone.form-control.form-control-prepend(type="tel" name="phone" placeholder="Телефон" value=(userInfo===undefined ? "" : userInfo.phone), maxlength=24)
                       .input-group-prepend

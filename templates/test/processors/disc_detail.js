@@ -41,10 +41,8 @@ module.exports = {
               callback();
               return router.bleed(500, null, response, err)
             }
-            console.log(result);
             disc_files = result;
             for (let file in disc_files){
-              console.log(JSON.stringify(disc_files[file]));
               disc_files[`${file}`].formatedDate = beautyDate(disc_files[file].dateEdit);
             }
             return callback({

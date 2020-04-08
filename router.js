@@ -45,7 +45,7 @@ let pugCompilerOptions = {
     pretty: false
 };
 
-let renderTimeout = 50000;
+let renderTimeout = 500000;
 let bleedStacktraceAllowed = false;
 let currentTemplateName = "test";
 

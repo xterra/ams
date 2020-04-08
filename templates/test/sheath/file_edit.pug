@@ -7,25 +7,24 @@ html
     link(rel='stylesheet', href='../../../../assets/libs/fortawesome/fontawesome-free/css/all.min.css')
   body
     include includes/header_private.pug
-    section
+    section.slice.slice-lg.delimiter-bottom
       a.btn.btn-neutral.btn-icon-only.rounded-circle.position-absolute.left-4.top-90.d-none.d-lg-inline-flex(href="/disciplines/"+discipline.allias+"/")
         span.btn-inner--icon
           i(data-feather='arrow-left')
       .container.d-flex.flex-column
         .row.align-items-center.justify-content-center
-          .col-md-6.col-lg-7.col-xl-8.py-6.py-md-0
+          .col-lg-7.col-xl-8.py-6.py-md-0
             div
-              .mb-5.text-center
+              .mb-3.text-center
                 h6.h3.mb-1 #{title}
               span.clearfix
               if errorMessage.length
-                p(style="color: red") #{errorMessage}
+                .alert.alert-danger(role='alert')
+                  | #{message}
               form#upload(action='', method='POST' enctype="")
                 .form-group.mb-0
-                    .d-flex.align-items-center
-                      div
-                        p#discipline.form-control-label(name="discipline")  Дисциплина: #{discipline.name}
-                .form-group.mb-0
+                  p#discipline.text-sm.font-weight-bold(name="discipline")  Дисциплина: #{discipline.name}
+                .form-group.my-2
                     .d-flex.align-items-center.justify-content-between
                       div
                         label.form-control-label Обновить файл
@@ -34,21 +33,17 @@ html
                           i.ml-0.mr-2(data-feather='upload')
                           span Выберите файл
                 div#fileSize
-                div#fileType
-                .form-group.mb-0
-                    .d-flex.align-items-center.justify-content-between
-                      div
-                        label.form-control-label Имя файла
-                          span.text-danger *
+                div#fileType.mb-2
+                .form-group.my-3
+                    label.form-control-label Имя файла
+                      span.text-danger *
                     .input-group.input-group-merge
                       input#filename.form-control.form-control-prepend(type='text', name="filename", placeholder='Имя файла', required, value=(fileInfo===undefined ? "" : fileInfo.name), maxlength=100)
                       .input-group-prepend
                         span.input-group-text
                           i(data-feather='file-text')
-                .form-group.mb-0
-                  .d-flex.align-items-center.justify-content-between
-                    div
-                      label.form-control-label Комментарий
+                .form-group.my-3
+                  label.form-control-label Комментарий
                   .input-group.input-group-merge
                     textarea#comment.form-control.form-control-prepend(type="textarea" name="comment", placeholder='Добавьте описание файла', rows="3", maxlength=150) #{fileInfo===undefined ? "" : fileInfo.comment}
                     .input-group-prepend

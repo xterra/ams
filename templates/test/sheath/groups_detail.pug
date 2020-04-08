@@ -10,7 +10,7 @@ html
         span.sr-only Loading...
     include includes/header_private.pug
     section.slice.slice-lg.delimiter-bottom(style="min-height: 580px")
-      a.btn.btn-neutral.btn-icon-only.rounded-circle.position-absolute.left-4.top-90.d-none.d-lg-inline-flex(href="/")
+      a.btn.btn-neutral.btn-icon-only.rounded-circle.position-absolute.left-4.top-90.d-none.d-lg-inline-flex(href="/groups/")
         span.btn-inner--icon
           i(data-feather='arrow-left')
       .container
@@ -43,7 +43,7 @@ html
                         a.list-group-item.list-group-item-action(href='/profiles/'+student._id+'/')
                           | #{student.lastName} #{student.name}
                     else
-                      p Групп пока нет
+                      p Студентов пока нет
     include includes/footer.pug                  
     script(src='../../../assets/libs/jquery/dist/jquery.min.js')
     script(src='../../../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js')

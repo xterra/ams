@@ -15,14 +15,15 @@ html
         .row.align-items-center.justify-content-center
           .col-lg-7.col-xl-8.py-6.py-md-0
             div
-              .mb-5.text-center
+              .mb-3.text-center
                 h6.h3.mb-1 Создание профиля
               span.clearfix
               if errorMessage.length
-                p.mb-0(style=" color: red")=errorMessage
+                .alert.alert-danger(role='alert')
+                  | #{errorMessage}
               form(action='.', method='POST')
                 .row
-                  .col.form-group
+                  .col.form-group.my-1
                     label.form-control-label Фамилия
                       span.text-danger *
                     .input-group.input-group-merge
@@ -30,93 +31,78 @@ html
                       .input-group-prepend
                         span.input-group-text
                           i(data-feather='align-left')
-                  .col.form-group.mb-0
-                    .d-flex.align-items-center.justify-content-between
-                      div
-                        label.form-control-label Имя
-                          span.text-danger *
+                  .col.form-group.my-1
+                    label.form-control-label Имя
+                      span.text-danger *  
                     .input-group.input-group-merge
                       input#name.form-control.form-control-prepend(type='text', name="name", placeholder='Имя', required, value=(userInfo===undefined ? "" : userInfo.name), maxlength=40)
                       .input-group-prepend
                         span.input-group-text
                           i(data-feather='align-left')
                 .row
-                  .col.form-group.mb-0
-                    .d-flex.align-items-center.justify-content-between
-                      div
-                        label.form-control-label Отчество
+                  .col.form-group.my-3
+                    label.form-control-label Отчество
                     .input-group.input-group-merge
                       input#fathername.form-control.form-control-prepend(type='text', name="fathername", placeholder='Отчество', value=(userInfo===undefined ? "" : userInfo.fatherName), maxlength=50)
                       .input-group-prepend
                         span.input-group-text
                           i(data-feather='align-left')
-                  .col.form-group.mb-0
-                    .d-flex.align-items-center.justify-content-between
-                      div
-                        label.form-control-label Роль
-                          span.text-danger *
+                  .col.form-group.my-3
+                    label.form-control-label Роль
+                      span.text-danger *    
                     select#securityRole.custom-select(type="select" name="securityRole" placeholder="Роль пользователя" onchange="selectedRole();" required)
                       option(value="teacher") teacher
                       option(value="student") student
                       option(value="superadmin") superadmin
                       option(value="admin") admin
-                .row.mt-2#position
-                  .col.form-group.mb-0
-                    .d-flex.align-items-center.justify-content-between
-                      div
-                        label.form-control-label Должность
+                .row#position
+                  .col.form-group.my-3
+                    label.form-control-label Должность
                     select.custom-select(type="select" name="position" placeholder="Должность преподавателя" )
                       option(value=null selected) Не назначена
                       option(value="Ассистент") Ассистент
                       option(value="Доцент") Доцент
                       option(value="Профессор") Профессор
                       option(value="Старший преподаватель") Старший преподаватель
-                .row.mt-2#group(hidden="true")
-                  .col.form-group.mb-0
-                    .d-flex.align-items-center.justify-content-between
-                      div
-                        label.form-control-label Группа
+                .row#group(hidden="true")
+                  .col.form-group.my-3
+                    label.form-control-label Группа
                     select.custom-select(type="select" name="group" placeholder="Группа студента")
                       option(value=null selected) Не назначена
                       for group in groups
                         option(value=group._id) #{group.fullname}
-                .row.mt-2
-                  .col.form-group.mb-0
-                    .d-flex.align-items-center.justify-content-between
-                      div
-                        label.form-control-label Логин 
-                          span.text-danger *
+                .row
+                  .col.form-group.my-3
+                    label.form-control-label Логин 
+                      span.text-danger *
                     .input-group.input-group-merge
                       input#username.form-control.form-control-prepend(type='text', name="username", placeholder='Логин', required, value=(userInfo===undefined ? "" : userInfo.username), maxlength=19)
                       .input-group-prepend
                         span.input-group-text
                           i(data-feather='user')
-                  .col.form-group.mb-0
+                  .col.form-group.my-3
                     .d-flex.align-items-center.justify-content-between
                       div
                         label.form-control-label Пароль
                           span.text-danger *
                       .mb-2
-                        a.small.text-muted.text-underline--dashed.border-primary(href='#', data-toggle='password-text', data-target='#password') Показать пароль
+                        i(data-feather='eye').mr-1
+                        a.small.text-muted.text-underline--dashed.border-primary(href='#', data-toggle='password-text', data-target='#password', onclick='this.innerHTML=="Показать пароль" ? this.innerHTML="Скрыть пароль" : this.innerHTML="Показать пароль"') Показать пароль
                     .input-group.input-group-merge
                       input#password.form-control.form-control-prepend(type='password', name="password", placeholder='Пароль', maxlength=65)
                       .input-group-prepend
                         span.input-group-text
                           i(data-feather='key')
-                .row.mt-2
-                  .col.form-group.mb-0
-                    .d-flex.align-items-center.justify-content-between
-                      div
-                        label.form-control-label Почта
+                .row
+                  .col.form-group.my-3
+                    label.form-control-label Почта
                     .input-group.input-group-merge
                       input#email.form-control.form-control-prepend(type="email" name="email" placeholder="Почта" value=(userInfo===undefined ? "" : userInfo.email), maxlength=60)
                       .input-group-prepend
                         span.input-group-text
                           i(data-feather='at-sign')
-                  .col.form-group.mb-0
-                    .d-flex.align-items-center.justify-content-between
-                      div
-                        label.form-control-label Телефон
+                  .col.form-group.my-3
+                    label.form-control-label Телефон
                     .input-group.input-group-merge
                       input#phone.form-control.form-control-prepend(type="tel" name="phone" placeholder="Телефон" value=(userInfo===undefined ? "" : userInfo.phone), maxlength=24)
                       .input-group-prepend

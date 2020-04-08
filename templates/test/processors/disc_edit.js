@@ -104,7 +104,6 @@ module.exports = {
                         errorMessage: "Что-то не так с обновлением, попробуйте снова."
                       }, "disc_form", 0, 0 );
                     }
-                    console.log(result);
                     console.log("Discipline updated!");
                     callback();
                     return router.bleed(301, `/disciplines/${postData.allias}/`, response);
