@@ -58,7 +58,7 @@ module.exports = {
               callback();
               return router.bleed(500, null, response, err);
             }
-          });
+          }, 10000000);
         }else{
           callback({
             title: "Создание новости",

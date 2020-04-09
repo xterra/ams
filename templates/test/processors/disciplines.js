@@ -21,12 +21,30 @@ module.exports = {
              ],
              as: "groupsInfo"
            }
-        }
+        },
+        {
+          $lookup:
+            {
+              from: "users",
+              let: { editors: "$editors"},
+              pipeline: [
+                { $match:
+                   {$expr:
+                    { $in: [ {$toString: "$_id"}, "$$editors" ]}
+                   }
+                },
+                { $project: {_id: 0, lastName: 1, name: 1, fatherName: 1}},
+              ],
+              as: "editorsInfo"
+            }
+         },
     ]).sort({name: 1}).toArray(function(err, result){
       if(err){
         callback();
         router.bleed(500, null, response, err);
       }
+      console.log(JSON.stringify(result[0].editorsInfo));
+      console.log(JSON.stringify(result[3].editorsInfo));
       const disciplines = result;
       if( sessionContext !== undefined && sessionContext !== null && "login" in sessionContext){
         db.collection("users").findOne({username: sessionContext.login}, {securityRole : 1, username : 1, group: 1}, function(err, result){

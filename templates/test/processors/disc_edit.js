@@ -113,7 +113,7 @@ module.exports = {
                   callback();
                   return router.bleed(500, null, response, err);
                 }
-              }, 1024);
+              }, 10000000);
             } else{
               return callback({
                 title: "Изменение дисциплины",

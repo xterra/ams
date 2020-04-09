@@ -120,7 +120,7 @@ module.exports = {
                 });
               }
             });
-          });
+          }, 10000000);
         } else{
             return callback({
               title: "Новый профиль",

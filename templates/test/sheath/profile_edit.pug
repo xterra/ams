@@ -61,7 +61,7 @@ html
                   .col.form-group.my-3
                     label.form-control-label Должность
                     select.custom-select(type="select" name="position" placeholder="Должность преподавателя" )
-                      -let positions = ["Ассистент", "Доцент", "Профессор", "Старший преподаватель"]
+                      -let positions = ["Ассистент", "Доцент", "Преподаватель", "Профессор", "Старший преподаватель"]
                         if(userInfo.securityRole.includes("teacher"))
                           for position in positions
                             if(userInfo.position==position)

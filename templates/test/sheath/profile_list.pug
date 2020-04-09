@@ -33,78 +33,78 @@ html
                     button.btn.btn-sm.btn-primary.btn-icon-only.rounded-circle(type='button')
                       span.btn-inner--icon
                         i.fas.fa-plus
-
-            .mb-5
-                .card
-                  .card-header
-                    .row.mx-n2
-                      .col.col-lg.px-2.text-center
-                        h5.h6.my-2 Преподаватели
-                  table.table.table-cards.align-items-center
-                    tbody
-                    for user in teachers
-                      tr
-                        th(scope='row')
-                          .media.align-items-center
-                            div
-                              .avatar-parent-child
-                                span.avatar.bg-primary.text-white.rounded-circle.avatar-sm #{user.username.substr(0,2).toUpperCase()}
-                            .media-body.ml-4
-                              a.name.h6.mb-0.text-sm(href="/profiles/"+user._id+"/") #{user.username}
-                              if currentUser.securityRole !== 0 && !currentUser.securityRole.includes('student')
+              
+            .row.mt-4
+              .col.col-lg.px-2.text-center
+                h5.h6.my-2 Преподаватели
+              .col-lg-12
+                .mb-5
+                  .table-responsive
+                    table.table.table-cards.align-items-center
+                      tbody
+                      for user in teachers
+                        tr
+                          th(scope='row')
+                            .media.align-items-center
+                              div
+                                .avatar-parent-child
+                                  span.avatar.bg-primary.text-white.rounded-circle.avatar-sm #{user.username.substr(0,2).toUpperCase()}
+                              .media-body.ml-4
+                                a.name.h6.mb-0.text-sm(href="/profiles/"+user._id+"/") #{user.username}
+                                if currentUser.securityRole !== 0 && !currentUser.securityRole.includes('student')
+                                  small.d-block.font-weight-bold #{user.email}
+                          td
+                              p.text-sm.font-weight-bold.pt-3 #{user.lastName}  #{user.name} #{user.fatherName}
+                          td.text-right
+                            .actions.ml-3
+                              a.action-item.mr-2(href="/profiles/"+user._id+"/")
+                                i(data-feather='external-link')
+                              if currentUser.securityRole !== 0 && currentUser.securityRole.includes('superadmin')
+                                a.action-item.mr-2(href='/profiles/edit/'+user._id+"/")
+                                  i(data-feather='edit-2')
+                                a.action-item.text-danger.mr-2(href='/profiles/delete/'+user._id+"/")
+                                  i(data-feather='trash-2')
+                      else 
+                        br
+                        li.list-group-item
+                          .row.align-items-center
+                            .col-auto
+                             p Профилей пока нет
+            .row.mt-4
+              .col.col-lg.px-2.text-center
+                h5.h6.my-2  Студенты
+              .col-lg-12
+                .mb-5
+                  .table-responsive
+                    table.table.table-cards.align-items-center
+                      tbody
+                      for user in students
+                        tr
+                          th(scope='row')
+                            .media.align-items-center
+                              div
+                                .avatar-parent-child
+                                  span.avatar.bg-primary.text-white.rounded-circle.avatar-sm #{user.username.substr(0,2).toUpperCase()}
+                              .media-body.ml-4
+                                a.name.h6.mb-0.text-sm(href="/profiles/"+user._id+"/") #{user.username}
                                 small.d-block.font-weight-bold #{user.email}
-                        td
-                            p.text-sm.font-weight-bold.pt-3 #{user.lastName}  #{user.name} #{user.fatherName}
-                        td.text-right
-                          .actions.ml-3
-                            a.action-item.mr-2(href="/profiles/"+user._id+"/")
-                              i(data-feather='external-link')
-                            if currentUser.securityRole !== 0 && currentUser.securityRole.includes('superadmin')
-                              a.action-item.mr-2(href='/profiles/edit/'+user._id+"/")
-                                i(data-feather='edit-2')
-                              a.action-item.text-danger.mr-2(href='/profiles/delete/'+user._id+"/")
-                                i(data-feather='trash-2')
-                    else 
-                      br
-                      li.list-group-item
-                        .row.align-items-center
-                          .col-auto
-                           p Профилей пока нет
-            .mb-5
-                .card
-                  .card-header
-                    .row.mx-n2
-                      .col.col-lg.px-2.text-center
-                        h5.h6.my-2 Студенты
-                  table.table.table-cards.align-items-center
-                    tbody
-                    for user in students
-                      tr
-                        th(scope='row')
-                          .media.align-items-center
-                            div
-                              .avatar-parent-child
-                                span.avatar.bg-primary.text-white.rounded-circle.avatar-sm #{user.username.substr(0,2).toUpperCase()}
-                            .media-body.ml-4
-                              a.name.h6.mb-0.text-sm(href="/profiles/"+user._id+"/") #{user.username}
-                              small.d-block.font-weight-bold #{user.email}
-                        td
-                            p.text-sm.font-weight-bold.pt-3 #{user.lastName}  #{user.name}
-                        td.text-right
-                          .actions.ml-3
-                            a.action-item.mr-2(href="/profiles/"+user._id+"/")
-                              i(data-feather='external-link')
-                            if currentUser.securityRole !== 0 && currentUser.securityRole.includes('superadmin')
-                              a.action-item.mr-2(href='/profiles/edit/'+user._id+"/")
-                                i(data-feather='edit-2')
-                              a.action-item.text-danger.mr-2(href='/profiles/delete/'+user._id+"/")
-                                i(data-feather='trash-2')
-                    else 
-                      br
-                      li.list-group-item
-                        .row.align-items-center
-                          .col-auto
-                           p Профилей пока нет    
+                          td
+                              p.text-sm.font-weight-bold.pt-3 #{user.lastName}  #{user.name}
+                          td.text-right
+                            .actions.ml-3
+                              a.action-item.mr-2(href="/profiles/"+user._id+"/")
+                                i(data-feather='external-link')
+                              if currentUser.securityRole !== 0 && currentUser.securityRole.includes('superadmin')
+                                a.action-item.mr-2(href='/profiles/edit/'+user._id+"/")
+                                  i(data-feather='edit-2')
+                                a.action-item.text-danger.mr-2(href='/profiles/delete/'+user._id+"/")
+                                  i(data-feather='trash-2')
+                      else 
+                        br
+                        li.list-group-item
+                          .row.align-items-center
+                            .col-auto
+                             p Профилей пока нет    
     include includes/footer.pug                  
     script(src='../assets/libs/jquery/dist/jquery.min.js')
     script(src='../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js')

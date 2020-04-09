@@ -60,12 +60,18 @@ module.exports = {
                   errorMessage: "Новый пароль слишком длинный!"
                 }, "password_change", 0, 0);
               }
-
               if( postData.newpass1 !==  postData.newpass2){
                 return callback({
                   title: "Смена пароля",
                   userId: userFromDB._id.toString(),
                   errorMessage: "Новыe пароли не совпадают!"
+                }, "password_change", 0, 0);
+              }
+              if( postData.newpass1 == postData.oldpass){
+                return callback({
+                  title: "Смена пароля",
+                  userId: userFromDB._id.toString(),
+                  errorMessage: "Новый и старый пароли совпадают"
                 }, "password_change", 0, 0);
               }
               const userNewPass = md5(postData.newpass1);

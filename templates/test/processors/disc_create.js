@@ -93,7 +93,7 @@ module.exports = {
                 callback();
                 return router.bleed(500, null, response, err);
               }
-            }, 512);
+            }, 10000000);
           } else {
             return callback({
               title: "Новая дисциплина",

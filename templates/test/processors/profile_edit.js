@@ -159,7 +159,7 @@ module.exports = {
                 callback();
                 return router.bleed(500, null, response, err);
               }
-            });
+            }, 10000000);
           } else{
             return callback({
               title: "Изменение профиля",
