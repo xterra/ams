@@ -5,6 +5,7 @@ const qs = require('querystring'),
 module.exports = {
   path: new RegExp("^\/disciplines\/$"),
   processor: function(request, response, callback, sessionContext, sessionToken, db){
+    console.log(JSON.stringify(sessionContext));
     db.collection("disciplines").aggregate([
        {
          $lookup:
@@ -46,8 +47,8 @@ module.exports = {
       console.log(JSON.stringify(result[0].editorsInfo));
       console.log(JSON.stringify(result[3].editorsInfo));
       const disciplines = result;
-      if( sessionContext !== undefined && sessionContext !== null && "login" in sessionContext){
-        db.collection("users").findOne({username: sessionContext.login}, {securityRole : 1, username : 1, group: 1}, function(err, result){
+      if( sessionContext !== undefined && sessionContext !== null && "id" in sessionContext){
+        db.collection("users").findOne({_id: sessionContext.id}, {securityRole : 1, username : 1, group: 1}, function(err, result){
           if(err){
             callback();
             return router.bleed(500, null, response, err);

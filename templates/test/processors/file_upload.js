@@ -14,7 +14,7 @@ module.exports= {
     let delimeteredURL = requestedURL.split('/')
     let disciplineAllias = delimeteredURL[delimeteredURL.length-2];
     console.log(disciplineAllias);
-    db.collection("users").findOne({username: sessionContext.login}, {username: 1, securityRole: 1}, function(err, result){
+    db.collection("users").findOne({_id: sessionContext.id}, {username: 1, securityRole: 1}, function(err, result){
       if(err){
         callback();
         return router.bleed(500, null, response, err);

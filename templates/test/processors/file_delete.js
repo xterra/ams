@@ -9,7 +9,7 @@ module.exports = {
       callback();
       return router.bleed(301, "/login/", response);
     }
-    db.collection("users").findOne({username: sessionContext.login},{username: 1, securityRole: 1}, function(err, result){
+    db.collection("users").findOne({_id: sessionContext.id},{username: 1, securityRole: 1}, function(err, result){
       if(err){
         callback();
         return router.bleed(500, null, response, err);

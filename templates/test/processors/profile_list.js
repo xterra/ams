@@ -14,7 +14,7 @@ module.exports = {
       }
       let users = result;
       let currentUser = users.find((element, index, array)=>{
-        if(element.username == sessionContext.login){
+        if(element._id == sessionContext.id){
           return element;
         } else{
           return false;

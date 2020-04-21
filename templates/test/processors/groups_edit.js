@@ -12,7 +12,7 @@ module.exports = {
     let requestedUrl = decodeURI(request.url);
     let delimeteredUrl = requestedUrl.split('/');
     let groupURL = delimeteredUrl[delimeteredUrl.length-2];
-    db.collection("users").findOne({username: sessionContext.login}, {username: 1, securityRole: 1}, function(err, result){
+    db.collection("users").findOne({_id: sessionContext.id}, {username: 1, securityRole: 1}, function(err, result){
       if(err){
         callback();
         return router.bleed(500, null, response, err);

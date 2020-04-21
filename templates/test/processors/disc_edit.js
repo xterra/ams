@@ -12,7 +12,7 @@ module.exports = {
     requestedUrl = decodeURI(request.url);
     delimeteredUrl = requestedUrl.split("/");
     disciplineAllias = delimeteredUrl[delimeteredUrl.length-2];
-    db.collection("users").findOne({username : sessionContext.login}, {username : 1, securityRole: 1}, function(err, result){
+    db.collection("users").findOne({_id : sessionContext.id}, {username : 1, securityRole: 1}, function(err, result){
       if(err){
         callback();
         router.bleed(500, null, response, err);

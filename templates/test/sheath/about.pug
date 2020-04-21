@@ -10,7 +10,7 @@ html
     .preloader
       .spinner-border.text-primary(role='status')
         span.sr-only Loading...
-    if user == null
+    if !userAthorized
       include includes/header_public.pug
     else
       include includes/header_private.pug

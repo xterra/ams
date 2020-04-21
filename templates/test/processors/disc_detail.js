@@ -22,7 +22,7 @@ module.exports = {
       const disc_detail = result;
       let disc_files = [];
       if( sessionContext !== undefined && sessionContext !== null && "login" in sessionContext){
-        db.collection("users").findOne({username : sessionContext.login}, {securityRole : 1, username : 1}, function(err, result){
+        db.collection("users").findOne({_id : sessionContext.id}, {securityRole : 1, username : 1}, function(err, result){
           if(err){
             callback();
             return router.bleed(500, null, response, err);

@@ -7,12 +7,12 @@ module.exports = {
     if(sessionToken == null || sessionContext == undefined || sessionContext == null){
       callback({
         title: "Абитуриентам",
-        user: null
+        userAthorized: false
       }, "abiturients", 5, 5);
     } else{
       callback({
         title: "Абитуриентам",
-        user: sessionContext.login
+        userAthorized: true
       }, "abiturients", 5, 5);
     }
   }

@@ -5,12 +5,12 @@ module.exports = {
     if(sessionToken == null || sessionContext == undefined || sessionContext == null){
       callback({
         title: "Контакты",
-        user: null
+        userAthorized: false
       }, "contacts", 5, 5);
     } else{
       callback({
         title: "Контакты",
-        user: sessionContext.login
+        userAthorized: true
       }, "contacts", 5, 5);
     }
 
