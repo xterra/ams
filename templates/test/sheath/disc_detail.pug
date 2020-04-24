@@ -1,0 +1,89 @@
+doctype html
+html
+  head
+    title #{title}
+    include includes/head_html.pug
+    link(rel='stylesheet', href='../../assets/libs/swiper/dist/css/swiper.min.css')
+    link(rel='stylesheet', href='../../assets/libs/fancyapps/fancybox/dist/jquery.fancybox.min.css')
+    link(rel='stylesheet', href='../../assets/libs/fortawesome/fontawesome-free/css/all.min.css')
+  body
+    .preloader
+      .spinner-border.text-primary(role='status')
+        span.sr-only Loading...
+    include includes/header_private.pug
+    section.slice.slice-lg.delimiter-bottom
+      a.btn.btn-neutral.btn-icon-only.rounded-circle.position-absolute.left-4.top-90.d-none.d-lg-inline-flex(href="/disciplines/")
+        span.btn-inner--icon
+          i(data-feather='arrow-left')
+      .container
+        .row.justify-content-center.mb-3
+          .col-lg-7.text-center
+            h1.mb-4 #{discipline.name}, #{discipline.mnemo}
+            p.lead.lh-190 #{discipline.description}
+        if (userInfo.securityRole.includes("superadmin") || (userInfo.securityRole.includes("teacher") && discipline.editors.includes(userInfo._id.toString())))
+          .row.justify-content-center.mb-3
+            a.mr-1(href="/disciplines/edit/"+discipline.allias+"/")
+              button.btn.btn-outline-primary(type='button') Редактировать
+            a.ml-1(href="/disciplines/delete/"+discipline.allias+"/")
+              button.btn.btn-outline-danger(type='button') Удалить
+        if (!userInfo.securityRole.includes("guest"))
+          .mb-5
+            .card
+              .card-header
+                .row.mx-n2
+                  .col.col-lg.px-2
+                    h5.h6.mb-0 Документы для дисциплины
+                    p.text-sm.mb-0 Возможность загрузить все необходимые документы
+                  if (userInfo.securityRole.includes("superadmin") || (userInfo.securityRole.includes("teacher") && discipline.editors.includes(userInfo._id.toString())))
+                    .col-auto.px-2
+                      a(href="/file/upload/"+discipline.allias+"/")
+                        button.btn.btn-sm.btn-primary.btn-icon-only.rounded-circle(type='button')
+                          span.btn-inner--icon
+                            i.fas.fa-plus
+              ul.list-group.list-group-flush
+                each file in files
+                  li.list-group-item
+                    .row.align-items-center
+                      .col-auto
+                        -var dirName = file._id.substr(0,2);
+                        a(href=href="/"+dirName+"/"+file._id download=discipline.mnemo+"_"+file.name+"."+file.ext)
+                          i(data-feather='file-text')
+                      .col.ml-n2
+                        a(href=href="/"+dirName+"/"+file._id download=discipline.mnemo+"_"+file.name+"."+file.ext)
+                          h6.text-sm.mb-0 #{file.name}
+                        p.card-text.small.text-muted #{file.comment}
+                      .col-md.d-none.d-md-block
+                        span.text-muted Изменено:
+                        |  #{file.formatedDate}
+                      .col-auto
+                        .actions.text-right.ml-3
+                          a.action-item.mr-2(href="/"+dirName+"/"+file._id download=discipline.mnemo+"_"+file.name+"."+file.ext)
+                            i(data-feather='download')
+                          if (userInfo.securityRole.includes("superadmin") || (userInfo.securityRole.includes("teacher") && discipline.editors.includes(userInfo._id.toString())))
+                            a.action-item.mr-2(href="/file/edit/"+discipline.allias+"/"+file._id+"/")
+                              i(data-feather='edit')
+                            a.action-item.mr-2(href="/file/delete/"+discipline.allias+"/"+file._id+"/")
+                              i(data-feather='trash-2')
+                else 
+                  br
+                  li.list-group-item
+                    .row.align-items-center
+                      .col-auto
+                       p Документов пока нет    
+    include includes/footer.pug 
+    script(src='../../assets/libs/jquery/dist/jquery.min.js')
+    script(src='../../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js')
+    script(src='../../assets/libs/svg-injector/dist/svg-injector.min.js')
+    script(src='../../assets/libs/feather-icons/dist/feather.min.js')
+    script(src='../../assets/libs/in-view/dist/in-view.min.js')
+    script(src='../../assets/libs/sticky-kit/dist/sticky-kit.min.js')
+    script(src='../../assets/libs/imagesloaded/imagesloaded.pkgd.min.js')
+    script(src='../../assets/libs/swiper/dist/js/swiper.min.js')
+    script(src='../../assets/libs/fancyapps/fancybox/dist/jquery.fancybox.min.js')
+    script(src='../../assets/js/quick-website.js')
+    script.
+      feather.replace({
+      width: "1em",
+      height: "1em"
+      })
+    include includes/yandex_metrika.pug

@@ -1,0 +1,111 @@
+doctype html
+html
+  head
+    include includes/head_html.pug
+    title #{title}
+    script(src="../../../groups_form_script.js" type="text/javascript")
+    link(rel='stylesheet', href='../../../assets/libs/fortawesome/fontawesome-free/css/all.min.css')
+  body
+    include includes/header_private.pug
+    section.slice.slice-lg.delimiter-bottom
+      a.btn.btn-neutral.btn-icon-only.rounded-circle.position-absolute.left-4.top-90.d-none.d-lg-inline-flex(href=(groupInfo==undefined ? "/groups/" : "/groups/"+groupInfo.url+"/"))
+        span.btn-inner--icon
+          i(data-feather='arrow-left')
+      .container.d-flex.flex-column
+        .row.align-items-center.justify-content-center
+          .col-lg-7.col-xl-8.py-6.py-md-0
+            div
+              .mb-3.text-center
+                h6.h3.mb-1 #{title}
+              span.clearfix
+              if errorMessage.length
+                .alert.alert-danger(role='alert')
+                  | #{errorMessage}
+              form(action='.', method='POST')
+                .form-group.mb-0
+                    .d-flex.align-items-center.justify-content-between
+                      div
+                        label.form-control-label Имя группы (3 буквы)
+                          span.text-danger *
+                    .input-group.input-group-merge
+                      input#name.form-control.form-control-prepend(type='text', name="name", placeholder='Имя', required, value=(groupInfo==undefined ? "" : groupInfo.name), maxlength=3)
+                      .input-group-prepend
+                        span.input-group-text
+                          i(data-feather='align-left')
+                .row
+                  .col.form-group.my-3
+                    label.form-control-label Тип обучения
+                      span.text-danger *
+                    select#typeEducation.custom-select(type='select', name="typeEducation", placeholder='Группа', onChange="selectedGroup();" required)
+                      -let types = ["Бакалавриат", "Магистратура"]
+                      for type in types
+                        if groupInfo !== undefined && type == groupInfo.typeEducation
+                          option(value=type selected) #{type}
+                        else
+                          option(value=type) #{type}
+                  .col.form-group.my-3
+                    label.form-control-label Курс
+                      span.text-danger *  
+                    select#course.custom-select(type='select', name="course", placeholder='Номер курса', required)
+                      -let courses;
+                      if groupInfo !== undefined && groupInfo.typeEducation == 'Магистратура'
+                        -courses = [1, 2]
+                      else
+                        -courses = [1, 2, 3, 4]
+                      for course in courses
+                        if groupInfo !== undefined && course == groupInfo.course
+                          option(value=course selected) #{course}
+                        else
+                          option(value=course) #{course}
+                .row
+                  .col.form-group.my-3
+                    label.form-control-label Полное наименование
+                      span.text-danger *  
+                    .input-group.input-group-merge
+                      input#fullname.form-control.form-control-prepend(type='text', name="fullname", placeholder='Наименования с цифрами', required, value=(groupInfo==undefined ? "" : groupInfo.fullname), maxlength=20)
+                      .input-group-prepend
+                        span.input-group-text
+                          i(data-feather='minimize-2')
+                  .col.form-group.my-3
+                    label.form-control-label Имя для ссылки(URL)
+                      span.text-danger *
+                    .input-group.input-group-merge
+                      input#url.form-control.form-control-prepend(type='text', name="url", placeholder='Короткое имя для ссылки', required, value=(groupInfo==undefined ? "" : groupInfo.url), , maxlength=15)
+                      .input-group-prepend
+                        span.input-group-text
+                          i(data-feather='link')  
+                if groupList!==undefined
+                  .form-group.my-3
+                      label.form-control-label Староста группы
+                      select#elder.custom-select(type='select', name="elder", placeholder='Староста группы')
+                        -groupList.sort((a,b) => {let textA = a.fullname.toUpperCase(); let textB = b.lastName.toUpperCase(); return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;});
+                        if groupInfo.elder==undefined
+                          for student in groupList
+                            option(value=student._id) #{student.lastName} #{student.name}
+                        else
+                          for student in groupList
+                            if groupInfo.elder == student._id
+                              option(value=student._id selected) #{student.lastName} #{student.name}
+                            else 
+                              option(value=student._id) #{student.lastName} #{student.name}
+                .row.mt-4
+                  .col.form-group.mb-0
+                    button.btn.btn-block.btn-primary(type='submit') #{groupList==undefined ? "Создать" : "Изменить"}
+                  .col.form-group.mb-0
+                    a(href=(groupList==undefined ? "/groups/" : "/groups/"+groupInfo.url+"/"))
+                      button.btn.btn-block.btn-secondary(type='button') Отмена
+    include includes/footer.pug 
+    script(src='../../../assets/libs/jquery/dist/jquery.min.js')
+    script(src='../../../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js')
+    script(src='../../../assets/libs/svg-injector/dist/svg-injector.min.js')
+    script(src='../../../assets/libs/feather-icons/dist/feather.min.js')
+    script(src='../../../assets/libs/in-view/dist/in-view.min.js')
+    script(src='../../../assets/libs/sticky-kit/dist/sticky-kit.min.js')
+    script(src='../../../assets/libs/imagesloaded/imagesloaded.pkgd.min.js')
+    script(src='../../../assets/js/quick-website.js')
+    script.
+      feather.replace({
+      width: "1em",
+      height: "1em"
+      })
+    include includes/yandex_metrika.pug

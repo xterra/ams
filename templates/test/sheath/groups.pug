@@ -1,0 +1,87 @@
+doctype html
+html
+  head
+    title #{title}
+    include includes/head_html.pug
+    link(rel='stylesheet', href='../assets/libs/fortawesome/fontawesome-free/css/all.min.css')
+  body.bg-light-secondary
+    .preloader
+      .spinner-border.text-primary(role='status')
+        span.sr-only Loading...
+    include includes/header_private.pug
+    section.slice.slice-lg.delimiter-bottom(style="min-height: 580px")
+      a.btn.btn-neutral.btn-icon-only.rounded-circle.position-absolute.left-4.top-90.d-none.d-lg-inline-flex(href="/")
+        span.btn-inner--icon
+          i(data-feather='arrow-left')
+      .container
+        .row.justify-content-center
+          .col-lg-9
+            .row.align-items-center.mb-4
+              .pr-3
+                span.h5.mb-0
+                  i(data-feather='users')
+              .col
+                if userInfo.securityRole !== 0 && userInfo.securityRole.includes('superadmin')
+                  h3.h5.mb-0 Управление учебными группы
+                  p.text-muted.mb-0 Все учебные группы.
+                else
+                  h3.h5.mb-0 #{title}
+                  p.text-muted.mb-0 Все учебные группы.
+              .col-auto
+                if userInfo.securityRole !== 0 && userInfo.securityRole.includes('superadmin')
+                  a(href="/groups/new/")
+                    button.btn.btn-sm.btn-primary.btn-icon-only.rounded-circle(type='button')
+                      span.btn-inner--icon
+                        i.fas.fa-plus
+            .row.mt-4
+              .col-lg-12
+                .mb-5
+                  .table-responsive
+                    table.table.table-cards.align-items-center
+                      thead
+                        tr
+                          th(scope='col', style='min-width:240px') Группа
+                          th(scope='col') Староста
+                          th(scope='col') Вид обучения
+                          th(scope='col')
+                      tbody
+                      -groups.sort((a,b) => {let textA = a.fullname.toUpperCase(); let textB = b.fullname.toUpperCase(); return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;});
+                      each group in groups
+                        tr
+                          td(scope='row')
+                            a.name.h6.mb-0.text-sm(href="/groups/"+group.url+"/") #{group.fullname}
+                            small.d-block.font-weight-bold #{group.name}, #{group.course} курс 
+                          td
+                              if group.elder==undefined
+                                p.text-sm.font-weight-bold.pt-3 Не назначен
+                              else
+                                p.text-sm.font-weight-bold.pt-3 #{group.elderInfo[0].lastName} #{group.elderInfo[0].name}
+                          td
+                              p.text-sm.font-weight-bold.pt-3 #{group.typeEducation}
+                          td.text-right
+                            .actions.ml-3
+                              a.action-item.mr-2(href="/groups/"+group.url+"/")
+                                i(data-feather='external-link')
+                              if userInfo.securityRole !== 0 && userInfo.securityRole.includes('superadmin')
+                                a.action-item.mr-2(href='/groups/edit/'+group.url+"/")
+                                  i(data-feather='edit-2')
+                                a.action-item.text-danger.mr-2(href='/groups/delete/'+group.url+"/")
+                                  i(data-feather='trash-2')
+                      else
+                        p Групп пока нет
+    include includes/footer.pug                  
+    script(src='../assets/libs/jquery/dist/jquery.min.js')
+    script(src='../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js')
+    script(src='../assets/libs/svg-injector/dist/svg-injector.min.js')
+    script(src='../assets/libs/feather-icons/dist/feather.min.js')
+    script(src='../assets/libs/in-view/dist/in-view.min.js')
+    script(src='../assets/libs/sticky-kit/dist/sticky-kit.min.js')
+    script(src='../assets/libs/imagesloaded/imagesloaded.pkgd.min.js')
+    script(src='../assets/libs/progressbar.js/dist/progressbar.min.js')
+    script(src='../assets/js/quick-website.js')
+    script.
+      feather.replace({
+      width: "1em",
+      height: "1em"
+      })
+    include includes/yandex_metrika.pug

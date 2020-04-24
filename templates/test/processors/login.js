@@ -8,7 +8,7 @@ module.exports = {
 
         if (sessionToken !== null && sessionToken) {
             callback();
-            return router.bleed(301, "/profile/" + sessionContext["id"] + "/", response);
+            return router.bleed(301, "/profiles/" + sessionContext["id"] + "/", response);
         }
 
         if (request.method === "POST") {
@@ -29,19 +29,22 @@ module.exports = {
 
                     if (login.length === 0 || password.length === 0) {
                         return callback({
-                            errorMessage: "Login or password can't be empty!"
+                            title: "Вход",
+                            errorMessage: "Неправильный логин или пароль"
                         }, "login", 0, 0);
                     }
 
                     if (login.length < 5 || password.length < 8) {
                         return callback({
-                            errorMessage: "Логин и пароль слишном короткие!"
+                            title: "Вход",
+                            errorMessage: "Неправильный логин или пароль"
                         }, "login", 0, 0);
                     }
 
                     if (login.length > 16 || password.length > 64) {
                         return callback({
-                            errorMessage: "Login or password are too long!"
+                            title: "Вход",
+                            errorMessage: "Неправильный логин или пароль"
                         }, "login", 0, 0);
                     }
 
@@ -50,8 +53,7 @@ module.exports = {
                         if (sessionToken !== null && sessionToken) {
 
                             console.log("Logged in user, setting initial data to his context...");
-
-                            sessionContext["id"] = "000000";
+                            console.log(`USER sessionContext: ${JSON.stringify(sessionContext)}`);
                             sessionContext["login"] = login;
                             sessionContext["loggedInTime"] = new Date();
 
@@ -59,7 +61,8 @@ module.exports = {
 
                                 if (error) {
                                     callback({
-                                        errorMessage: "Can't update your session with init data!"
+                                        title: "Вход",
+                                        errorMessage: "Не можем обновить Вашу сессию с начальными данными!"
                                     }, "login", 0, 0);
                                 } else {
                                     callback();
@@ -70,7 +73,8 @@ module.exports = {
 
                         } else {
                             callback({
-                                errorMessage: "Wrong login or password"
+                                title: "Вход",
+                                errorMessage: "Неправильный логин или пароль"
                             }, "login", 0, 0);
                         }
 
@@ -87,6 +91,7 @@ module.exports = {
         }
 
         callback({
+            title: "Вход",
             errorMessage: ""
         }, "login", 0, 0);
     }

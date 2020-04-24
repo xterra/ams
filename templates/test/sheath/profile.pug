@@ -1,22 +1,86 @@
 doctype html
-html(lang="en")
-    head
-        title Profile page
-    body
-        h1 It's your private profile, #{userLogin}
-        p You have been logged in at #{loginTime}
-        p Secret token is #{sessionToken}
-        br
-        h4 You can store data in your session:
-        form(action='.', method='POST')
+html
+  head
+    title #{title}
+    include includes/head_html.pug
+    link(rel='stylesheet', href='../../assets/libs/fortawesome/fontawesome-free/css/all.min.css')
+  body.bg-section-secondary
+    .preloader
+      .spinner-border.text-primary(role='status')
+        span.sr-only Loading...
+    include includes/header_private.pug
+    section.pt-5.bg-section-secondary
+      .container
+        .row.justify-content-center
+          .col-lg-9
+            .row.align-items-center
+              .col-auto
+                -let symbolForAvatar = profileInfo.username.substr(0,2).toUpperCase()
+                span.avatar.bg-primary.text-white.rounded-circle #{symbolForAvatar}
+              .col.ml-n3.ml-md-n2
+                h2.mb-0
+                  b #{profileInfo.lastName}
+                  |  #{profileInfo.name} #{profileInfo.fatherName}
+                if profileInfo.securityRole.includes("teacher")
+                  span.text-muted.d-block #{profileInfo.position}
+                else if profileInfo.securityRole.includes("student")
+                  span.text-muted.d-block Студент группы #{profileInfo.groupInfo[0].fullname}
+                else
+                  #{profileInfo.securityRole[0]}
+                
+    section.slice.slice-sm.bg-section-secondary(style="min-height: 380px")
+      .container
+        .row.justify-content-center
+          .col-lg-7
             div
-                | Data key:
-                input(type='text', name='key', value='')
-                | Data value:
-                input(type='text', name='value', value='')
-                input(type='submit', value='Save')
-        br
-        h4 Already stored data in your session:
-        p #{storedData}
-        br
-        button(onmousedown='window.location="/logout/"') Logout me!
+              .card.card-fluid
+                .card-header
+                  .row.align-items-center
+                    .col-auto
+                      p Информация
+                ul.list-group.list-group-flush
+                    li.list-group-item
+                      .row.align-items-center
+                        .col-auto
+                          i(data-feather='user')
+                        .col.ml-n2
+                          h6.text-sm.mb-0 Логин
+                        .col.ml-n2
+                          p.card-text #{profileInfo.username}
+                    li.list-group-item
+                      .row.align-items-center
+                        .col-auto
+                          i(data-feather='at-sign')
+                        .col.ml-n2
+                          h6.text-sm.mb-0 Почта
+                        .col.ml-n2
+                          p.card-text #{profileInfo.email}
+                    li.list-group-item
+                      .row.align-items-center
+                        .col-auto
+                          i(data-feather='phone')
+                        .col.ml-n2
+                          h6.text-sm.mb-0 Телефон
+                        .col.ml-n2
+                          p.card-text #{profileInfo.phone}
+              .row.justify-content-center.mb-3
+                a.mr-1(href="/profiles/change/"+profileInfo._id+"/")
+                  button.btn.btn-outline-primary(type='button') Сменить пароль
+                a.ml-1(href="/logout/")
+                  button.btn.btn-outline-danger(type='button') Выход из профиля          
+    include includes/footer.pug
+    script(src='../../assets/libs/jquery/dist/jquery.min.js')
+    script(src='../../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js')
+    script(src='../../assets/libs/svg-injector/dist/svg-injector.min.js')
+    script(src='../../assets/libs/feather-icons/dist/feather.min.js')
+    script(src='../../assets/libs/in-view/dist/in-view.min.js')
+    script(src='../../assets/libs/sticky-kit/dist/sticky-kit.min.js')
+    script(src='../../assets/libs/imagesloaded/imagesloaded.pkgd.min.js')
+    script(src='../../assets/libs/progressbar.js/dist/progressbar.min.js')
+    script(src='../../assets/js/quick-website.js')
+    script.
+      feather.replace({
+      width: "1em",
+      height: "1em"
+      })
+    include includes/yandex_metrika.pug

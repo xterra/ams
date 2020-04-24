@@ -1,0 +1,132 @@
+doctype html
+html
+  head
+    title #{title}
+    include includes/head_html.pug
+    script(src="../../../../profiles_form_script.js" type="text/javascript")
+    link(rel='stylesheet', href='../../assets/libs/fortawesome/fontawesome-free/css/all.min.css')
+  body
+    include includes/header_private.pug
+    section.slice.slice-lg.delimiter-bottom
+      a.btn.btn-neutral.btn-icon-only.rounded-circle.position-absolute.left-4.top-90.d-none.d-lg-inline-flex(href="/profiles/")
+        span.btn-inner--icon
+          i(data-feather='arrow-left')
+      .container.d-flex.flex-column
+        .row.align-items-center.justify-content-center
+          .col-lg-7.col-xl-8.py-6.py-md-0
+            div
+              .mb-3.text-center
+                h6.h3.mb-1 Создание профиля
+              span.clearfix
+              if errorMessage.length
+                .alert.alert-danger(role='alert')
+                  | #{errorMessage}
+              form(action='.', method='POST')
+                .row
+                  .col.form-group.my-1
+                    label.form-control-label Фамилия
+                      span.text-danger *
+                    .input-group.input-group-merge
+                      input#lastname.form-control.form-control-prepend(type='text', name="lastname", placeholder='Фамилия', required, value=(userInfo===undefined ? "" : userInfo.lastName), maxlength=50)
+                      .input-group-prepend
+                        span.input-group-text
+                          i(data-feather='align-left')
+                  .col.form-group.my-1
+                    label.form-control-label Имя
+                      span.text-danger *  
+                    .input-group.input-group-merge
+                      input#name.form-control.form-control-prepend(type='text', name="name", placeholder='Имя', required, value=(userInfo===undefined ? "" : userInfo.name), maxlength=40)
+                      .input-group-prepend
+                        span.input-group-text
+                          i(data-feather='align-left')
+                .row
+                  .col.form-group.my-3
+                    label.form-control-label Отчество
+                    .input-group.input-group-merge
+                      input#fathername.form-control.form-control-prepend(type='text', name="fathername", placeholder='Отчество', value=(userInfo===undefined ? "" : userInfo.fatherName), maxlength=50)
+                      .input-group-prepend
+                        span.input-group-text
+                          i(data-feather='align-left')
+                  .col.form-group.my-3
+                    label.form-control-label Роль
+                      span.text-danger *    
+                    select#securityRole.custom-select(type="select" name="securityRole" placeholder="Роль пользователя" onchange="selectedRole();" required)
+                      option(value="teacher") teacher
+                      option(value="student") student
+                      option(value="superadmin") superadmin
+                      option(value="admin") admin
+                .row#position
+                  .col.form-group.my-3
+                    label.form-control-label Должность
+                    select.custom-select(type="select" name="position" placeholder="Должность преподавателя" )
+                      option(value=null selected) Не назначена
+                      option(value="Ассистент") Ассистент
+                      option(value="Доцент") Доцент
+                      option(value="Преподаватель") Преподаватель
+                      option(value="Профессор") Профессор
+                      option(value="Старший преподаватель") Старший преподаватель
+                .row#group(hidden="true")
+                  .col.form-group.my-3
+                    label.form-control-label Группа
+                    select.custom-select(type="select" name="group" placeholder="Группа студента")
+                      option(value=null selected) Не назначена
+                      for group in groups
+                        option(value=group._id) #{group.fullname}
+                .row
+                  .col.form-group.my-3
+                    label.form-control-label Логин 
+                      span.text-danger *
+                    .input-group.input-group-merge
+                      input#username.form-control.form-control-prepend(type='text', name="username", placeholder='Логин', required, value=(userInfo===undefined ? "" : userInfo.username), maxlength=19)
+                      .input-group-prepend
+                        span.input-group-text
+                          i(data-feather='user')
+                  .col.form-group.my-3
+                    .d-flex.align-items-center.justify-content-between
+                      div
+                        label.form-control-label Пароль
+                          span.text-danger *
+                      .mb-2
+                        i(data-feather='eye').mr-1
+                        a.small.text-muted.text-underline--dashed.border-primary(href='#', data-toggle='password-text', data-target='#password', onclick='this.innerHTML=="Показать пароль" ? this.innerHTML="Скрыть пароль" : this.innerHTML="Показать пароль"') Показать пароль
+                    .input-group.input-group-merge
+                      input#password.form-control.form-control-prepend(type='password', name="password", placeholder='Пароль', maxlength=65)
+                      .input-group-prepend
+                        span.input-group-text
+                          i(data-feather='key')
+                .row
+                  .col.form-group.my-3
+                    label.form-control-label Почта
+                    .input-group.input-group-merge
+                      input#email.form-control.form-control-prepend(type="email" name="email" placeholder="Почта" value=(userInfo===undefined ? "" : userInfo.email), maxlength=60)
+                      .input-group-prepend
+                        span.input-group-text
+                          i(data-feather='at-sign')
+                  .col.form-group.my-3
+                    label.form-control-label Телефон
+                    .input-group.input-group-merge
+                      input#phone.form-control.form-control-prepend(type="tel" name="phone" placeholder="Телефон" value=(userInfo===undefined ? "" : userInfo.phone), maxlength=24)
+                      .input-group-prepend
+                        span.input-group-text
+                          i(data-feather='phone')  
+                .row.mt-3
+                  .col.form-group.mb-0             
+                    button.btn.btn-block.btn-primary(type='submit') Создать
+                  .col.form-group.mb-0
+                    a(href="/profiles/")
+                      button.btn.btn-block.btn-secondary(type="button") Отмена
+    include includes/footer.pug 
+    script(src='../../assets/libs/jquery/dist/jquery.min.js')
+    script(src='../../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js')
+    script(src='../../assets/libs/svg-injector/dist/svg-injector.min.js')
+    script(src='../../assets/libs/feather-icons/dist/feather.min.js')
+    script(src='../../assets/libs/in-view/dist/in-view.min.js')
+    script(src='../../assets/libs/sticky-kit/dist/sticky-kit.min.js')
+    script(src='../../assets/libs/imagesloaded/imagesloaded.pkgd.min.js')
+    script(src='../../assets/js/quick-website.js')
+    script.
+      feather.replace({
+      width: "1em",
+      height: "1em"
+      })
+    include includes/yandex_metrika.pug

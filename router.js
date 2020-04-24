@@ -24,6 +24,7 @@ module.exports = {
 };
 
 const security = require("./security");
+const boot = require("./boot");
 
 const responseErrorMessages = {
     306: ["Unknown error", "Something wrong happened, but we do not know what exactly it was."],
@@ -44,7 +45,7 @@ let pugCompilerOptions = {
     pretty: false
 };
 
-let renderTimeout = 5000;
+let renderTimeout = 500000;
 let bleedStacktraceAllowed = false;
 let currentTemplateName = "test";
 
@@ -52,9 +53,10 @@ const  PATHS_templateDir = path.join(__dirname, "templates", currentTemplateName
        PATHS_templateResourcesDir = path.join(PATHS_templateDir, "resources"),
        PATHS_templateSheathDir = path.join(PATHS_templateDir, "sheath"),
        PATHS_templatePreprocessorsDir = path.join(PATHS_templateDir, "processors"),
-       PATHS_dataDir = path.join(__dirname, "data"),
+       PATHS_dataDir = process.env['STORAGE_DATA_LOCATION'] || path.join(__dirname, "data"),
        PATHS_dataPublicDir = path.join(PATHS_dataDir, "public"),
        PATHS_dataPrivateDir = path.join(PATHS_dataDir, "private");
+
 
 function reloadMIMEs() {
     const oldSupportedFileTypes = supportedFileTypes;
@@ -138,8 +140,26 @@ function route(request, response) {
                 return bleed(403, requestedURL, response);
             }
         }
-
-        bleed(404, requestedURL, response);
+        return security.getSessionFromRequest(request, response, function(sessionToken, sessionData){
+          console.log(sessionData);
+          if(sessionToken == null || sessionData == null){
+            console.log("User is not logged in");
+            return bleed(404, requestedURL, response);
+          } else{
+            const filePathInPrivateData = path.join(PATHS_dataPrivateDir, requestedURL);
+            if (fs.existsSync(filePathInPrivateData)) {
+                stat = fs.statSync(filePathInPrivateData);
+                if (stat.isFile()) {
+                    return stream(filePathInPrivateData, stat, request, response);
+                } else {
+                    return bleed(404, requestedURL, response);
+                }
+            } else {
+                console.log(`I'm here.`);
+                return bleed(404, requestedURL, response);
+            }
+          }
+        }, true);
     } catch (e) {
         bleed(500, null, response, e);
         console.error("An error occurred in router -> route", e);
@@ -244,6 +264,7 @@ function render(pageProcessor, requestedURL, request, response) {
         const processorTimeout = setTimeout(function () {
             if (!response.finished) bleed(503, null, response, new Error("Processor reached timeout"));
         }, renderTimeout);
+        const db = boot.getDB();
         return security.getSessionFromRequest(request, response, function (sessionToken, sessionData) {
             pageProcessor(request, response, function (processedData, useSheathName, serverCacheTime, clientCacheTime, contentType) {
                 if (!timeoutBleeded) {
@@ -274,14 +295,14 @@ function render(pageProcessor, requestedURL, request, response) {
                                 }
                                 responseData = processedData;
                             }
+
                             let head = {
                                 "Cache-Control": clientCacheTime,
                                 "Content-Type": contentType,
-                                "Content-Length": responseData.length
+                                "Content-Length": Buffer.byteLength(responseData)
                             };
                             response.writeHead(200, head);
-                            response.write(responseData);
-                            response.end();
+                            response.end(responseData);
                             if (request.method === "GET" && serverCacheTime > 0) cachedRenderedPages[requestedURL] = [new Date().getTime() + (serverCacheTime * 1000), responseData, head];
                         } catch (e) {
                             bleed(500, null, response, e);
@@ -289,7 +310,7 @@ function render(pageProcessor, requestedURL, request, response) {
                         }
                     }
                 }
-            }, sessionData, sessionToken);
+            }, sessionData, sessionToken, db);
         });
     } catch (e) {
         bleed(500, null, response, e);

@@ -1,0 +1,38 @@
+.form#filter
+  .row
+    .col-12
+      h1.h6.mb-0 Тип обучения
+    .col-sm-5.col-lg-12
+      .custom-control.custom-switch
+        input#bakalavr.custom-control-input(type='checkbox', name="types", value='Бакалавриат')
+        label.custom-control-label(for='bakalavr') Бакалавриат
+    .col-sm-5.col-lg-12
+      input#magistr(type='checkbox', name="types", value='Магистратура')
+      label.ml-2(for='magistr') Магистратура
+  .row
+    .col-12
+      h1.h6.mb-0 Группы
+    .col-lg-12.col-sm-4
+      input#UIS(type='checkbox', name="groups", value='УИС')
+      label.ml-2(for='UIS') УИС
+    .col-lg-12.col-sm-4
+      input#UVA(type='checkbox', name="groups", value='УВА')
+      label.ml-2(for='UVA') УВА
+    .col-lg-12.col-sm-4
+      input#UVV(type='checkbox' name="groups", value='УВВ')
+      label.ml-2(for='UVV') УВВ
+  .row
+    .col-12
+      h1.h6.mb-0 Курс
+    .col-lg-12.col-sm-5
+      input#first(type='checkbox', name="courses", value='1 курс')
+      label.ml-2(for='first') 1 курс
+    .col-lg-12.col-sm-5
+      input#second(type='checkbox', name="courses", value='2 курс')
+      label.ml-2(for='second') 2 курс
+    .col-lg-12.col-sm-5
+      input#third(type='checkbox', name="courses", value='3 курс')
+      label.ml-2(for='third') 3 курс
+    .col-lg-12.col-sm-5
+      input#fourth(type='checkbox', name="courses", value='4 курс')
+      label.ml-2(for='fourth') 4 курс

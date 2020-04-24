@@ -1,0 +1,59 @@
+doctype html
+html
+  head
+    title #{title}
+    include includes/head_html.pug
+    link(rel='stylesheet', href='../assets/libs/fortawesome/fontawesome-free/css/all.min.css')
+  body.bg-section-secondary
+    .preloader
+      .spinner-border.text-primary(role='status')
+        span.sr-only Loading...
+    if userInfo == null
+      include includes/header_public.pug
+    else
+      include includes/header_private.pug
+    section.slice.slice-lg.py-2.bg-cover.bg-size--cover
+      span.mask.bg-primary
+      .container.d-flex.align-items-center(data-offset-top='#navbar-main')
+        .col
+          .row.align-items-center.justify-content-center.mb-4
+            .col-md-7.col-lg-7.text-center
+              h1.display-4.text-white.mb-2
+                 |Блог новостей
+              p.lead.text-white.opacity-8
+              if userInfo !== null && (userInfo.securityRole.includes('superadmin') || userInfo.securityRole.includes('teacher'))
+                .row.align-items-center.justify-content-center
+                  a(href='/news/create/')
+                    button.btn.btn-outline-light(type='button') Добавить новость
+    section.slice.pt-5.pb-7
+      .container
+        .row
+          each pieceOfNews in news
+            .col-xl-4.col-md-6
+              .card.hover-translate-y-n3.hover-shadow-lg.overflow-hidden
+                .card-body.py-4
+                  small.d-block.text-sm.mb-2 #{pieceOfNews.formatedDate}
+                  a.h5.stretched-link.lh-150(href='/news/'+pieceOfNews.url+"/") #{pieceOfNews.title}
+                  p.mt-3.mb-0.lh-170 #{pieceOfNews.short}
+                .card-footer.border-0.delimiter-top
+                  .row.align-items-center
+                    .col-auto
+                      span.avatar.avatar-sm.bg-primary.rounded-circle ПС
+                      span.text-sm.mb-0.avatar-content Пользователь сайта
+          else 
+            p.text-center Новостей пока нет.                
+    include includes/footer.pug
+    script(src='../assets/libs/jquery/dist/jquery.min.js')
+    script(src='../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js')
+    script(src='../assets/libs/svg-injector/dist/svg-injector.min.js')
+    script(src='../assets/libs/feather-icons/dist/feather.min.js')
+    script(src='../assets/libs/in-view/dist/in-view.min.js')
+    script(src='../assets/libs/sticky-kit/dist/sticky-kit.min.js')
+    script(src='../assets/libs/imagesloaded/imagesloaded.pkgd.min.js')
+    script(src='../assets/js/quick-website.js')
+    script.
+      feather.replace({
+      width: "1em",
+      height: "1em"
+      })
+    include includes/yandex_metrika.pug

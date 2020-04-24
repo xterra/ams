@@ -1,0 +1,78 @@
+doctype html
+html
+  head
+    title #{title}
+    include includes/head_html.pug
+    link(rel='stylesheet', href='../../assets/libs/fortawesome/fontawesome-free/css/all.min.css')
+  body
+    .preloader
+      .spinner-border.text-primary(role='status')
+        span.sr-only Loading...
+    include includes/header_private.pug
+    section.slice.slice-lg.delimiter-bottom
+      a.btn.btn-neutral.btn-icon-only.rounded-circle.position-absolute.left-4.top-90.d-none.d-lg-inline-flex(href="/news/")
+        span.btn-inner--icon
+          i(data-feather='arrow-left')
+      .container.d-flex.flex-column
+        .row.align-items-center.justify-content-center
+          .col-lg-6.col-xl-6.py-6.py-md-0
+            div
+              .mb-3.text-center
+                h6.h3.mb-1 Создание новости
+              span.clearfix
+              if errorMessage.length
+                .alert.alert-danger(role='alert')
+                  | #{errorMessage}
+              form(action='.', method='POST')
+                .form-group
+                  label.form-control-label Заголовок
+                    span.text-danger *
+                  .input-group.input-group-merge
+                    input#title.form-control.form-control-prepend(type='text', placeholder='Заголовок новости', name='title', value='' required, maxlength=80)
+                    .input-group-prepend
+                      span.input-group-text
+                        i(data-feather='align-left')
+                .form-group.my-3
+                  label.form-control-label Имя для ссылки
+                    span.text-danger *  
+                  .input-group.input-group-merge
+                    input#url.form-control.form-control-prepend(type='text', placeholder='Короткое имя для URL', name='url', value='', required, maxlength=60)
+                    .input-group-prepend
+                      span.input-group-text
+                        i(data-feather='at-sign')
+                .form-group.my-3
+                  label.form-control-label Краткое описание
+                  .input-group.input-group-merge
+                    textarea#short.form-control.form-control-prepend(type='textarea', placeholder='Краткое описание новости', name='short', value='', rows="2", maxlength=140)
+                    .input-group-prepend
+                      span.input-group-text
+                        i(data-feather='align-justify')
+                .form-group.my-3
+                  label.form-control-label Основной текст
+                    span.text-danger *
+                  .input-group.input-group-merge
+                    textarea#text.form-control.form-control-prepend(type='textarea', placeholder='Текст новости', name='text', value='', rows="4" required, maxlength=600)
+                    .input-group-prepend
+                      span.input-group-text
+                        i(data-feather='align-justify')
+                .row.mt-4
+                  .col.form-group.mb-0
+                    button.btn.btn-block.btn-primary(type='submit') Создать
+                  .col.form-group.mb-0
+                    a(href="/news/")
+                      button.btn.btn-block.btn-secondary(type='button') Отмена
+    include includes/footer.pug 
+    script(src='../../assets/libs/jquery/dist/jquery.min.js')
+    script(src='../../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js')
+    script(src='../../assets/libs/svg-injector/dist/svg-injector.min.js')
+    script(src='../../assets/libs/feather-icons/dist/feather.min.js')
+    script(src='../../assets/libs/in-view/dist/in-view.min.js')
+    script(src='../../assets/libs/sticky-kit/dist/sticky-kit.min.js')
+    script(src='../../assets/libs/imagesloaded/imagesloaded.pkgd.min.js')
+    script(src='../../assets/js/quick-website.js')
+    script.
+      feather.replace({
+      width: "1em",
+      height: "1em"
+      })
+    include includes/yandex_metrika.pug

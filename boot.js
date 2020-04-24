@@ -98,7 +98,6 @@ function initDb(callback) {
                             return callback(null);
                         } else {
                             createdUsersCollection.insertOne({
-                                _id: "5f4dcc3b5aa765d61d8327deb882cf99",
                                 email: "admin@example.org",
                                 phone: 12345678901,
                                 username: "admin",

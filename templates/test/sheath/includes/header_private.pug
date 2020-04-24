@@ -1,0 +1,36 @@
+header#header-main.header-transparent.bg-primary
+  nav#navbar-main.navbar.navbar-main.navbar-expand-lg.navbar-dark.bg-dark
+    .container
+      a.navbar-brand(href='/')
+        img(alt='Логотип', src='../../../../assets/img/logo/asu-main-beta-small.png')
+      button.navbar-toggler(type='button', data-toggle='collapse', data-target='#navbar-main-collapse', aria-controls='navbar-main-collapse', aria-expanded='false', aria-label='Toggle navigation')
+        span.navbar-toggler-icon
+      #navbar-main-collapse.collapse.navbar-collapse.navbar-collapse-overlay
+        .position-relative
+          button.navbar-toggler(type='button', data-toggle='collapse', data-target='#navbar-main-collapse', aria-controls='navbar-main-collapse', aria-expanded='false', aria-label='Toggle navigation')
+            i(data-feather='x')
+        ul.navbar-nav.ml-lg-auto
+          li.nav-item.dropdown.dropdown-animate(data-toggle='hover')
+            a.nav-link(href='#', role='button', data-toggle='dropdown', aria-haspopup='true', aria-expanded='false') Общее
+              i(data-feather='chevron-down')
+            .dropdown-menu.dropdown-menu-single
+              a.dropdown-item(href='/') Главная
+              a.dropdown-item(href='/about/') О нас 
+              a.dropdown-item(href='/for-abiturients/') Абитуриентам
+              a.dropdown-item(href='/contacts/') Контакты 
+          li.nav-item.nav-item-spaced
+            a.nav-link(href='/news/') Новости
+          li.nav-item.nav-item-spaced
+            a.nav-link(href='/groups/') Группы
+          li.nav-item.nav-item-spaced
+            a.nav-link(href='/profiles/') Профили
+          li.nav-item.nav-item-spaced
+            a.nav-link(href='/disciplines/') Дисциплины
+        ul.navbar-nav.align-items-lg-center.d-none.d-lg-flex.ml-lg-auto
+          li.nav-item
+            a.nav-link(href='/profile/') Профиль
+          li.nav-item
+            a.nav-link(href='/logout/') Выход
+        .d-lg-none.px-4.text-center
+          a.btn.btn-block.btn-sm.btn-primary(href='/profile/') Профиль
+          a.btn.btn-block.btn-sm.btn-primary(href='/logout/') Выход

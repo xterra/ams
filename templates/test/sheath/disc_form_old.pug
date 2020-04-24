@@ -1,0 +1,125 @@
+doctype html
+html
+  head
+    include includes/head_html.pug
+    title #{title}
+    script(src="../../../../disc_script.js" type="text/javascript")
+    script(src="../../../../multiple_select.js" type="text/javascript")
+    link(rel='stylesheet', href='../../../assets/libs/fortawesome/fontawesome-free/css/all.min.css')
+    link(rel='stylesheet', href='../../../assets/libs/bootstrap/dist/css/bootstrap-select.css')
+  body
+    include includes/header_private.pug
+    section.slice.slice-lg.delimiter-bottom
+      a.btn.btn-neutral.btn-icon-only.rounded-circle.position-absolute.left-4.top-90.d-none.d-lg-inline-flex(href=(title==="Новая дисциплина" ? "/disciplines/" : "/disciplines/"+discipline.allias+"/"))
+        span.btn-inner--icon
+          i(data-feather='arrow-left')
+      .container.d-flex.flex-column
+        .row.align-items-center.justify-content-center
+          .col-md-6.col-lg-7.col-xl-8.py-6.py-md-0
+            div
+              .mb-5.text-center
+                h6.h3.mb-1 #{title}
+              span.clearfix
+              if errorMessage.length
+                p.mb-0(style=" color: red")=errorMessage
+              form(action='.', method='POST')
+                .form-group.mb-0
+                    .d-flex.align-items-center.justify-content-between
+                      div
+                        label.form-control-label Имя дисциплины
+                          span.text-danger *
+                    .input-group.input-group-merge
+                      input#name.form-control.form-control-prepend(type='text', name="name", placeholder='Имя', required, value=(discipline===undefined ? "" : discipline.name), maxlength=120)
+                      .input-group-prepend
+                        span.input-group-text
+                          i(data-feather='align-left')
+                .row
+                  .col.form-group.mb-0
+                    .d-flex.align-items-center.justify-content-between
+                      div
+                        label.form-control-label Аббревиатура
+                          span.text-danger *
+                    .input-group.input-group-merge
+                      input#mnemo.form-control.form-control-prepend(type='text', name="mnemo", placeholder='Краткое имя', required, value=(discipline===undefined ? "" : discipline.mnemo), maxlength=20)
+                      .input-group-prepend
+                        span.input-group-text
+                          i(data-feather='minimize-2')
+                  .col.form-group.mb-0
+                    .d-flex.align-items-center.justify-content-between
+                      div
+                        label.form-control-label Имя ссылки(URL) для дисциплины
+                          span.text-danger *
+                    .input-group.input-group-merge
+                      input#allias.form-control.form-control-prepend(type='text', name="allias", placeholder='Короткое имя для ссылки', required, value=(discipline===undefined ? "" : discipline.allias), , maxlength=30)
+                      .input-group-prepend
+                        span.input-group-text
+                          i(data-feather='link')
+                .form-group.mb-0
+                  .d-flex.align-items-center.justify-content-between
+                    div
+                      label.form-control-label Описание дисциплины
+                  .input-group.input-group-merge
+                    textarea#description.form-control.form-control-prepend(type='textarea', placeholder='Добавьте описание дисциплины', name='description', rows="4", maxlength=300) #{discipline===undefined ? "" : discipline.description}
+                    .input-group-prepend
+                      span.input-group-text
+                        i(data-feather='align-justify') 
+                .form-group.mb-0
+                  .d-flex.align-items-center.justify-content-between
+                    div
+                      label.form-control-label Группы
+                        span.text-danger *    
+                  -let selectedGroups = [];
+                  select#groups.custom-select(type='select', name="groups", multiple='', size="1", onchange='SelectShow("groups")', required)  
+                    -groupsInfo.sort((a,b) => {let textA = a.fullname.toUpperCase(); let textB = b.fullname.toUpperCase(); return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;});
+                    if discipline===undefined
+                      for group in groupsInfo
+                        option(value=group._id.toString()) #{group.fullname}
+                    else
+                      for group in groupsInfo
+                        if discipline.groups !== undefined && discipline.groups.includes(group._id.toString())
+                          option(selected=true value=group._id.toString()) #{group.fullname}
+                          -selectedGroups.push(group.fullname);
+                        else
+                          option(value=group._id.toString()) #{group.fullname}
+                  #selectedgroups Выбранные значения: #{selectedGroups.join("; ")}  
+                if(userInfo.securityRole.includes("superadmin"))
+                  .form-group.mb-0
+                    .d-flex.align-items-center.justify-content-between
+                      div
+                        label.form-control-label Редакторы дисциплины  
+                          span.text-danger * 
+                    -let selectedEditors = [];
+                    select#editors.selectpicker(name="editors",data-live-search='true', title="Не выбраны", multiple='', size="1", onchange='SelectShow("editors")', required)  
+                      -teachersList.sort((a,b) => {let textA = a.lastName.toUpperCase(); let textB = b.lastName.toUpperCase(); return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;});
+                      if discipline===undefined
+                        for teacher in teachersList
+                          option(value=teacher._id.toString()) #{teacher.lastName} #{teacher.name}
+                      else
+                        for teacher in teachersList
+                          if discipline.editors.includes(teacher._id.toString())
+                            option(selected=true value=teacher._id.toString()) #{teacher.lastName} #{teacher.name}
+                            -selectedEditors.push(`${teacher.lastName} ${teacher.name}`);
+                          else
+                            option(value=teacher._id.toString()) #{teacher.lastName} #{teacher.name}
+                    #selectededitors Выбранные значения: #{selectedEditors.join("; ")}  
+                .row.mt-4
+                  .col.form-group.mb-0
+                    button.btn.btn-block.btn-primary(type='submit') #{title==="Новая дисциплина" ? "Создать" : "Изменить"}
+                  .col.form-group.mb-0
+                    a(href=(title==="Новая дисциплина" ? "/disciplines/" : "/disciplines/"+discipline.allias+"/"))
+                      button.btn.btn-block.btn-secondary(type='button') Отмена
+    script(src='../../../assets/libs/jquery/dist/jquery.min.js')
+    script(src='../../../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js')
+    script(src='../../../assets/libs/bootstrap/dist/js/bootstrap-select.js')
+    script(src='../../../assets/libs/svg-injector/dist/svg-injector.min.js')
+    script(src='../../../assets/libs/feather-icons/dist/feather.min.js')
+    script(src='../../../assets/libs/in-view/dist/in-view.min.js')
+    script(src='../../../assets/libs/sticky-kit/dist/sticky-kit.min.js')
+    script(src='../../../assets/libs/imagesloaded/imagesloaded.pkgd.min.js')
+    script(src='../../../assets/js/quick-website.js')
+    script.
+      feather.replace({
+      width: "1em",
+      height: "1em"
+      })
+    include includes/yandex_metrika.pug

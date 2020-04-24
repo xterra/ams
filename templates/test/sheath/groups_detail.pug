@@ -1,0 +1,62 @@
+doctype html
+html
+  head
+    title #{title}
+    include includes/head_html.pug
+    link(rel='stylesheet', href='../../../assets/libs/fortawesome/fontawesome-free/css/all.min.css')
+  body.bg-light-secondary
+    .preloader
+      .spinner-border.text-primary(role='status')
+        span.sr-only Loading...
+    include includes/header_private.pug
+    section.slice.slice-lg.delimiter-bottom(style="min-height: 580px")
+      a.btn.btn-neutral.btn-icon-only.rounded-circle.position-absolute.left-4.top-90.d-none.d-lg-inline-flex(href="/groups/")
+        span.btn-inner--icon
+          i(data-feather='arrow-left')
+      .container
+        .row.justify-content-center
+          .col-lg-9
+            .row.align-items-center.mb-4
+              .pr-3
+                span.h5.mb-0
+                  i(data-feather='users')
+              .col
+                h3.h5.mb-0 #{groupInfo.fullname}
+                p.text-muted.mb-0 Информация о группе #{groupInfo.fullname}
+              .col-auto
+                if userInfo.securityRole !== 0 && (userInfo.securityRole.includes('superadmin') || userInfo.securityRole.includes('admin'))
+                  a(href="/groups/edit/"+groupInfo.url+"/")
+                    button.btn.btn-primary.btn-icon.rounded-pill(type='button')
+                      span.btn-inner--icon
+                        i(data-feather='edit-2')
+            .row.mt-4
+              .col-lg-12
+                .mb-5
+                  ul.list-group
+                    -groupList.sort((a,b) => {let textA = a.lastName.toUpperCase(); let textB = b.lastName.toUpperCase(); return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;});
+                    each student in groupList
+                      if groupInfo.elder !== undefined && student._id.toString()===groupInfo.elder.toString()
+                        a.list-group-item.list-group-item-action.d-flex.justify-content-between.align-items-centeractive(href='/profiles/'+student._id+'/')
+                          | #{student.lastName} #{student.name}
+                          span.badge.badge-primary.badge-pill староста
+                      else
+                        a.list-group-item.list-group-item-action(href='/profiles/'+student._id+'/')
+                          | #{student.lastName} #{student.name}
+                    else
+                      p Студентов пока нет
+    include includes/footer.pug                  
+    script(src='../../../assets/libs/jquery/dist/jquery.min.js')
+    script(src='../../../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js')
+    script(src='../../../assets/libs/svg-injector/dist/svg-injector.min.js')
+    script(src='../../../assets/libs/feather-icons/dist/feather.min.js')
+    script(src='../../../assets/libs/in-view/dist/in-view.min.js')
+    script(src='../../../assets/libs/sticky-kit/dist/sticky-kit.min.js')
+    script(src='../../../assets/libs/imagesloaded/imagesloaded.pkgd.min.js')
+    script(src='../../../assets/libs/progressbar.js/dist/progressbar.min.js')
+    script(src='../../../assets/js/quick-website.js')
+    script.
+      feather.replace({
+      width: "1em",
+      height: "1em"
+      })
+    include includes/yandex_metrika.pug

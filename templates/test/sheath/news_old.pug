@@ -1,0 +1,18 @@
+doctype html
+html
+    head
+      title "NEWS page"
+    body
+      h1="NEWS"
+      p #{sessionLogin}
+      hr
+      if sessionLogin=='admin'
+        a(href="/news/create/")
+          button(type="button") Create news
+      each pieceOfNews in news
+        h2 #{pieceOfNews.title}
+        p  #{pieceOfNews.text}
+        hr
+      else 
+        p There are no news.
+    

@@ -1,0 +1,41 @@
+doctype html
+html
+  head
+    title #{title}
+    include includes/head_html.pug
+    link(rel='stylesheet', href='../../../assets/libs/fortawesome/fontawesome-free/css/all.min.css')
+  body.bg-light-secondary
+    .preloader
+      .spinner-border.text-primary(role='status')
+        span.sr-only Loading...
+    include includes/header_private.pug
+    .jumbotron.shadow-lg.mb-0
+      .row.justify-content-center.py-8
+        .col-lg-8.text-center
+          h2.lh-160
+            | Вы точно хотите удалить новость 
+            br
+            strong "#{news_detail.title}" ?
+          .mt-5.row.justify-content-center
+            a.btn.btn-lg.btn-outline-primary.btn-icon.mr-3(href='/news/'+news_detail.url+'/')
+              span.btn-inner--icon
+                i(data-feather='arrow-left')
+              span.btn-inner--text Отмена
+            form(action="" method="POST")
+              button.btn.btn-lg.btn-outline-danger(type="submit") Удалить
+    include includes/footer.pug
+    script(src='../../../assets/libs/jquery/dist/jquery.min.js')
+    script(src='../../../assets/libs/svg-injector/dist/svg-injector.min.js')
+    script(src='../../../assets/libs/feather-icons/dist/feather.min.js')
+    script(src='../../../assets/libs/in-view/dist/in-view.min.js')
+    script(src='../../../assets/libs/sticky-kit/dist/sticky-kit.min.js')
+    script(src='../../../assets/libs/imagesloaded/imagesloaded.pkgd.min.js')
+    script(src='../../../assets/libs/swiper/dist/js/swiper.min.js')
+    script(src='../../../assets/libs/fancyapps/fancybox/dist/jquery.fancybox.min.js')
+    script(src='../../../assets/js/quick-website.js')
+    script.
+     feather.replace({
+     width: "1em",
+     height: "1em"
+     })
+    include includes/yandex_metrika.pug
