@@ -271,13 +271,17 @@ function getSessionData(sessionToken, callback) {
         context[sessionToken][0] = new Date();
         callback(null, context[sessionToken][1]);
     } else {
-        boot.getDB().collection("sessions").findOne({_id: sessionToken}, function(err, result){
-          if(err) console.log(err)
-          console.log(`Get info about session: ${JSON.stringify(result)}`);
-        });
-
-        callback(null, null);
-
+      boot.getDB().collection("sessions").findOne({_id: sessionToken}, function(err, result){
+        if(err) console.log(err);
+        if(result == null){
+          return callback(null, null);
+        }
+        console.log(`\nGet info about session: ${JSON.stringify(result)}\n`);
+        let sessionData = result.data;
+        sessionData["id"] = result.ownerID;
+        context[sessionToken] = [new Date(), sessionData, result.ownerID];
+        return callback(null, sessionData);
+      });
         // TODO: update session lifetime in cache and DB
         // TODO: add go to DB to load and update
     }
