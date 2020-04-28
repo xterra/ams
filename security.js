@@ -27,7 +27,8 @@ module.exports = {
     updateSessionFromCookies: updateSessionFromCookies,
     updateSession: updateSession,
     runCleaner: runCleaner,
-    stopCleaner: stopCleaner
+    stopCleaner: stopCleaner,
+    checkUserPasswordReset: checkUserPasswordReset
 };
 
 const router = require("./router"),
@@ -324,6 +325,24 @@ function updateSession(sessionToken, sessionData, callback) {
         console.warn("User do not have stored data in context. Is that okay, damn?", sessionToken);
         callback(null, false);
     }
+}
+
+function checkUserPasswordReset(sessionData, callback){
+  if(sessionData == null || !sessionData.hasOwnProperty('id')){
+    return callback(null, false);
+  }
+  let userID = sessionData.id;
+  boot.getDB().collection("users").findOne({_id: userID}, {passwordReset : 1}, function(err, result){
+    if(err){
+      console.log(`Error occurred in checkUserPasswordReset when search user: ${err}`);
+      return callback(err, null);
+    }
+    if(result == null){
+      return callback(null, false);
+    } else{
+      return callback(null, result.passwordReset);
+    }
+  });
 }
 
 function reloadConfigurations() {
