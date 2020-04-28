@@ -266,6 +266,13 @@ function render(pageProcessor, requestedURL, request, response) {
         }, renderTimeout);
         const db = boot.getDB();
         return security.getSessionFromRequest(request, response, function (sessionToken, sessionData) {
+          security.checkUserPasswordReset(sessionData, function(err, passwordReseted){
+            if(err){
+              return bleed(500, null, response, err);
+            }
+            const pageForPasswordReset = "/password_reset/";
+            const pageForLogout = "/logout/";
+            if(passwordReseted && requestedURL !== pageForPasswordReset && requestedURL !== pageForLogout) bleed(301, pageForPasswordReset, response);
             pageProcessor(request, response, function (processedData, useSheathName, serverCacheTime, clientCacheTime, contentType) {
                 if (!timeoutBleeded) {
                     clearTimeout(processorTimeout);
@@ -311,6 +318,7 @@ function render(pageProcessor, requestedURL, request, response) {
                     }
                 }
             }, sessionData, sessionToken, db);
+          });
         });
     } catch (e) {
         bleed(500, null, response, e);
