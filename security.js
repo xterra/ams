@@ -160,7 +160,7 @@ function makeSession (userID, callback) {
 }
 
 function makeSessionUsingToken (token, userID, callback) {
-    let defaultSessionData = {};
+    let defaultSessionData = {id: userID};
     if(boot.isConnected()){
         return storeSessionInDB(token, defaultSessionData, userID, function(error, storedSessionData){
             if(error){
