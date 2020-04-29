@@ -2,6 +2,7 @@ const router = require("../../../router"),
       qs = require('querystring'),
       security = require("../../../security"),
       md5 = require('md5'),
+      ObjectID = require('mongodb').ObjectID,
       cookie = require('cookie');
 
 module.exports = {
@@ -12,7 +13,7 @@ module.exports = {
       return router.bleed(404, null, response);
     }
     console.log(JSON.stringify(sessionContext));
-    db.collection("users").findOne({_id: sessionContext.id}, {username: 1, passwordReset: 1, password: 1}, function(err, forgetfulUser){
+    db.collection("users").findOne({_id: new ObjectID(sessionContext.id)}, {username: 1, passwordReset: 1, password: 1}, function(err, forgetfulUser){
       if(err){
         console.error(`Error in password_reset -> find user from user: ${err}`);
         callback();
@@ -53,7 +54,13 @@ module.exports = {
               }, "password_reset", 0, 0);
             }
             const userNewPass = md5(postData.newpass1);
-            db.collection('users').update({_id: forgetfulUser._id},
+            if( userNewPass == forgetfulUser.password){
+              return callback({
+                title: "Сброс пароля",
+                errorMessage: "Пароль должен отличаться от старого"
+              }, "password_reset", 0, 0);
+            }
+            db.collection('users').update({_id: new ObjectID(forgetfulUser._id)},
               {$set: {
               password: userNewPass,
               passwordChanged: new Date(),

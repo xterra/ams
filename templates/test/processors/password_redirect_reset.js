@@ -1,6 +1,7 @@
 const router = require("../../../router"),
       qs = require('querystring'),
       security = require("../../../security"),
+      ObjectID = require('mongodb').ObjectID,
       cookie = require('cookie');
 
 module.exports = {
@@ -9,6 +10,7 @@ module.exports = {
     let requestedUrl = decodeURI(request.url);
     let delimiteredUrl = requestedUrl.split('/');
     let resetToken = delimiteredUrl[delimiteredUrl.length - 2];
+    console.log(`resetToken: ${resetToken}`)
     db.collection("sessions").findOne({_id: resetToken}, function(err, foundSession){
       if(err){
         console.error(`Error in password_redirect_reset -> find session from DB: ${err}`);
@@ -21,7 +23,8 @@ module.exports = {
         return router.bleed(404, null, response);
       }
       let userSession = foundSession;
-      db.collection("users").update({_id: userSession.ownerID}, {$set : {passwordReset: true}}, function(err){
+      console.log(`userSession: ${JSON.stringify(userSession)}`)
+      db.collection("users").update({_id: new ObjectID(userSession.ownerID)}, {$set : {passwordReset: true}}, function(err){
         if(err){
           console.error(`Error in password_redirect_reset -> update user in DB: ${err}`);
           callback();
