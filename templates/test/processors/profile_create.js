@@ -32,40 +32,33 @@ module.exports = {
               return router.bleed(400, null, response);
             }
             const postData = qs.parse(data);
-            if(postData.username.length < 5 || postData.password.length < 8){
+            if(postData.username.length < 5){
               return callback({
                 title: "Новый профиль",
-                adminName: adminInfo.username,
                 userInfo: postData,
                 groups: groups,
-                errorMessage: "Логин или пароль короткие!"
+                errorMessage: "Логин слишком короткий"
               }, "profile_create", 0, 0);
             }
-
-            if(postData.username.length > 16 || postData.password.length > 64){
+            if(postData.username.length > 16){
               return callback({
                 title: "Новый профиль",
-                adminName: adminInfo.username,
                 userInfo: postData,
                 groups: groups,
-                errorMessage: "Логин или пароль слишком длинные!"
+                errorMessage: "Логин слишком длинный!"
               }, "profile_create", 0, 0);
             }
-            const cryptoPass = md5(postData.password);
             return db.collection("users").findOne({username: postData.username}, {_id:1}, null, function(err, foundUser){
               if(err){
                 callback();
                 return router.bleed(500, null, response, err);
               }
-
-
               if(foundUser){
                 return callback({
                   title: "Новый профиль",
-                  adminName: adminInfo.username,
                   userInfo: postData,
                   groups: groups,
-                  errorMessage: "Такой пользователь уже существует!"
+                  errorMessage: "Такой логин уже существует!"
                 }, "profile_create", 0, 0);
               }else{
                 let positionOrGroupKey,
@@ -84,7 +77,7 @@ module.exports = {
                   name: postData.name,
                   fatherName: postData.fathername,
                   username: postData.username,
-                  password: cryptoPass,
+                  password: '',
                   accountCreated: new Date(),
                   passwordChanged: new Date(),
                   passwordChangesHistory: [],
@@ -95,17 +88,17 @@ module.exports = {
                   securityGrants: [],
                   securityRole: [postData.securityRole],
                   personalDataUsageAgreed: new Date(),
-                  accountActivated: new Date()
+                  accountActivated: new Date(),
+                  passwordReset: true
                 }, null, function(err, result){ //TODO:ПЕРЕДЕЛАТЬ!!!
                   if (!err) {
                     console.log(`User created with id: ${result.insertedId}`);
                     callback();
-                    return router.bleed(301, "/profiles/", response);
+                    return router.bleed(301, `/profiles/reset/${result.insertedId}/`, response);
                   } else {
                       if(result.result.ok === 1) {
                         return callback({
                           title: "Новый профиль",
-                          adminName: adminInfo.username,
                           userInfo: postData,
                           groups: groups,
                           errorMessage: "Пользователь не создан... Попробуйте ещё раз!"
@@ -124,7 +117,6 @@ module.exports = {
         } else{
             return callback({
               title: "Новый профиль",
-              adminName: adminInfo.username,
               userInfo: {},
               groups: groups,
               errorMessage: ""
