@@ -89,8 +89,10 @@ html
                               p.card-text #{profileInfo.phone}        
           if userInfo.securityRole.includes("superadmin")
             .row.justify-content-center.mb-3
-              a.ml-1(href="/profiles/delete/"+profileInfo._id+"/")
-                button.btn.btn-outline-danger(type='button') Удалить профиль 
+              a.mr-1(href="/profiles/delete/"+profileInfo._id+"/")
+                button.btn.btn-outline-danger(type='button') Удалить профиль
+              a.ml-1(href="/profiles/reset/"+profileInfo._id+"/")
+                button.btn.btn-outline-primary(type='button') Сбросить пароль
     include includes/footer.pug
     script(src='../../assets/libs/jquery/dist/jquery.min.js')
     script(src='../../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js')
