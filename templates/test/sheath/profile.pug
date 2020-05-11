@@ -27,7 +27,11 @@ html
                   span.text-muted.d-block Студент группы #{profileInfo.groupInfo[0].fullname}
                 else
                   #{profileInfo.securityRole[0]}
-                
+              .col-auto
+                a(href="/profiles/edit/"+profileInfo._id+"/")
+                  button.btn.btn-primary.btn-icon.rounded-pill(type='button')
+                    span.btn-inner--icon
+                      i(data-feather='edit-2')
     section.slice.slice-sm.bg-section-secondary(style="min-height: 380px")
       .container
         .row.justify-content-center
