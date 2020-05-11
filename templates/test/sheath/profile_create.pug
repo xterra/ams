@@ -59,7 +59,7 @@ html
                   .col.form-group.my-3
                     label.form-control-label Должность
                     select.custom-select(type="select" name="position" placeholder="Должность преподавателя" )
-                      option(value=null selected) Не назначена
+                      option(value="" selected) Не назначена
                       option(value="Ассистент") Ассистент
                       option(value="Доцент") Доцент
                       option(value="Преподаватель") Преподаватель
@@ -69,7 +69,7 @@ html
                   .col.form-group.my-3
                     label.form-control-label Группа
                     select.custom-select(type="select" name="group" placeholder="Группа студента")
-                      option(value=null selected) Не назначена
+                      option(value="" selected) Не назначена
                       for group in groups
                         option(value=group._id) #{group.fullname}
                 .row

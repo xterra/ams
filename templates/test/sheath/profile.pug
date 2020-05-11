@@ -23,7 +23,7 @@ html
                   |  #{profileInfo.name} #{profileInfo.fatherName}
                 if profileInfo.securityRole.includes("teacher")
                   span.text-muted.d-block #{profileInfo.position}
-                else if profileInfo.securityRole.includes("student")
+                else if profileInfo.securityRole.includes("student") && profileInfo.groupInfo.length !== 0
                   span.text-muted.d-block Студент группы #{profileInfo.groupInfo[0].fullname}
                 else
                   #{profileInfo.securityRole[0]}

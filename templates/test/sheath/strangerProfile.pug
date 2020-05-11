@@ -24,12 +24,12 @@ html
                 h2.mb-0
                   b #{profileInfo.lastName}
                   |  #{profileInfo.name} #{profileInfo.fatherName}
-                if profileInfo.securityRole.includes("teacher")
+                if profileInfo.securityRole.includes("teacher") && profileInfo.position !== undefined
                   span.text-muted.d-block #{profileInfo.position}
-                else if profileInfo.securityRole.includes("student")
+                else if profileInfo.securityRole.includes("student") && profileInfo.groupInfo.length !== 0
                   span.text-muted.d-block Студент группы #{profileInfo.groupInfo[0].fullname}
                 else
-                  #{profileInfo.securityRole[0]}
+                  span.text-muted.d-block #{profileInfo.securityRole[0]}
               if userInfo.securityRole.length !== 0 && userInfo.securityRole.includes("superadmin")
                 .col-auto
                   a(href="/profiles/edit/"+profileInfo._id+"/")
