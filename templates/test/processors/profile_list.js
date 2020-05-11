@@ -13,27 +13,14 @@ module.exports = {
         return router.bleed(500, null, response, err);
       }
       let users = result;
-      let currentUser = users.find((element, index, array)=>{
-        if(element._id == sessionContext.id){
-          return element;
-        } else{
-          return false;
-        }
+      let currentUser = users.find((element) => {
+        return element._id.toString() == sessionContext.id.toString();
       });
       let teachers = users.filter((curUser) => {
-          if(curUser.securityRole.includes('teacher')){
-            return true;
-          } else {
-            return false;
-          }
+          return curUser.securityRole.includes('teacher')
         });
-        console.log(teachers);
       let students = users.filter((curUser) => {
-          if(curUser.securityRole.includes('student')){
-            return true;
-          } else {
-            return false;
-          }
+          return curUser.securityRole.includes('student')
         });
       return callback({
         title: "Список пользователей",

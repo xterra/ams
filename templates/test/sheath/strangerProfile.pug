@@ -24,12 +24,12 @@ html
                 h2.mb-0
                   b #{profileInfo.lastName}
                   |  #{profileInfo.name} #{profileInfo.fatherName}
-                if profileInfo.securityRole.includes("teacher")
+                if profileInfo.securityRole.includes("teacher") && profileInfo.position !== undefined
                   span.text-muted.d-block #{profileInfo.position}
-                else if profileInfo.securityRole.includes("student")
+                else if profileInfo.securityRole.includes("student") && profileInfo.groupInfo.length !== 0
                   span.text-muted.d-block Студент группы #{profileInfo.groupInfo[0].fullname}
                 else
-                  #{profileInfo.securityRole[0]}
+                  span.text-muted.d-block #{profileInfo.securityRole[0]}
               if userInfo.securityRole.length !== 0 && userInfo.securityRole.includes("superadmin")
                 .col-auto
                   a(href="/profiles/edit/"+profileInfo._id+"/")
@@ -89,8 +89,10 @@ html
                               p.card-text #{profileInfo.phone}        
           if userInfo.securityRole.includes("superadmin")
             .row.justify-content-center.mb-3
-              a.ml-1(href="/profiles/delete/"+profileInfo._id+"/")
-                button.btn.btn-outline-danger(type='button') Удалить профиль 
+              a.mr-1(href="/profiles/delete/"+profileInfo._id+"/")
+                button.btn.btn-outline-danger(type='button') Удалить профиль
+              a.ml-1(href="/profiles/reset/"+profileInfo._id+"/")
+                button.btn.btn-outline-primary(type='button') Сбросить пароль
     include includes/footer.pug
     script(src='../../assets/libs/jquery/dist/jquery.min.js')
     script(src='../../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js')

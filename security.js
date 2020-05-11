@@ -27,7 +27,8 @@ module.exports = {
     updateSessionFromCookies: updateSessionFromCookies,
     updateSession: updateSession,
     runCleaner: runCleaner,
-    stopCleaner: stopCleaner
+    stopCleaner: stopCleaner,
+    checkUserPasswordReset: checkUserPasswordReset
 };
 
 const router = require("./router"),
@@ -159,7 +160,7 @@ function makeSession (userID, callback) {
 }
 
 function makeSessionUsingToken (token, userID, callback) {
-    let defaultSessionData = {};
+    let defaultSessionData = {id: userID};
     if(boot.isConnected()){
         return storeSessionInDB(token, defaultSessionData, userID, function(error, storedSessionData){
             if(error){
@@ -271,13 +272,17 @@ function getSessionData(sessionToken, callback) {
         context[sessionToken][0] = new Date();
         callback(null, context[sessionToken][1]);
     } else {
-        boot.getDB().collection("sessions").findOne({_id: sessionToken}, function(err, result){
-          if(err) console.log(err)
-          console.log(`Get info about session: ${JSON.stringify(result)}`);
-        });
-
-        callback(null, null);
-
+      boot.getDB().collection("sessions").findOne({_id: sessionToken}, function(err, result){
+        if(err) console.log(err);
+        if(result == null){
+          return callback(null, null);
+        }
+        console.log(`\nGet info about session: ${JSON.stringify(result)}\n`);
+        let sessionData = result.data;
+        sessionData["id"] = result.ownerID;
+        context[sessionToken] = [new Date(), sessionData, result.ownerID];
+        return callback(null, sessionData);
+      });
         // TODO: update session lifetime in cache and DB
         // TODO: add go to DB to load and update
     }
@@ -320,6 +325,24 @@ function updateSession(sessionToken, sessionData, callback) {
         console.warn("User do not have stored data in context. Is that okay, damn?", sessionToken);
         callback(null, false);
     }
+}
+
+function checkUserPasswordReset(sessionData, callback){
+  if(sessionData == null || !sessionData.hasOwnProperty('id')){
+    return callback(null, false);
+  }
+  let userID = sessionData.id;
+  boot.getDB().collection("users").findOne({_id: userID}, {passwordReset : 1}, function(err, result){
+    if(err){
+      console.log(`Error occurred in checkUserPasswordReset when search user: ${err}`);
+      return callback(err, null);
+    }
+    if(result == null){
+      return callback(null, false);
+    } else{
+      return callback(null, result.passwordReset);
+    }
+  });
 }
 
 function reloadConfigurations() {
