@@ -113,10 +113,7 @@ module.exports = {
                 //TODO: Add mail checking
 
                 function getPositionOrGroupKey(securityRole){
-                  if(securityRole.includes("student")){
-                    return "group";
-                  }
-                   return "position";
+                  return securityRole.includes("student") ? "group" : "position";
                 }
 
                 if(updatedProfileData.username !== profileInfo.username){
@@ -128,7 +125,7 @@ module.exports = {
                       profileInfo: profileInfo,
                       groups: groups,
                       errorMessage: messageCheckUsernameLength
-                    }, "profile_edit", 0, 0);
+                    }, "profile_form", 0, 0);
                   }
                   return db.collection("users").findOne({username: updatedProfileData.username}, {_id:1}, null, function(err, foundUser){
                     if(err){
@@ -142,7 +139,7 @@ module.exports = {
                         profileInfo: profileInfo,
                         groups: groups,
                         errorMessage: "Такой пользователь уже существует!"
-                      }, "profile_edit", 0, 0);
+                      }, "profile_form", 0, 0);
                     }else{
                       db.collection("users").update({_id: profileInfo._id}, {$set: updatedProfileData}, function(err){
                         if(err){
@@ -202,7 +199,7 @@ module.exports = {
               profileInfo: profileInfo,
               groups: groups,
               errorMessage: ""
-            }, "profile_edit", 0, 0)
+            }, "profile_form", 0, 0)
           }
         });
       });
