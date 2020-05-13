@@ -44,17 +44,10 @@ html
                       tbody
                       for user in teachers
                         tr
-                          th(scope='row')
-                            .media.align-items-center
-                              div
-                                .avatar-parent-child
-                                  span.avatar.bg-primary.text-white.rounded-circle.avatar-sm #{user.username.substr(0,2).toUpperCase()}
-                              .media-body.ml-4
-                                a.name.h6.mb-0.text-sm(href="/profiles/"+user._id+"/") #{user.username}
-                                if currentUser.securityRole !== 0 && !currentUser.securityRole.includes('student')
-                                  small.d-block.font-weight-bold #{user.email}
                           td
-                              p.text-sm.font-weight-bold.pt-3 #{user.lastName}  #{user.name} #{user.fatherName}
+                              a.name.h6.mb-0.text-sm.font-weight-bold.pt-3(href="/profiles/"+user._id+"/") #{user.lastName}  #{user.name} #{user.fatherName}
+                          td
+                              p.text-sm.font-weight-bold.pt-3 #{user.position}
                           td.text-right
                             .actions.ml-3
                               a.action-item.mr-2(href="/profiles/"+user._id+"/")
@@ -80,16 +73,10 @@ html
                       tbody
                       for user in students
                         tr
-                          th(scope='row')
-                            .media.align-items-center
-                              div
-                                .avatar-parent-child
-                                  span.avatar.bg-primary.text-white.rounded-circle.avatar-sm #{user.username.substr(0,2).toUpperCase()}
-                              .media-body.ml-4
-                                a.name.h6.mb-0.text-sm(href="/profiles/"+user._id+"/") #{user.username}
-                                small.d-block.font-weight-bold #{user.email}
                           td
-                              p.text-sm.font-weight-bold.pt-3 #{user.lastName}  #{user.name}
+                            a.name.h6.mb-0.text-sm.font-weight-bold.pt-3(href="/profiles/"+user._id+"/") #{user.lastName}  #{user.name} #{user.fatherName}
+                          td
+                            p.text-sm.font-weight-bold.pt-3 #{user.groupInfo[0].fullname}
                           td.text-right
                             .actions.ml-3
                               a.action-item.mr-2(href="/profiles/"+user._id+"/")
