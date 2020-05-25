@@ -4,6 +4,13 @@ html
     title #{title}
     include includes/head_html.pug
     link(rel='stylesheet', href='../assets/libs/fortawesome/fontawesome-free/css/all.min.css')
+    style.
+      #cleanerText{
+      position: absolute;
+      right: 20px;
+      top: 10px;
+      z-index: 99
+      }
   body.bg-light-secondary
     .preloader
       .spinner-border.text-primary(role='status')
@@ -14,7 +21,10 @@ html
         span.btn-inner--icon
           i(data-feather='arrow-left')
       .container
-        .row.justify-content-center
+        .row
+          .col-lg-3.d-none.d-md-block
+            .row.align-items-center.mb-4
+              include includes/filter_profiles.pug
           .col-lg-9
             .row.align-items-center.mb-4
               .pr-3
@@ -33,29 +43,31 @@ html
                     button.btn.btn-sm.btn-primary.btn-icon-only.rounded-circle(type='button')
                       span.btn-inner--icon
                         i.fas.fa-plus
-              
+            .row.align-items-center.mb-4
+                .col
+                  .input-group.input-group-merge
+                    input#search.form-control.form-control-prepend(type='text', name="search", placeholder='Поиск по пользователям')
+                    .input-group-prepend
+                        span.input-group-text
+                          i(data-feather='search')
+                    a#cleanerText
+                      i(data-feather='x')  
             .row.mt-4
               .col.col-lg.px-2.text-center
                 h5.h6.my-2 Преподаватели
               .col-lg-12
-                .mb-5
+                .mb-3
                   .table-responsive
                     table.table.table-cards.align-items-center
                       tbody
                       for user in teachers
                         tr
-                          th(scope='row')
-                            .media.align-items-center
-                              div
-                                .avatar-parent-child
-                                  span.avatar.bg-primary.text-white.rounded-circle.avatar-sm #{user.username.substr(0,2).toUpperCase()}
-                              .media-body.ml-4
-                                a.name.h6.mb-0.text-sm(href="/profiles/"+user._id+"/") #{user.username}
-                                if currentUser.securityRole !== 0 && !currentUser.securityRole.includes('student')
-                                  small.d-block.font-weight-bold #{user.email}
-                          td
-                              p.text-sm.font-weight-bold.pt-3 #{user.lastName}  #{user.name} #{user.fatherName}
-                          td.text-right
+                          td.py-0
+                              a.name.h6.mb-0.text-sm.font-weight-bold(href="/profiles/"+user._id+"/") #{user.lastName}  #{user.name} #{user.fatherName}
+                          td.py-0
+                              p.text-sm.mb-0.font-weight-bold #{user.position}
+                              label(hidden="true") Преподаватель
+                          td.text-right.py-0
                             .actions.ml-3
                               a.action-item.mr-2(href="/profiles/"+user._id+"/")
                                 i(data-feather='external-link')
@@ -70,7 +82,7 @@ html
                           .row.align-items-center
                             .col-auto
                              p Профилей пока нет
-            .row.mt-4
+            .row
               .col.col-lg.px-2.text-center
                 h5.h6.my-2  Студенты
               .col-lg-12
@@ -80,17 +92,16 @@ html
                       tbody
                       for user in students
                         tr
-                          th(scope='row')
-                            .media.align-items-center
-                              div
-                                .avatar-parent-child
-                                  span.avatar.bg-primary.text-white.rounded-circle.avatar-sm #{user.username.substr(0,2).toUpperCase()}
-                              .media-body.ml-4
-                                a.name.h6.mb-0.text-sm(href="/profiles/"+user._id+"/") #{user.username}
-                                small.d-block.font-weight-bold #{user.email}
-                          td
-                              p.text-sm.font-weight-bold.pt-3 #{user.lastName}  #{user.name}
-                          td.text-right
+                          td.py-0
+                            a.name.h6.mb-0.text-sm.font-weight-bold.pt-3(href="/profiles/"+user._id+"/") #{user.lastName}  #{user.name} #{user.fatherName}
+                            label(hidden="true") Студент
+                          td.py-0
+                            if user.groupInfo[0] !== undefined
+                              p.text-sm.mb-0.font-weight-bold.pt-3 #{user.groupInfo[0].fullname}
+                              label(hidden="true") #{user.groupInfo[0].name}, #{user.groupInfo[0].course} курс
+                            else
+                              p.text-sm.font-weight-bold.pt-3 Не назначена
+                          td.text-right.py-0
                             .actions.ml-3
                               a.action-item.mr-2(href="/profiles/"+user._id+"/")
                                 i(data-feather='external-link')
@@ -105,7 +116,8 @@ html
                           .row.align-items-center
                             .col-auto
                              p Профилей пока нет    
-    include includes/footer.pug                  
+    include includes/footer.pug
+    script(src="../../../../profile_search_and_filter.js" type="text/javascript")                 
     script(src='../assets/libs/jquery/dist/jquery.min.js')
     script(src='../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js')
     script(src='../assets/libs/svg-injector/dist/svg-injector.min.js')

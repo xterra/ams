@@ -75,6 +75,7 @@ module.exports = {
               }
               try{
                 let postData = qs.parse(data);
+                console.log(`Profile info id before : ${profileInfo._id}`);
                 const updatedProfileData = getUpdatesForProfile();
                 function getUpdatesForProfile(){
                   if(userNotAdmin(userInfo.securityRole)){
@@ -83,7 +84,7 @@ module.exports = {
                   return updateAllDataFromProfile();
                 }
                 function updateAdditionalDataFromProfile(){
-                  let newProfileData = profileInfo;
+                  let newProfileData = JSON.parse(JSON.stringify(profileInfo));
                   newProfileData.email = postData.email;
                   newProfileData.phone = postData.phone;
 
@@ -93,7 +94,7 @@ module.exports = {
                   return newProfileData;
                 }
                 function updateAllDataFromProfile(){
-                  let newProfileData = profileInfo;
+                  let newProfileData = {};
                   newProfileData.email = postData.email;
                   newProfileData.phone = postData.phone;
                   newProfileData.lastName = postData.lastName;
@@ -113,12 +114,8 @@ module.exports = {
                 //TODO: Add mail checking
 
                 function getPositionOrGroupKey(securityRole){
-                  if(securityRole.includes("student")){
-                    return "group";
-                  }
-                   return "position";
+                  return securityRole.includes("student") ? "group" : "position";
                 }
-
                 if(updatedProfileData.username !== profileInfo.username){
                   const messageCheckUsernameLength = checkUsernameLength(updatedProfileData.username);
                   if(messageCheckUsernameLength){
@@ -128,7 +125,7 @@ module.exports = {
                       profileInfo: profileInfo,
                       groups: groups,
                       errorMessage: messageCheckUsernameLength
-                    }, "profile_edit", 0, 0);
+                    }, "profile_form", 0, 0);
                   }
                   return db.collection("users").findOne({username: updatedProfileData.username}, {_id:1}, null, function(err, foundUser){
                     if(err){
@@ -142,53 +139,38 @@ module.exports = {
                         profileInfo: profileInfo,
                         groups: groups,
                         errorMessage: "Такой пользователь уже существует!"
-                      }, "profile_edit", 0, 0);
-                    }else{
-                      db.collection("users").update({_id: profileInfo._id}, {$set: updatedProfileData}, function(err){
+                      }, "profile_form", 0, 0);
+                    }
+                    updateProfile(db, profileInfo, updatedProfileData, function(err){
+                      if(err){
+                        callback();
+                        return router.bleed(500, null, response, err);
+                      }
+                      deleteSpecialFields(db, profileInfo, updatedProfileData, function (err) {
                         if(err){
                           callback();
                           return router.bleed(500, null, response, err);
                         }
-                        if(updatedProfileData.username == profileInfo.username){
-                          callback();
-                          return router.bleed(301, `/profiles/${profileInfo._id}/`, response);
-                        } else{
-                          return db.collection("users").update({_id: profileInfo._id}, {$push: {loginHistory: profileInfo.username}}, function(err){
-                            if(err) {
-                              console.log(`Error in update login ${profileInfo.username}`);
-                              callback();
-                              return router.bleed(500, null, response, err);
-                            }
-                            callback();
-                            return router.bleed(301, `/profiles/${profileInfo._id}/`, response);
-                          });
-                        }
+                        callback();
+                        return router.bleed(301, `/profiles/${profileInfo._id}/`, response);
                       });
-                    }
+                    });
                   });
                 }
-                else {
-                      db.collection("users").update({_id: profileInfo._id}, {$set: updatedProfileData}, function(err){
-                        if(err){
-                          callback();
-                          return router.bleed(500, null, response, err);
-                        }
-                        if(updatedProfileData.username == profileInfo.username){
-                          callback();
-                          return router.bleed(301, `/profiles/${profileInfo._id}/`, response);
-                        } else{
-                          return db.collection("users").update({_id: profileInfo._id}, {$push: {loginHistory: profileInfo.username}}, function(err){
-                            if(err) {
-                              console.log(`Error in update login ${profileInfo.username}`);
-                              callback();
-                              return router.bleed(500, null, response, err);
-                            }
-                            callback();
-                            return router.bleed(301, `/profiles/${profileInfo._id}/`, response);
-                          });
-                        }
-                    });
-                }
+                updateProfile(db, profileInfo, updatedProfileData, function(err){
+                  if(err){
+                    callback();
+                    return router.bleed(500, null, response, err);
+                  }
+                  deleteSpecialFields(db, profileInfo, updatedProfileData, function (err) {
+                    if(err){
+                      callback();
+                      return router.bleed(500, null, response, err);
+                    }
+                    callback();
+                    return router.bleed(301, `/profiles/${profileInfo._id}/`, response);
+                  });
+                });
               }catch(err){
                 console.log(`Error in profile_edit -> POST in try{}`);
                 callback();
@@ -202,13 +184,44 @@ module.exports = {
               profileInfo: profileInfo,
               groups: groups,
               errorMessage: ""
-            }, "profile_edit", 0, 0)
+            }, "profile_form", 0, 0)
           }
         });
       });
     });
   }
 }
+
+function updateProfile(db, profileInfo, updatedProfileData, callback){
+  db.collection("users").update({_id: new ObjectID(profileInfo._id)}, {$set: updatedProfileData}, function(err){
+    if(err) return callback(err);
+
+    if(updatedProfileData.username == profileInfo.username) return callback();
+
+    db.collection("users").update({_id: new ObjectID(profileInfo._id)}, {$push: {loginHistory: profileInfo.username}}, function(err){
+      if(err) {
+        console.log(`Error in pushing loginHistory: ${profileInfo.username}`);
+        return callback(err);
+      }
+        callback();
+      });
+  });
+}
+
+function deleteSpecialFields(db, profileInfo, updatedProfileData, callback){
+  let fieldsForDelete = { group : "" , position : ""};
+  console.log(`\n Compare new and old securityRole: ${updatedProfileData.securityRole.toString()} vs ${profileInfo.securityRole.toString()}\n`);
+  if(updatedProfileData.securityRole.toString() == profileInfo.securityRole.toString()) return callback();
+
+  if(updatedProfileData.securityRole.includes("teacher")) delete fieldsForDelete["position"];
+  if(updatedProfileData.securityRole.includes("student")) delete fieldsForDelete["group"];
+  console.log(`JSON stringify: ${JSON.stringify(fieldsForDelete)}`);
+  db.collection("users").update({_id: new ObjectID(profileInfo._id)}, {$unset : fieldsForDelete}, function(err){
+    if(err) return callback(err);
+    return callback();
+  });
+}
+
 
 function checkUsernameLength(username){
   let loginTooSmall = "Логин слишком короткий";
