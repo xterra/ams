@@ -45,7 +45,7 @@ html
                 .form-group.my-3
                   label.form-control-label Комментарий
                   .input-group.input-group-merge
-                    textarea#comment.form-control.form-control-prepend(type="textarea" name="comment", placeholder='Добавьте описание файла', rows="3", maxlength=150) #{fileInfo===undefined ? "" : fileInfo.comment}
+                    textarea#comment.form-control.form-control-prepend(type="textarea" name="comment", placeholder='Добавьте описание файла', rows="4", maxlength=300) #{fileInfo===undefined ? "" : fileInfo.comment}
                     .input-group-prepend
                       span.input-group-text
                         i(data-feather='align-justify')    
