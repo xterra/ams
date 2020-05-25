@@ -22,7 +22,7 @@ html
           i(data-feather='arrow-left')
       .container
         .row
-          .col-lg-3
+          .col-lg-3.d-none.d-md-block
             .row.align-items-center.mb-4
               include includes/filter_profiles.pug
           .col-lg-9
@@ -56,18 +56,18 @@ html
               .col.col-lg.px-2.text-center
                 h5.h6.my-2 Преподаватели
               .col-lg-12
-                .mb-5
+                .mb-3
                   .table-responsive
                     table.table.table-cards.align-items-center
                       tbody
                       for user in teachers
                         tr
-                          td
-                              a.name.h6.mb-0.text-sm.font-weight-bold.pt-3(href="/profiles/"+user._id+"/") #{user.lastName}  #{user.name} #{user.fatherName}
-                          td
-                              p.text-sm.font-weight-bold.pt-3 #{user.position}
+                          td.py-0
+                              a.name.h6.mb-0.text-sm.font-weight-bold(href="/profiles/"+user._id+"/") #{user.lastName}  #{user.name} #{user.fatherName}
+                          td.py-0
+                              p.text-sm.mb-0.font-weight-bold #{user.position}
                               label(hidden="true") Преподаватель
-                          td.text-right
+                          td.text-right.py-0
                             .actions.ml-3
                               a.action-item.mr-2(href="/profiles/"+user._id+"/")
                                 i(data-feather='external-link')
@@ -82,7 +82,7 @@ html
                           .row.align-items-center
                             .col-auto
                              p Профилей пока нет
-            .row.mt-4
+            .row
               .col.col-lg.px-2.text-center
                 h5.h6.my-2  Студенты
               .col-lg-12
@@ -92,16 +92,16 @@ html
                       tbody
                       for user in students
                         tr
-                          td
+                          td.py-0
                             a.name.h6.mb-0.text-sm.font-weight-bold.pt-3(href="/profiles/"+user._id+"/") #{user.lastName}  #{user.name} #{user.fatherName}
                             label(hidden="true") Студент
-                          td
+                          td.py-0
                             if user.groupInfo[0] !== undefined
-                              p.text-sm.font-weight-bold.pt-3 #{user.groupInfo[0].fullname}
+                              p.text-sm.mb-0.font-weight-bold.pt-3 #{user.groupInfo[0].fullname}
                               label(hidden="true") #{user.groupInfo[0].name}, #{user.groupInfo[0].course} курс
                             else
                               p.text-sm.font-weight-bold.pt-3 Не назначена
-                          td.text-right
+                          td.text-right.py-0
                             .actions.ml-3
                               a.action-item.mr-2(href="/profiles/"+user._id+"/")
                                 i(data-feather='external-link')
