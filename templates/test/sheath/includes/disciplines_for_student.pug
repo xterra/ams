@@ -7,6 +7,9 @@ section.slice.py-5.bg-section-secondary(style="min-height: 580px")
       .col-lg-10
         .row.align-items-center.mb-4.ml-4
           .col
+            h1.h5.mb-0 Дисциплины
+        .row.align-items-center.mb-4.ml-4
+          .col
             .input-group.input-group-merge
               input#search.form-control.form-control-prepend(type='text', name="search", placeholder='Поиск по дисциплинам')
               .input-group-prepend
@@ -16,7 +19,7 @@ section.slice.py-5.bg-section-secondary(style="min-height: 580px")
                 i(data-feather='x')
         .row.align-items-center.mb-4.ml-4
           .col
-            h1.h5.mb-0 Ваши дисциплины
+            h1.h5.mb-0 Ваши
         .row.ml-4.mr-n2
           each disc in studentDisciplines 
             .col-sm-6.col-lg-4.px-2
@@ -44,7 +47,7 @@ section.slice.py-5.bg-section-secondary(style="min-height: 580px")
             p Дисциплин пока ещё нет.
         .row.align-items-center.mb-4.ml-4
           .col
-            h1.h5.mb-0 Другие дисциплины
+            h1.h5.mb-0 Другие
         .row.ml-4.mr-n2
           each otherDisc in otherDisciplines 
             .col-sm-6.col-lg-4.px-2
