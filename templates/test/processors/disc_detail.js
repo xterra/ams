@@ -6,6 +6,10 @@ const qs = require('querystring'),
 module.exports = {
   path: new RegExp("^\/disciplines\/[^\/]+\/$"),
   processor: function(request, response, callback, sessionContext, sessionToken, db){
+    if(sessionToken == null || sessionContext == undefined || sessionContext == null){
+      callback();
+      return router.bleed(301, "/login/", response);
+    }
     requestedUrl = decodeURI(request.url);
     delimeteredUrl = requestedUrl.split("/");
     disciplineAllias = delimeteredUrl[delimeteredUrl.length-2];
@@ -21,7 +25,6 @@ module.exports = {
       }
       const disc_detail = result;
       let disc_files = [];
-      if( sessionContext !== undefined && sessionContext !== null && "login" in sessionContext){
         db.collection("users").findOne({_id : sessionContext.id}, {securityRole : 1, username : 1}, function(err, result){
           if(err){
             callback();
@@ -36,7 +39,7 @@ module.exports = {
               files: disc_files
             }, "disc_detail", 0, 0);
           }
-          db.collection("files").find({_id: {$in: disc_detail.files}}).sort({name: 1}).toArray(function(err, result){
+          db.collection("files").find({_id: {$in: disc_detail.files}}).sort({dateEdit: -1}).toArray(function(err, result){
             if(err){
               callback();
               return router.bleed(500, null, response, err)
@@ -53,10 +56,6 @@ module.exports = {
             }, "disc_detail", 0, 0);
           });
         });
-      } else {
-        callback();
-        return router.bleed(301, "/login/", response);
-      }
     });
   }
 }
