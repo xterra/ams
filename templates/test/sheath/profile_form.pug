@@ -89,7 +89,7 @@ html
                               option(value=group._id.toString()) #{group.fullname}
                           option(value=null) Не назначена
                         else
-                          option(value="" selected) Не назначена
+                          option(selected=true value=null) Не назначена
                           for group in groups
                             option(value=group._id.toString()) #{group.fullname}
                   .row

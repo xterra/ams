@@ -52,7 +52,7 @@ html
                             a.name.h6.mb-0.text-sm(href="/groups/"+group.url+"/") #{group.fullname}
                             small.d-block.font-weight-bold #{group.name}, #{group.course} курс 
                           td
-                              if group.elder==undefined
+                              if group.elder==undefined || group.elderInfo.length == 0
                                 p.text-sm.font-weight-bold.pt-3 Не назначен
                               else
                                 p.text-sm.font-weight-bold.pt-3 #{group.elderInfo[0].lastName} #{group.elderInfo[0].name}

@@ -41,8 +41,6 @@ module.exports = {
           return router.bleed(500, null, response, err);
         }
         const groups = result;
-        console.log(groups);
-        console.log(`\n ${JSON.stringify(groups[0].elderInfo)}`)
         return callback({
           title: "Группы",
           groups: groups,

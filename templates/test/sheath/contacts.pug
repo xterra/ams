@@ -67,7 +67,7 @@ html
           .col-lg-6
             h5.h3 Контактный телефон
             p 8 (495) 684-22-50 
-            | доступность: пн-пт с 10:00 до 16:00
+            p доступность: пн-пт с 10:00 до 16:00
           .col-lg-6
             h5.h3 Полезные ссылки
             p
@@ -89,34 +89,30 @@ html
               | 3 этаж, ауд. 1312-1314, кафедра АСУ
             #accordionExample.accordion
               .card
-                #headingOne.card-header
-                  h2.mb-0.py-0
-                    button.btn.btn-link(type='button', data-toggle='collapse', data-target='#collapseOne', aria-expanded='false'  aria-controls='collapseOne', style="color: darkorange")
-                      | от станции метро "Новослободская" на трамвае
+                #headingOne.card-header(data-toggle='collapse', data-target='#collapseOne', aria-expanded='false'  aria-controls='collapseOne')
+                  p.pb-1(style="color: darkorange")
+                    | от станции метро "Новослободская" на трамвае
                 #collapseOne.collapse(aria-labelledby='headingOne', data-parent='#accordionExample')
                   .card-body
                     | от станции метро "Новослободская" (выход №1) пройти 200 метров до остановки "метро Новослобоская", затем на трамвае № 50 до остановки "МИИТ", после пройти 100 метров до КПП.
               .card
-                #headingTwo.card-header
-                  h2.mb-0
-                    button.btn.btn-link.collapsed(type='button', data-toggle='collapse', data-target='#collapseTwo', aria-expanded='false', aria-controls='collapseTwo', style="color: maroon")
-                      | от станции метро "Новослободская" пешком
+                #headingTwo.card-header(data-toggle='collapse', data-target='#collapseTwo', aria-expanded='false', aria-controls='collapseTwo')
+                  p.pb-1(style="color: maroon")
+                    | от станции метро "Новослободская" пешком
                 #collapseTwo.collapse(aria-labelledby='headingTwo', data-parent='#accordionExample')
                   .card-body
                     | от станции метро "Новослобоская" (выход №1) пешком 15 минут.
               .card
-                #headingThree.card-header
-                  h2.mb-0
-                    button.btn.btn-link.collapsed(type='button', data-toggle='collapse', data-target='#collapseThree', aria-expanded='false', aria-controls='collapseThree', style="color: blue")
-                      | от станции метро "Достоевская" на трамвае
+                #headingThree.card-header(data-toggle='collapse', data-target='#collapseThree', aria-expanded='false', aria-controls='collapseThree')
+                  p.pb-1(style="color: blue")
+                    | от станции метро "Достоевская" на трамвае
                 #collapseThree.collapse(aria-labelledby='headingThree', data-parent='#accordionExample')
                   .card-body
                     | от станции метро "Достоевская" (выход №1 к театру Российской армии) пройти 300 метров до остановки "улица Достоевского", затем на трамвае №50 до остановки "МИИТ", после пройти 200 метров до КПП.
               .card
-                #headingFour.card-header
-                  h2.mb-0
-                    button.btn.btn-link.collapsed(type='button', data-toggle='collapse', data-target='#collapseFour', aria-expanded='false', aria-controls='collapseFour', style="color: green")
-                      | от станции метро "Достоевская" пешком
+                #headingFour.card-header(data-toggle='collapse', data-target='#collapseFour', aria-expanded='false', aria-controls='collapseFour',)
+                  p.pb-1(style="color: green")
+                    | от станции метро "Достоевская" пешком
                 #collapseFour.collapse(aria-labelledby='headingFour', data-parent='#accordionExample')
                   .card-body
                     | от станции метро "Достоевская" (выход №1 к театру Российской армии), 10-12 минут пешком.     
