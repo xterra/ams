@@ -6,6 +6,6 @@ function addToClipboard(id){
   document.body.appendChild(tempInput);
   tempInput.select();
   document.execCommand('copy');
-  alert("Copied text:  " + tempInput.value)
+  alert("Ссылка скопирована.")
   document.body.removeChild(tempInput);
 }

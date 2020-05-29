@@ -85,6 +85,7 @@ module.exports = {
                 }
                 function updateAdditionalDataFromProfile(){
                   let newProfileData = JSON.parse(JSON.stringify(profileInfo));
+                  delete newProfileData["_id"];
                   newProfileData.email = postData.email;
                   newProfileData.phone = postData.phone;
 
