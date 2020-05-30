@@ -1,7 +1,7 @@
 let searchAndFilter = function() {
   let filterForm = document.getElementById("filter"),
       inputForm = document.getElementById("search"),
-      profiles = document.querySelectorAll('tr');
+      profiles = document.querySelectorAll('li.list-group-item');
 
   filterForm.addEventListener("change", searchAndFilterHandler);
   inputForm.addEventListener("input", searchAndFilterHandler);

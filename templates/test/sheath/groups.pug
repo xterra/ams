@@ -15,7 +15,7 @@ html
           i(data-feather='arrow-left')
       .container
         .row.justify-content-center
-          .col-lg-9
+          .col-lg-8
             .row.align-items-center.mb-4
               .pr-3
                 span.h5.mb-0
@@ -33,42 +33,47 @@ html
                     button.btn.btn-sm.btn-primary.btn-icon-only.rounded-circle(type='button')
                       span.btn-inner--icon
                         i.fas.fa-plus
-            .row.mt-4
-              .col-lg-12
-                .mb-5
-                  .table-responsive
-                    table.table.table-cards.align-items-center
-                      thead
-                        tr
-                          th(scope='col', style='min-width:240px') Группа
-                          th(scope='col') Староста
-                          th(scope='col') Вид обучения
-                          th(scope='col')
-                      tbody
-                      -groups.sort((a,b) => {let textA = a.fullname.toUpperCase(); let textB = b.fullname.toUpperCase(); return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;});
-                      each group in groups
-                        tr
-                          td(scope='row')
-                            a.name.h6.mb-0.text-sm(href="/groups/"+group.url+"/") #{group.fullname}
-                            small.d-block.font-weight-bold #{group.name}, #{group.course} курс 
-                          td
-                              if group.elder==undefined || group.elderInfo.length == 0
-                                p.text-sm.font-weight-bold.pt-3 Не назначен
-                              else
-                                p.text-sm.font-weight-bold.pt-3 #{group.elderInfo[0].lastName} #{group.elderInfo[0].name}
-                          td
-                              p.text-sm.font-weight-bold.pt-3 #{group.typeEducation}
-                          td.text-right
-                            .actions.ml-3
-                              a.action-item.mr-2(href="/groups/"+group.url+"/")
-                                i(data-feather='external-link')
-                              if userInfo.securityRole !== 0 && userInfo.securityRole.includes('superadmin')
-                                a.action-item.mr-2(href='/groups/edit/'+group.url+"/")
-                                  i(data-feather='edit-2')
-                                a.action-item.text-danger.mr-2(href='/groups/delete/'+group.url+"/")
-                                  i(data-feather='trash-2')
-                      else
-                        p Групп пока нет
+            .card
+              ul.list-group.list-group-flush
+                -groups.sort((a,b) => {let textA = a.fullname.toUpperCase(); let textB = b.fullname.toUpperCase(); return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;});
+                li.list-group-item
+                  .row.align-items-center
+                    .col.ml-2.pl-2
+                      p.text-sm.mb-0 Группа
+                    .col.ml-2.pl-4
+                      p.text-sm.mb-0 Староста
+                    .col.d-none.d-md-block.ml-2.pl-4
+                      p.text-sm.mb-0 Вид обучения
+                    .col
+                      p.text-sm.mb-0 
+                each group in groups
+                  li.list-group-item
+                    .row.align-items-center
+                      .col.ml-2.pl-2
+                        a.name.h6.mb-0.text-sm(href="/groups/"+group.url+"/") #{group.fullname}
+                        small.d-block.font-weight-bold #{group.name}, #{group.course} курс 
+                      .col
+                        if group.elder==undefined || group.elderInfo.length == 0
+                          p.text-sm.mb-0.font-weight-bold Не назначен
+                        else
+                          p.text-sm.mb-0.font-weight-bold #{group.elderInfo[0].lastName} #{group.elderInfo[0].name}
+                      .col.d-none.d-md-block
+                        p.text-sm.font-weight-bold.pt-3 #{group.typeEducation}
+                      .col-auto
+                        .actions.text-right.ml-3
+                          a.action-item.mr-2(href="/groups/"+group.url+"/")
+                            i(data-feather='external-link')
+                          if userInfo.securityRole !== 0 && userInfo.securityRole.includes('superadmin')
+                            a.action-item.mr-2(href='/groups/edit/'+group.url+"/")
+                              i(data-feather='edit-2')
+                            a.action-item.text-danger.mr-2(href='/groups/delete/'+group.url+"/")
+                              i(data-feather='trash-2')
+                else 
+                  br
+                  li.list-group-item
+                    .row.align-items-center
+                      .col-auto
+                       p Групп пока нет
     include includes/footer.pug                  
     script(src='../assets/libs/jquery/dist/jquery.min.js')
     script(src='../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js')
