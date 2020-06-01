@@ -35,7 +35,7 @@ module.exports = {
           callback();
           return router.bleed(500, null, response);
         }
-        if(result == 0){
+        if(result == null){
           callback();
           return router.bleed(301, "/disciplines/", response);
         }
@@ -46,7 +46,7 @@ module.exports = {
         }
         if(request.method == "POST"){
           // TODO: function to delete all files attached for discipline
-          deleteAtachedFiles(discipline.files, (err) =>{
+          deleteAtachedFiles(discipline, db, (err) =>{
             if(err) {
               console.log(`Error with delete files in disc_delete: ${err}`);
             } else{
@@ -72,7 +72,9 @@ module.exports = {
     });
   }
 }
-function deleteAtachedFiles(fileNames, callback){
+function deleteAtachedFiles(discipline, db, callback){
+  let fileNames = discipline.files;
+  if(fileNames.length == 0) return callback(null);
   const storageConfigurations = ini.parse(fs.readFileSync(path.join(__dirname, "../../../" , "configurations", "storage.ini"), "utf-8"));
   console.log(storageConfigurations['data']['location']);
   const STORAGE_DATA_LOCATION = process.env['STORAGE_DATA_LOCATION'] ? `${process.env['STORAGE_DATA_LOCATION']}/private` : '';
@@ -84,6 +86,7 @@ function deleteAtachedFiles(fileNames, callback){
     for (let file of fileNames){
       dirName = file.substr(0, 2);
       fs.unlinkSync(`${PATH_TO_FILES}/${dirName}/${file}`);
+      let deletionResult = db.collection("files").remove({_id: file});
       dirFiles = fs.readdirSync(`${PATH_TO_FILES}/${dirName}/`);
       if(dirFiles.length == 0){
         fs.rmdir(`${PATH_TO_FILES}/${dirName}/`, (err) =>{
