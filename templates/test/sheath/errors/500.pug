@@ -1,0 +1,82 @@
+doctype html
+html
+  head
+    meta(http-equiv='content-type', content='text/html;charset=utf-8')
+    meta(charset='utf-8')
+    meta(name='viewport', content='width=device-width,initial-scale=1,shrink-to-fit=no')
+    title Ошибка сервера
+    style.
+      @keyframes hidePreloader {
+      0% {
+      width: 100%;
+      height: 100%
+      }
+      100% {
+      width: 0;
+      height: 0
+      }
+      }
+      body>div.preloader {
+      position: fixed;
+      background: #fff;
+      width: 100%;
+      height: 100%;
+      z-index: 1071;
+      opacity: 0;
+      transition: opacity .5s ease;
+      overflow: hidden;
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+      justify-content: center
+      }
+      body:not(.loaded)>div.preloader {
+      opacity: 1
+      }
+      body:not(.loaded) {
+      overflow: hidden
+      }
+      body.loaded>div.preloader {
+      animation: hidePreloader .5s linear .5s forwards
+      }
+    script.
+      window.addEventListener("load", function() {
+      setTimeout(function() {
+      document.querySelector("body").classList.add("loaded")
+      }, 300)
+      })
+    link(rel='icon', href='../../../../assets/img/brand/favicon.png', type='image/png')
+    link(rel='stylesheet', href='../../../../assets/libs/fortawesome/fontawesome-free/css/all.min.css')
+    link#stylesheet(rel='stylesheet', href='../../../../assets/css/quick-website.css')
+  body
+    .preloader
+      .spinner-border.text-primary(role='status')
+        span.sr-only Загрузка...
+    section.vh-100.d-flex.align-items-center
+      .bg-primary.position-absolute.h-100.top-0.right-0.zindex-110.col-lg-6.col-xl-6.zindex-100.d-none.d-lg-flex.flex-column.justify-content-end.rounded-bottom-left
+      .container-fluid(<div='')
+        .col-sm-7.col-lg-6.col-xl-6.mx-auto.ml-lg-0
+          .row.justify-content-center
+            .col-11.col-lg-10.col-xl-6.py-5
+              h6.display-1.mb-3.font-weight-600.text-warning Упс!
+              p.lead.text-lg.mb-5 Ошибка сервера. Не переживайте мы все починим!
+              a.btn.btn-dark.btn-icon.hover-translate-y-n3(href='/')
+                span.btn-inner--icon
+                  i(data-feather='home')
+                span.btn-inner--text Вернуться на главную
+            .col-12.d-none
+              p.text-sm.text-danger #{stacktrace}  
+              p #{timestamp}    
+    script(src='../../../../assets/libs/jquery/dist/jquery.min.js')
+    script(src='../../../../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js')
+    script(src='../../../../assets/libs/svg-injector/dist/svg-injector.min.js')
+    script(src='../../../../assets/libs/feather-icons/dist/feather.min.js')
+    script(src='../../../../assets/libs/in-view/dist/in-view.min.js')
+    script(src='../../../../assets/libs/sticky-kit/dist/sticky-kit.min.js')
+    script(src='../../../../assets/libs/imagesloaded/imagesloaded.pkgd.min.js')
+    script(src='../../../../assets/js/quick-website.js')
+    script.
+      feather.replace({
+      width: "1em",
+      height: "1em"
+      })
