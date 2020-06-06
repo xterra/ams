@@ -1,6 +1,6 @@
 {
   "name": "amsp",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Server of web-application for MIIT AMS Portal",
   "private": false,
   "main": "boot.js",
@@ -24,14 +24,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/blue-b1rd/ams.git"
+    "url": "https://github.com/swenkal/ams.git"
   },
-  "author": "Leonid Fedotov <me@ileonidze.ml>",
+  "author": "Leonid Fedotov <me@ileonidze.ml>, Alex Podshivalov <ksndr.pdsh@gmail.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/blue-b1rd/ams/issues"
+    "url": "https://github.com/xterra/ams"
   },
-  "homepage": "https://github.com/blue-b1rd/ams",
+  "homepage": "https://github.com/swenkal/ams",
   "devDependencies": {
     "formidable": "^1.2.1"
   }
