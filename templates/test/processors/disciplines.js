@@ -1,42 +1,42 @@
 const qs = require('querystring'),
-      router = require("../../../router"),
-      security = require("../../../security");
+      router = require('../../../router'),
+      security = require('../../../security');
 
 module.exports = {
-  path: new RegExp("^\/disciplines\/$"),
+  path: new RegExp('^\/disciplines\/$'),
   processor: function(request, response, callback, sessionContext, sessionToken, db){
     console.log(JSON.stringify(sessionContext));
-    db.collection("disciplines").aggregate([
-       {
-         $lookup:
-           {
-             from: "groups",
-             let: { groups: "$groups"},
-             pipeline: [
-               { $match:
-                  {$expr:
-                   { $in: [ {$toString: "$_id"}, "$$groups" ]}
-                  }
-               },
-               { $project: {_id: 0, fullname: 1, name: 1, course: 1, typeEducation: 1}},
-             ],
-             as: "groupsInfo"
-           }
-        },
+    db.collection('disciplines').aggregate([
+      {
+        $lookup:
+        {
+          from: 'groups',
+          let: { groups: '$groups'},
+          pipeline: [
+            { $match:
+              {$expr:
+                { $in: [ {$toString: '$_id'}, '$$groups' ]}
+              }
+            },
+            { $project: {_id: 0, fullname: 1, name: 1, course: 1, typeEducation: 1}},
+          ],
+          as: 'groupsInfo'
+        }
+      },
         {
           $lookup:
             {
-              from: "users",
-              let: { editors: "$editors"},
+              from: 'users',
+              let: { editors: '$editors'},
               pipeline: [
                 { $match:
                    {$expr:
-                    { $in: [ {$toString: "$_id"}, "$$editors" ]}
+                    { $in: [ {$toString: '$_id'}, '$$editors' ]}
                    }
                 },
                 { $project: {_id: 0, lastName: 1, name: 1, fatherName: 1}},
               ],
-              as: "editorsInfo"
+              as: 'editorsInfo'
             }
          },
     ]).sort({name: 1}).toArray(function(err, result){
@@ -47,8 +47,8 @@ module.exports = {
       console.log(JSON.stringify(result[0].editorsInfo));
       console.log(JSON.stringify(result[3].editorsInfo));
       const disciplines = result;
-      if( sessionContext !== undefined && sessionContext !== null && "id" in sessionContext){
-        db.collection("users").findOne({_id: sessionContext.id}, {securityRole : 1, username : 1, group: 1}, function(err, result){
+      if( sessionContext !== undefined && sessionContext !== null && 'id' in sessionContext){
+        db.collection('users').findOne({_id: sessionContext.id}, {securityRole : 1, username : 1, group: 1}, function(err, result){
           if(err){
             callback();
             return router.bleed(500, null, response, err);
@@ -66,12 +66,12 @@ module.exports = {
               }
             }
             return callback({
-              title: "Дисциплины",
-              urlDiscDetail: "/disciplines/",
+              title: 'Дисциплины',
+              urlDiscDetail: '/disciplines/',
               teacherDisciplines: teacherDisciplines,
               otherDisciplines: otherDisciplines,
               userInfo: userInfo
-            }, "disciplines", 0, 0);
+            }, 'disciplines', 0, 0);
           } else if(userInfo.securityRole.length !== 0 && userInfo.securityRole.includes('student') && userInfo.group !== undefined){
             let studentDisciplines = [],
                 otherDisciplines = [];
@@ -83,24 +83,24 @@ module.exports = {
               }
             }
             return callback({
-              title: "Дисциплины",
-              urlDiscDetail: "/disciplines/",
+              title: 'Дисциплины',
+              urlDiscDetail: '/disciplines/',
               studentDisciplines: studentDisciplines,
               otherDisciplines: otherDisciplines,
               userInfo: userInfo
-            }, "disciplines", 0, 0);
+            }, 'disciplines', 0, 0);
           } else{
             return callback({
-              title: "Дисциплины",
-              urlDiscDetail: "/disciplines/",
+              title: 'Дисциплины',
+              urlDiscDetail: '/disciplines/',
               disciplines: disciplines,
               userInfo: userInfo
-            }, "disciplines", 0, 0);
+            }, 'disciplines', 0, 0);
           }
         });
       } else {
         callback();
-        return router.bleed(301, "/login/", response);
+        return router.bleed(301, '/login/', response);
       }
     });
   }
