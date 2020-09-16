@@ -1,19 +1,17 @@
-const router = require('../../../router');
-
+'use strict';
 
 module.exports = {
-  path: new RegExp("^\/for-abiturients\/$"),
-  processor: function(request, response, callback, sessionContext, sessionToken, db){
-    if(sessionToken == null || sessionContext == undefined || sessionContext == null){
-      callback({
-        title: "Абитуриентам",
-        userAthorized: false
-      }, "abiturients", 5, 5);
-    } else{
-      callback({
-        title: "Абитуриентам",
-        userAthorized: true
-      }, "abiturients", 5, 5);
-    }
+  path: new RegExp('^/for-abiturients/$'),
+  processor(request, response, callback, sessionContext, sessionToken, db) {
+    callback({
+      title: 'Абитуриентам',
+      userAthorized: isUserAuthed(sessionContext, sessionToken)
+    }, 'abiturients', 5, 5);
   }
+};
+
+function isUserAuthed(sessionContext, sessionToken) {
+  return (typeof sessionToken === 'string' &&
+    sessionContext instanceof Object &&
+    sessionContext['id'] !== undefined);
 }

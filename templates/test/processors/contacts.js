@@ -1,18 +1,19 @@
+'use strict';
 
 module.exports = {
-  path: new RegExp("^\/contacts\/$"),
-  processor: function(request, response, callback, sessionContext, sessionToken, db){
-    if(sessionToken == null || sessionContext == undefined || sessionContext == null){
+  path: new RegExp('^/contacts/$'),
+  processor(request, response, callback, sessionContext, sessionToken, db) {
+    setImmediate( () => {
       callback({
-        title: "Контакты",
-        userAthorized: false
-      }, "contacts", 5, 5);
-    } else{
-      callback({
-        title: "Контакты",
-        userAthorized: true
-      }, "contacts", 5, 5);
-    }
-
+        title: 'Контакты',
+        userAthorized: isUserAuthed(sessionContext, sessionToken)
+      }, 'contacts', 5, 5);
+    });
   }
+};
+
+function isUserAuthed(sessionContext, sessionToken) {
+  return (typeof sessionToken === 'string' &&
+    sessionContext instanceof Object &&
+    sessionContext['id'] !== undefined);
 }
