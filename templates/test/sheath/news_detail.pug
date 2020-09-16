@@ -28,11 +28,20 @@ html
                 .row.align-items-center.mt-5.pt-5.delimiter-top
                   .col.mb-3.mb-lg-0
                     .media.align-items-center
-                      div
-                        span.avatar.avatar-sm.bg-primary.rounded-circle ПС
-                      .media-body.ml-2
-                        span.d-block.h6.mb-0 Пользователь сайта
-                        span.text-sm.text-muted Опубликовано: #{news_detail.formatedDate}
+                      if userInfo == null
+                        div
+                          span.avatar.avatar-sm.bg-primary.rounded-circle ПС
+                        .media-body.ml-2
+                          span.d-block.h6.mb-0 Пользователь сайта
+                          span.text-sm.text-muted Опубликовано: #{news_detail.formatedDate}
+                      else
+                        -let authorInfo = news_detail.authorInfo[0]
+                        -let authorInitials = `${authorInfo.lastName.substr(0,1)}${authorInfo.name.substr(0,1)}`
+                        div
+                          span.avatar.avatar-sm.bg-primary.rounded-circle #{authorInitials}
+                        .media-body.ml-2
+                          span.d-block.h6.mb-0 #{authorInfo.lastName} #{authorInfo.name}
+                          span.text-sm.text-muted Опубликовано: #{news_detail.formatedDate}
     section.slice.slice-lg.pt-10.pb-5
       .container.pb-6
         .row.row-grid.align-items-center

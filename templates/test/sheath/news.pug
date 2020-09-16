@@ -38,8 +38,14 @@ html
                 .card-footer.border-0.delimiter-top
                   .row.align-items-center
                     .col-auto
-                      span.avatar.avatar-sm.bg-primary.rounded-circle ПС
-                      span.text-sm.mb-0.avatar-content Пользователь сайта
+                      if userInfo == null
+                        span.avatar.avatar-sm.bg-primary.rounded-circle ПС
+                        span.text-sm.mb-0.avatar-content Пользователь сайта
+                      else
+                        -let authorInfo = pieceOfNews.authorInfo[0]
+                        -let authorInitials = `${authorInfo.lastName.substr(0,1)}${authorInfo.name.substr(0,1)}`
+                        span.avatar.avatar-sm.bg-primary.rounded-circle #{authorInitials}
+                        span.text-sm.mb-0.avatar-content #{authorInfo.lastName} #{authorInfo.name}
           else 
             p.text-center Новостей пока нет.                
     include includes/footer.pug
