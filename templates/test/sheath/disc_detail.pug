@@ -3,6 +3,37 @@ html
   head
     title #{title}
     include includes/head_html.pug
+    style.
+      .wrapper {
+        position: relative;
+        overflow: hidden;
+      }
+      .container-list {
+        overflow-y: scroll;
+        height: 350px;
+        border-top: 50px solid transparent;
+        border-bottom: 50px solid transparent;
+      }
+      .fixed-rows-head{
+        position: absolute;
+        padding: 10px;
+        margin-top: -40px;
+        line-height: normal;
+        width: 100%;
+        z-index: 2;
+        text-align: left;
+        font-weight: bold;
+      }
+      .fixed-rows-footer{
+        position: absolute;
+        line-height: normal;
+        margin-top: 255px;
+        padding-left: 10px;
+        width: 100%;
+        z-index: 2;
+        text-align: left;
+        font-weight: bold;
+      }
     link(rel='stylesheet', href='../../assets/libs/swiper/dist/css/swiper.min.css')
     link(rel='stylesheet', href='../../assets/libs/fancyapps/fancybox/dist/jquery.fancybox.min.css')
     link(rel='stylesheet', href='../../assets/libs/fortawesome/fontawesome-free/css/all.min.css')
@@ -27,50 +58,59 @@ html
             a.ml-1(href="/disciplines/delete/"+discipline.allias+"/")
               button.btn.btn-outline-danger(type='button') Удалить
         if (!userInfo.securityRole.includes("guest"))
-          .mb-5
-            .card
-              .card-header
-                .row.mx-n2
-                  .col.col-lg.px-2
-                    h5.h6.mb-0 Документы для дисциплины
-                    p.text-sm.mb-0 Возможность загрузить все необходимые документы
-                  if (userInfo.securityRole.includes("superadmin") || (userInfo.securityRole.includes("teacher") && discipline.editors.includes(userInfo._id.toString())))
-                    .col-auto.px-2
-                      a(href="/file/upload/"+discipline.allias+"/")
-                        button.btn.btn-sm.btn-primary.btn-icon-only.rounded-circle(type='button')
-                          span.btn-inner--icon
-                            i.fas.fa-plus
-              ul.list-group.list-group-flush
-                each file in files
-                  li.list-group-item
-                    .row.align-items-center
-                      .col-auto
-                        -var dirName = file._id.substr(0,2);
-                        a(href=href="/"+dirName+"/"+file._id download=discipline.mnemo+"_"+file.name+"."+file.ext)
-                          i(data-feather='file-text')
-                      .col.ml-n2
-                        a(href=href="/"+dirName+"/"+file._id download=discipline.mnemo+"_"+file.name+"."+file.ext)
-                          h6.text-sm.mb-0 #{file.name}
-                        p.card-text.small.text-muted #{file.comment}
-                      .col-md.d-none.d-md-block
-                        span.text-muted Изменено:
-                        |  #{file.formatedDate}
-                      .col-auto
-                        .actions.text-right.ml-3
-                          a.action-item.mr-2(href="/"+dirName+"/"+file._id download=discipline.mnemo+"_"+file.name+"."+file.ext)
-                            i(data-feather='download')
-                          if (userInfo.securityRole.includes("superadmin") || (userInfo.securityRole.includes("teacher") && discipline.editors.includes(userInfo._id.toString())))
-                            a.action-item.mr-2(href="/file/edit/"+discipline.allias+"/"+file._id+"/")
-                              i(data-feather='edit')
-                            a.action-item.mr-2(href="/file/delete/"+discipline.allias+"/"+file._id+"/")
-                              i(data-feather='trash-2')
-                else 
-                  br
-                  li.list-group-item
-                    .row.align-items-center
-                      .col-auto
-                       p Документов пока нет    
+          .mb-5.wrapper.card
+            .container-list
+              
+              .row.ml-0.fixed-rows-head
+                .col.col-lg.px-2
+                  h5.h6 Документы для дисциплины
+                if (userInfo.securityRole.includes("superadmin") || (userInfo.securityRole.includes("teacher") && discipline.editors.includes(userInfo._id.toString())))
+                  .col-auto.px-2
+                    a(href="/file/upload/"+discipline.allias+"/")
+                      button.btn.btn-sm.btn-primary.btn-icon-only.rounded-circle(type='button')
+                        span.btn-inner--icon
+                          i.fas.fa-plus
+              .row.ml-0.align-items-center.fixed-rows-footer
+                .col-auto
+                  input#allFiles(type='checkbox', name='allFiles', value='', onClick="selectAllCheckboxes('files'); showOrHideButton('files')" )
+                .col.ml-n2
+                  p.text-sm.mb-0 Выбрать все
+                .col-md.d-none.d-md-block
+                .col-auto
+                  button#submit.btn.btn-sm.btn-primary(type='submit', disabled, onClick="document.getElementById('zip').submit()") Скачать
+              form#zip(action='/createZip/' method='POST')
+                ul.list-group.list-group-flush
+                  each file in files
+                    li.list-group-item
+                      .row.align-items-center
+                        .col-auto
+                          -let fileJSON = JSON.stringify({fullPath : file.fullPath, fullName : file.fullName});
+                          input(type='checkbox', name='files', value=fileJSON, onClick="showOrHideButton('files')" )
+                        .col.ml-n2
+                          a(href=file.fullPath download=discipline.mnemo+'_'+file.fullName)
+                            h6.text-sm.mb-0 #{file.name}
+                          p.card-text.small.text-muted #{file.comment}
+                        .col-md.d-none.d-md-block
+                          span.text-muted Изменено:
+                          |  #{file.formatedDate}
+                        .col-auto
+                          .actions.text-right.ml-3
+                            a.action-item.mr-2(href=file.fullPath download=discipline.mnemo+'_'+file.fullName)
+                              i(data-feather='download')
+                            if (userInfo.securityRole.includes("superadmin") || (userInfo.securityRole.includes("teacher") && discipline.editors.includes(userInfo._id.toString())))
+                              a.action-item.mr-2(href="/file/edit/"+discipline.allias+"/"+file._id+"/")
+                                i(data-feather='edit')
+                              a.action-item.mr-2(href="/file/delete/"+discipline.allias+"/"+file._id+"/")
+                                i(data-feather='trash-2')
+                  else 
+                    br
+                    li.list-group-item
+                      .row.align-items-center
+                        .col-auto
+                         p Документов пока нет      
     include includes/footer.pug 
+    script(src="../../checkbox_hide_button.js" type="text/javascript")
+    script(src="../../checkbox_select_all.js" type="text/javascript")
     script(src='../../assets/libs/jquery/dist/jquery.min.js')
     script(src='../../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js')
     script(src='../../assets/libs/svg-injector/dist/svg-injector.min.js')

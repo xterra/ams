@@ -6,10 +6,11 @@ const qs = require('querystring'),
 module.exports = {
   path: new RegExp("^\/disciplines\/[^\/]+\/$"),
   processor: function(request, response, callback, sessionContext, sessionToken, db){
-    if(sessionToken == null || sessionContext == undefined || sessionContext == null){
-      callback();
-      return router.bleed(301, "/login/", response);
-    }
+    console.log(`sessionContext: ${sessionContext}\n sessionToken: ${sessionToken}\n`);
+    const userAuthed = isUserAuthed(sessionContext, sessionToken);
+    console.log(`userAuthed : ${userAuthed}`);
+    if(!userAuthed) return redirectToLoginPage(response, callback);
+
     requestedUrl = decodeURI(request.url);
     delimeteredUrl = requestedUrl.split("/");
     disciplineAllias = delimeteredUrl[delimeteredUrl.length-2];
@@ -45,8 +46,11 @@ module.exports = {
               return router.bleed(500, null, response, err)
             }
             disc_files = result;
-            for (let file in disc_files){
-              disc_files[`${file}`].formatedDate = beautyDate(disc_files[file].dateEdit);
+            for (let file of disc_files){
+              file.formatedDate = beautyDate(file.dateEdit);
+              file.fullName = `${file.name}.${file.ext}`;
+              const dirName = file._id.substr(0,2);
+              file.fullPath = `/${dirName}/${file._id}`;
             }
             return callback({
               title: "О дисциплине",
@@ -58,4 +62,15 @@ module.exports = {
         });
     });
   }
+}
+
+function isUserAuthed(sessionContext, sessionToken) {
+  return (typeof sessionToken === 'string' &&
+    sessionContext instanceof Object &&
+    sessionContext['id'] !== undefined);
+}
+
+function redirectToLoginPage(response, callback) {
+  callback();
+  return router.bleed(301, '/login/', response);
 }
