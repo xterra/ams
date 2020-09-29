@@ -1,6 +1,7 @@
 const qs = require('querystring'),
       archiver = require('archiver'),
-      router = require('../../../router.js');
+      router = require('../../../router.js'),
+      path = require('path');
 
 module.exports = {
   path : new RegExp('^\/createZip\/$'),
@@ -12,7 +13,8 @@ module.exports = {
       router.downloadClientPostData(request, (err, data) => {
         if(err) return edirectTo400Page(response, callback);
         try {
-          const PATH_TO_FILES = '/Users/ksndr/Projects/ams/data/private'; // TODO: сделать нормальное присваивание через process.env и storage.ini
+          const STORAGE_DATA_LOCATION = process.env['STORAGE_DATA_LOCATION'] ? `${process.env['STORAGE_DATA_LOCATION']}/private` : '';
+          const PATH_TO_FILES = STORAGE_DATA_LOCATION || '/Users/ksndr/Projects/ams/data/private';
           let postData = qs.parse(data);
           const filesFromClient = postData.files.map(curFile => {
             curFile = JSON.parse(curFile);
