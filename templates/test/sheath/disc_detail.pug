@@ -14,25 +14,21 @@ html
         border-top: 50px solid transparent;
         border-bottom: 50px solid transparent;
       }
-      .fixed-rows-head{
+      .fixed-rows-head,
+      .fixed-rows-footer{
         position: absolute;
-        padding: 10px;
-        margin-top: -40px;
         line-height: normal;
         width: 100%;
         z-index: 2;
         text-align: left;
         font-weight: bold;
       }
+      .fixed-rows-head {
+        margin-top: -40px;
+        padding: 10px;
+      }
       .fixed-rows-footer{
-        position: absolute;
-        line-height: normal;
-        margin-top: 255px;
-        padding-left: 10px;
-        width: 100%;
-        z-index: 2;
-        text-align: left;
-        font-weight: bold;
+        margin-top: 250px;
       }
     link(rel='stylesheet', href='../../assets/libs/swiper/dist/css/swiper.min.css')
     link(rel='stylesheet', href='../../assets/libs/fancyapps/fancybox/dist/jquery.fancybox.min.css')
@@ -42,7 +38,7 @@ html
       .spinner-border.text-primary(role='status')
         span.sr-only Loading...
     include includes/header_private.pug
-    section.slice.slice-lg.delimiter-bottom
+    section.delimiter-bottom
       a.btn.btn-neutral.btn-icon-only.rounded-circle.position-absolute.left-4.top-90.d-none.d-lg-inline-flex(href="/disciplines/")
         span.btn-inner--icon
           i(data-feather='arrow-left')
@@ -62,7 +58,7 @@ html
             .container-list
               
               .row.ml-0.fixed-rows-head
-                .col.col-lg.px-2
+                .col.col-lg.px-2.ml-2
                   h5.h6 Документы для дисциплины
                 if (userInfo.securityRole.includes("superadmin") || (userInfo.securityRole.includes("teacher") && discipline.editors.includes(userInfo._id.toString())))
                   .col-auto.px-2
@@ -71,14 +67,16 @@ html
                         span.btn-inner--icon
                           i.fas.fa-plus
               .row.ml-0.align-items-center.fixed-rows-footer
-                .col-auto
+                .col-auto.ml-2
                   input#allFiles(type='checkbox', name='allFiles', value='', onClick="selectAllCheckboxes('files'); showOrHideButton('files')" )
                 .col.ml-n2
                   p.text-sm.mb-0 Выбрать все
                 .col-md.d-none.d-md-block
+                  
                 .col-auto
                   button#submit.btn.btn-sm.btn-primary(type='submit', disabled, onClick="document.getElementById('zip').submit()") Скачать
               form#zip(action='/createZip/' method='POST')
+                input(type='text', name='discUrl', value=discipline.allias, hidden)
                 ul.list-group.list-group-flush
                   each file in files
                     li.list-group-item
@@ -113,14 +111,7 @@ html
     script(src="../../checkbox_select_all.js" type="text/javascript")
     script(src='../../assets/libs/jquery/dist/jquery.min.js')
     script(src='../../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js')
-    script(src='../../assets/libs/svg-injector/dist/svg-injector.min.js')
     script(src='../../assets/libs/feather-icons/dist/feather.min.js')
-    script(src='../../assets/libs/in-view/dist/in-view.min.js')
-    script(src='../../assets/libs/sticky-kit/dist/sticky-kit.min.js')
-    script(src='../../assets/libs/imagesloaded/imagesloaded.pkgd.min.js')
-    script(src='../../assets/libs/swiper/dist/js/swiper.min.js')
-    script(src='../../assets/libs/fancyapps/fancybox/dist/jquery.fancybox.min.js')
-    script(src='../../assets/js/quick-website.js')
     script.
       feather.replace({
       width: "1em",

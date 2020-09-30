@@ -24,7 +24,7 @@ module.exports = {
 
           response.writeHead(200, {
             'Content-Type': 'application/octet-stream',
-            'Content-disposition': 'attachment; filename=myFile.zip'
+            'Content-disposition': `attachment; filename=${postData.discUrl}.zip`
           });
           const zip = archiver('zip');
 
