@@ -8,70 +8,72 @@ html
     .preloader
       .spinner-border.text-primary(role='status')
         span.sr-only Loading...
-    include includes/header_private.pug
-    section.pt-5.bg-section-secondary
-      .container
-        .row.justify-content-center
-          .col-lg-9
-            .row.align-items-center
-              .col-auto
-                -let symbolForAvatar = profileInfo.username.substr(0,2).toUpperCase()
-                span.avatar.bg-primary.text-white.rounded-circle #{symbolForAvatar}
-              .col.ml-n3.ml-md-n2
-                h2.mb-0
-                  b #{profileInfo.lastName}
-                  |  #{profileInfo.name} #{profileInfo.fatherName}
-                if profileInfo.securityRole.includes("teacher")
-                  span.text-muted.d-block #{profileInfo.position}
-                else if profileInfo.securityRole.includes("student") && profileInfo.groupInfo.length !== 0
-                  span.text-muted.d-block Студент группы #{profileInfo.groupInfo[0].fullname}
-                else
-                  #{profileInfo.securityRole[0]}
-              .col-auto
-                a(href="/profiles/edit/"+profileInfo._id+"/")
-                  button.btn.btn-primary.btn-icon.rounded-pill(type='button')
-                    span.btn-inner--icon
-                      i(data-feather='edit-2')
-    section.slice.slice-sm.bg-section-secondary(style="min-height: 380px")
-      .container
-        .row.justify-content-center
-          .col-lg-7
-            div
-              .card.card-fluid
-                .card-header
-                  .row.align-items-center
-                    .col-auto
-                      p Информация
-                ul.list-group.list-group-flush
-                    li.list-group-item
-                      .row.align-items-center
-                        .col-auto
-                          i(data-feather='user')
-                        .col.ml-n2
-                          h6.text-sm.mb-0 Логин
-                        .col.ml-n2
-                          p.card-text #{profileInfo.username}
-                    li.list-group-item
-                      .row.align-items-center
-                        .col-auto
-                          i(data-feather='at-sign')
-                        .col.ml-n2
-                          h6.text-sm.mb-0 Почта
-                        .col.ml-n2
-                          p.card-text #{profileInfo.email}
-                    li.list-group-item
-                      .row.align-items-center
-                        .col-auto
-                          i(data-feather='phone')
-                        .col.ml-n2
-                          h6.text-sm.mb-0 Телефон
-                        .col.ml-n2
-                          p.card-text #{profileInfo.phone}
-              .row.justify-content-center.mb-3
-                a.mr-1(href="/profiles/change/"+profileInfo._id+"/")
-                  button.btn.btn-outline-primary(type='button') Сменить пароль
-                a.ml-1(href="/logout/")
-                  button.btn.btn-outline-danger(type='button') Выход из профиля          
+    .footer-wrapper
+      include includes/header_private.pug
+      section.pt-5.bg-section-secondary
+        .container
+          .row.justify-content-center
+            .col-lg-9
+              .row.align-items-center
+                .col-auto
+                  -let symbolForAvatar = profileInfo.username.substr(0,2).toUpperCase()
+                  span.avatar.bg-primary.text-white.rounded-circle #{symbolForAvatar}
+                .col.ml-n3.ml-md-n2
+                  h2.mb-0
+                    b #{profileInfo.lastName}
+                    |  #{profileInfo.name} #{profileInfo.fatherName}
+                  if profileInfo.securityRole.includes("teacher")
+                    span.text-muted.d-block #{profileInfo.position}
+                  else if profileInfo.securityRole.includes("student") && profileInfo.groupInfo.length !== 0
+                    span.text-muted.d-block Студент группы #{profileInfo.groupInfo[0].fullname}
+                  else
+                    #{profileInfo.securityRole[0]}
+                .col-auto
+                  a(href="/profiles/edit/"+profileInfo._id+"/")
+                    button.btn.btn-primary.btn-icon.rounded-pill(type='button')
+                      span.btn-inner--icon
+                        i(data-feather='edit-2')
+      section.slice.slice-sm.bg-section-secondary
+        .container
+          .row.justify-content-center
+            .col-lg-7
+              div
+                .card.card-fluid
+                  .card-header
+                    .row.align-items-center
+                      .col-auto
+                        p Информация
+                  ul.list-group.list-group-flush
+                      li.list-group-item
+                        .row.align-items-center
+                          .col-auto
+                            i(data-feather='user')
+                          .col.ml-n2
+                            h6.text-sm.mb-0 Логин
+                          .col.ml-n2
+                            p.card-text #{profileInfo.username}
+                      li.list-group-item
+                        .row.align-items-center
+                          .col-auto
+                            i(data-feather='at-sign')
+                          .col.ml-n2
+                            h6.text-sm.mb-0 Почта
+                          .col.ml-n2
+                            p.card-text #{profileInfo.email}
+                      li.list-group-item
+                        .row.align-items-center
+                          .col-auto
+                            i(data-feather='phone')
+                          .col.ml-n2
+                            h6.text-sm.mb-0 Телефон
+                          .col.ml-n2
+                            p.card-text #{profileInfo.phone}
+                .row.justify-content-center.mb-3
+                  a.mr-1(href="/profiles/change/"+profileInfo._id+"/")
+                    button.btn.btn-outline-primary(type='button') Сменить пароль
+                  a.ml-1(href="/logout/")
+                    button.btn.btn-outline-danger(type='button') Выход из профиля
+      .push          
     include includes/footer.pug
     script(src='../../assets/libs/jquery/dist/jquery.min.js')
     script(src='../../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js')

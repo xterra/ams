@@ -34,6 +34,22 @@ style.
   body.loaded>div.preloader {
   animation: hidePreloader .5s linear .5s forwards
   }
+  * {
+    margin: 0;
+  }
+  html, 
+  body {
+      height: 100%;
+  }
+  .footer-wrapper {
+      min-height: 100%;
+      height: auto !important;
+      height: 100%;
+      margin: 0 auto -139px; /* the bottom margin is the negative value of the footer's height */
+  }
+  footer, .push {
+      height: 139px; /* .push must be the same height as .footer */
+  }
 script.
   window.addEventListener("load", function() {
   setTimeout(function() {

@@ -8,20 +8,22 @@ html
     .preloader
       .spinner-border.text-primary(role='status')
         span.sr-only Loading...
-    .jumbotron.bg-light-secondary.shadow-lg.mb-0
-      .row.justify-content-center.py-8
-        .col-lg-8.text-center
-          h2.lh-160
-            | Вы точно хотите удалить файл
-            br
-            strong "#{file.name}" ?
-          .mt-5.row.justify-content-center
-            a.btn.btn-lg.btn-outline-primary.btn-icon.mr-3(href='/disciplines/'+disciplineAllias+'/')
-              span.btn-inner--icon
-                i(data-feather='arrow-left')
-              span.btn-inner--text Отмена
-            form(action="" method="POST")
-              button.btn.btn-lg.btn-outline-danger(type="submit") Удалить
+    .footer-wrapper
+      .jumbotron.bg-light-secondary.shadow-lg.mb-0
+        .row.justify-content-center.py-8
+          .col-lg-8.text-center
+            h2.lh-160
+              | Вы точно хотите удалить файл
+              br
+              strong "#{file.name}" ?
+            .mt-5.row.justify-content-center
+              a.btn.btn-lg.btn-outline-primary.btn-icon.mr-3(href='/disciplines/'+disciplineAllias+'/')
+                span.btn-inner--icon
+                  i(data-feather='arrow-left')
+                span.btn-inner--text Отмена
+              form(action="" method="POST")
+                button.btn.btn-lg.btn-outline-danger(type="submit") Удалить
+      .push
     include includes/footer.pug 
     script(src='../../../../assets/libs/jquery/dist/jquery.min.js')
     script(src='../../../../assets/libs/svg-injector/dist/svg-injector.min.js')

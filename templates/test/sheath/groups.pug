@@ -8,72 +8,74 @@ html
     .preloader
       .spinner-border.text-primary(role='status')
         span.sr-only Loading...
-    include includes/header_private.pug
-    section.slice.slice-lg.delimiter-bottom(style="min-height: 580px")
-      a.btn.btn-neutral.btn-icon-only.rounded-circle.position-absolute.left-4.top-90.d-none.d-lg-inline-flex(href="/")
-        span.btn-inner--icon
-          i(data-feather='arrow-left')
-      .container
-        .row.justify-content-center
-          .col-lg-8
-            .row.align-items-center.mb-4
-              .pr-3
-                span.h5.mb-0
-                  i(data-feather='users')
-              .col
-                if userInfo.securityRole !== 0 && userInfo.securityRole.includes('superadmin')
-                  h3.h5.mb-0 Управление учебными группы
-                  p.text-muted.mb-0 Все учебные группы.
-                else
-                  h3.h5.mb-0 #{title}
-                  p.text-muted.mb-0 Все учебные группы.
-              .col-auto
-                if userInfo.securityRole !== 0 && userInfo.securityRole.includes('superadmin')
-                  a(href="/groups/new/")
-                    button.btn.btn-sm.btn-primary.btn-icon-only.rounded-circle(type='button')
-                      span.btn-inner--icon
-                        i.fas.fa-plus
-            .card
-              ul.list-group.list-group-flush
-                -groups.sort((a,b) => {let textA = a.fullname.toUpperCase(); let textB = b.fullname.toUpperCase(); return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;});
-                li.list-group-item
-                  .row.align-items-center
-                    .col.ml-2.pl-2
-                      p.text-sm.mb-0 Группа
-                    .col.d-none.d-sm-block.ml-2.pl-4
-                      p.text-sm.mb-0 Староста
-                    .col.d-none.d-md-block.ml-2.pl-4
-                      p.text-sm.mb-0 Вид обучения
-                    .col
-                      p.text-sm.mb-0 
-                each group in groups
+    .footer-wrapper
+      include includes/header_private.pug
+      section.slice.slice-lg.delimiter-bottom
+        a.btn.btn-neutral.btn-icon-only.rounded-circle.position-absolute.left-4.top-90.d-none.d-lg-inline-flex(href="/")
+          span.btn-inner--icon
+            i(data-feather='arrow-left')
+        .container
+          .row.justify-content-center
+            .col-lg-8
+              .row.align-items-center.mb-4
+                .pr-3
+                  span.h5.mb-0
+                    i(data-feather='users')
+                .col
+                  if userInfo.securityRole !== 0 && userInfo.securityRole.includes('superadmin')
+                    h3.h5.mb-0 Управление учебными группы
+                    p.text-muted.mb-0 Все учебные группы.
+                  else
+                    h3.h5.mb-0 #{title}
+                    p.text-muted.mb-0 Все учебные группы.
+                .col-auto
+                  if userInfo.securityRole !== 0 && userInfo.securityRole.includes('superadmin')
+                    a(href="/groups/new/")
+                      button.btn.btn-sm.btn-primary.btn-icon-only.rounded-circle(type='button')
+                        span.btn-inner--icon
+                          i.fas.fa-plus
+              .card
+                ul.list-group.list-group-flush
+                  -groups.sort((a,b) => {let textA = a.fullname.toUpperCase(); let textB = b.fullname.toUpperCase(); return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;});
                   li.list-group-item
                     .row.align-items-center
                       .col.ml-2.pl-2
-                        a.name.h6.mb-0.text-sm(href="/groups/"+group.url+"/") #{group.fullname}
-                        small.d-block.font-weight-bold #{group.name}, #{group.course} курс 
-                      .col.d-none.d-sm-block
-                        if group.elder==undefined || group.elderInfo.length == 0
-                          p.text-sm.mb-0.font-weight-bold Не назначен
-                        else
-                          p.text-sm.mb-0.font-weight-bold #{group.elderInfo[0].lastName} #{group.elderInfo[0].name}
-                      .col.d-none.d-md-block
-                        p.text-sm.font-weight-bold.pt-3 #{group.typeEducation}
+                        p.text-sm.mb-0 Группа
+                      .col.d-none.d-sm-block.ml-2.pl-4
+                        p.text-sm.mb-0 Староста
+                      .col.d-none.d-md-block.ml-2.pl-4
+                        p.text-sm.mb-0 Вид обучения
                       .col
-                        .actions.text-right.ml-3
-                          a.action-item.mr-2(href="/groups/"+group.url+"/")
-                            i(data-feather='external-link')
-                          if userInfo.securityRole !== 0 && userInfo.securityRole.includes('superadmin')
-                            a.action-item.mr-2(href='/groups/edit/'+group.url+"/")
-                              i(data-feather='edit-2')
-                            a.action-item.text-danger.mr-2(href='/groups/delete/'+group.url+"/")
-                              i(data-feather='trash-2')
-                else 
-                  br
-                  li.list-group-item
-                    .row.align-items-center
-                      .col-auto
-                       p Групп пока нет
+                        p.text-sm.mb-0 
+                  each group in groups
+                    li.list-group-item
+                      .row.align-items-center
+                        .col.ml-2.pl-2
+                          a.name.h6.mb-0.text-sm(href="/groups/"+group.url+"/") #{group.fullname}
+                          small.d-block.font-weight-bold #{group.name}, #{group.course} курс 
+                        .col.d-none.d-sm-block
+                          if group.elder==undefined || group.elderInfo.length == 0
+                            p.text-sm.mb-0.font-weight-bold Не назначен
+                          else
+                            p.text-sm.mb-0.font-weight-bold #{group.elderInfo[0].lastName} #{group.elderInfo[0].name}
+                        .col.d-none.d-md-block
+                          p.text-sm.font-weight-bold.pt-3 #{group.typeEducation}
+                        .col
+                          .actions.text-right.ml-3
+                            a.action-item.mr-2(href="/groups/"+group.url+"/")
+                              i(data-feather='external-link')
+                            if userInfo.securityRole !== 0 && userInfo.securityRole.includes('superadmin')
+                              a.action-item.mr-2(href='/groups/edit/'+group.url+"/")
+                                i(data-feather='edit-2')
+                              a.action-item.text-danger.mr-2(href='/groups/delete/'+group.url+"/")
+                                i(data-feather='trash-2')
+                  else 
+                    br
+                    li.list-group-item
+                      .row.align-items-center
+                        .col-auto
+                         p Групп пока нет
+      .push
     include includes/footer.pug                  
     script(src='../assets/libs/jquery/dist/jquery.min.js')
     script(src='../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js')

@@ -6,59 +6,62 @@ html
     include includes/head_html.pug
     link(rel='stylesheet', href='../../../assets/libs/fortawesome/fontawesome-free/css/all.min.css')
   body
-    include includes/header_private.pug
-    section.slice.slice-lg.delimiter-bottom
-      a.btn.btn-neutral.btn-icon-only.rounded-circle.position-absolute.left-4.top-90.d-none.d-lg-inline-flex(href="/disciplines/"+discipline.allias+"/")
-        span.btn-inner--icon
-          i(data-feather='arrow-left')
-      .container.d-flex.flex-column
-        .row.align-items-center.justify-content-center
-          .col-lg-7.col-xl-8.py-6.py-md-0
-            div
-              .mb-3.text-center
-                h6.h3.mb-1 #{title}
-              span.clearfix
-              if message.length
-                .d-flex.justify-content-between
-                  .alert.alert-success(role='alert')
-                    | #{message}
-                    a.text-right(href="/disciplines/"+discipline.allias+"/")
-                      button.btn.btn-sm.btn-secondary(type="button") Перейти к дисциплине
-              form#upload(action='', method='POST' ecntype="")
-                .form-group.mb-0
-                    p.text-sm.font-weight-bold  Дисциплина: #{discipline.name}
-                .form-group.my-3
-                    .d-flex.align-items-center.justify-content-between
-                      div
-                        label.form-control-label Файл
-                          span.text-danger *
-                        input#myfile.custom-input-file(type='file', name='myfile', onchange="selectedFile();", required)
-                        label(for='myfile')
-                          i.ml-0.mr-2(data-feather='upload')
-                          span Выберите файл
-                div#fileSize
-                div#fileType.mb-2
-                .form-group.my-3
-                    label.form-control-label Имя файла
-                      span.text-danger *
+    .footer-wrapper
+      include includes/header_private.pug
+      section.slice.slice-lg.delimiter-bottom
+        a.btn.btn-neutral.btn-icon-only.rounded-circle.position-absolute.left-4.top-90.d-none.d-lg-inline-flex(href="/disciplines/"+discipline.allias+"/")
+          span.btn-inner--icon
+            i(data-feather='arrow-left')
+        .container.d-flex.flex-column
+          .row.align-items-center.justify-content-center
+            .col-lg-7.col-xl-8.py-6.py-md-0
+              div
+                .mb-3.text-center
+                  h6.h3.mb-1 #{title}
+                span.clearfix
+                if message.length
+                  .d-flex.justify-content-between
+                    .alert.alert-success(role='alert')
+                      | #{message}
+                      a.text-right(href="/disciplines/"+discipline.allias+"/")
+                        button.btn.btn-sm.btn-secondary(type="button") Перейти к дисциплине
+                form#upload(action='', method='POST' ecntype="")
+                  .form-group.mb-0
+                      p.text-sm.font-weight-bold  Дисциплина: #{discipline.name}
+                  .form-group.my-3
+                      .d-flex.align-items-center.justify-content-between
+                        div
+                          label.form-control-label Файл
+                            span.text-danger *
+                          input#myfile.custom-input-file(type='file', name='myfile', onchange="selectedFile();", required)
+                          label(for='myfile')
+                            i.ml-0.mr-2(data-feather='upload')
+                            span Выберите файл
+                  div#fileSize
+                  div#fileType.mb-2
+                  .form-group.my-3
+                      label.form-control-label Имя файла
+                        span.text-danger *
+                      .input-group.input-group-merge
+                        input#filename.form-control.form-control-prepend(type='text', name="filename", placeholder='Имя файла', required, maxlength=100)
+                        .input-group-prepend
+                          span.input-group-text
+                            i(data-feather='file-text')
+                  .form-group.my-3
+                    label.form-control-label Комментарий
                     .input-group.input-group-merge
-                      input#filename.form-control.form-control-prepend(type='text', name="filename", placeholder='Имя файла', required, maxlength=100)
+                      textarea#comment.form-control.form-control-prepend(type="textarea" name="comment", placeholder='Добавьте описание файла', rows="4", maxlength=300)
                       .input-group-prepend
                         span.input-group-text
-                          i(data-feather='file-text')
-                .form-group.my-3
-                  label.form-control-label Комментарий
-                  .input-group.input-group-merge
-                    textarea#comment.form-control.form-control-prepend(type="textarea" name="comment", placeholder='Добавьте описание файла', rows="4", maxlength=300)
-                    .input-group-prepend
-                      span.input-group-text
-                        i(data-feather='align-justify')    
-                .row.mt-4  
-                  .col.form-group.mb-0
-                    button.btn.btn-block.btn-primary(type='submit') Загрузить
-                  .col.form-group.mb-0
-                    a(href="/disciplines/"+discipline.allias+"/")
-                      button.btn.btn-block.btn-secondary(type='button') Отмена
+                          i(data-feather='align-justify')    
+                  .row.mt-4  
+                    .col.form-group.mb-0
+                      button.btn.btn-block.btn-primary(type='submit') Загрузить
+                    .col.form-group.mb-0
+                      a(href="/disciplines/"+discipline.allias+"/")
+                        button.btn.btn-block.btn-secondary(type='button') Отмена
+      .push
+    include includes/footer.pug
     script(src='../../../assets/libs/jquery/dist/jquery.min.js')
     script(src='../../../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js')
     script(src='../../../assets/libs/svg-injector/dist/svg-injector.min.js')

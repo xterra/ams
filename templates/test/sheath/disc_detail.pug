@@ -37,75 +37,77 @@ html
     .preloader
       .spinner-border.text-primary(role='status')
         span.sr-only Loading...
-    include includes/header_private.pug
-    section.delimiter-bottom
-      a.btn.btn-neutral.btn-icon-only.rounded-circle.position-absolute.left-4.top-90.d-none.d-lg-inline-flex(href="/disciplines/")
-        span.btn-inner--icon
-          i(data-feather='arrow-left')
-      .container
-        .row.justify-content-center.mb-3
-          .col-lg-7.text-center
-            h1.mb-4 #{discipline.name}, #{discipline.mnemo}
-            p.lead.lh-190 #{discipline.description}
-        if (userInfo.securityRole.includes("superadmin") || (userInfo.securityRole.includes("teacher") && discipline.editors.includes(userInfo._id.toString())))
+    .footer-wrapper
+      include includes/header_private.pug
+      section.delimiter-bottom
+        a.btn.btn-neutral.btn-icon-only.rounded-circle.position-absolute.left-4.top-90.d-none.d-lg-inline-flex(href="/disciplines/")
+          span.btn-inner--icon
+            i(data-feather='arrow-left')
+        .container
           .row.justify-content-center.mb-3
-            a.mr-1(href="/disciplines/edit/"+discipline.allias+"/")
-              button.btn.btn-outline-primary(type='button') Редактировать
-            a.ml-1(href="/disciplines/delete/"+discipline.allias+"/")
-              button.btn.btn-outline-danger(type='button') Удалить
-        if (!userInfo.securityRole.includes("guest"))
-          .mb-5.wrapper.card
-            .container-list
-              
-              .row.ml-0.fixed-rows-head
-                .col.col-lg.px-2.ml-2
-                  h5.h6 Документы для дисциплины
-                if (userInfo.securityRole.includes("superadmin") || (userInfo.securityRole.includes("teacher") && discipline.editors.includes(userInfo._id.toString())))
-                  .col-auto.px-2
-                    a(href="/file/upload/"+discipline.allias+"/")
-                      button.btn.btn-sm.btn-primary.btn-icon-only.rounded-circle(type='button')
-                        span.btn-inner--icon
-                          i.fas.fa-plus
-              .row.ml-0.align-items-center.fixed-rows-footer
-                .col-auto.ml-2
-                  input#allFiles(type='checkbox', name='allFiles', value='', onClick="selectAllCheckboxes('files'); showOrHideButton('files')" )
-                .col.ml-n2
-                  p.text-sm.mb-0 Выбрать все
-                .col-md.d-none.d-md-block
-                  
-                .col-auto
-                  button#submit.btn.btn-sm.btn-primary(type='submit', disabled, onClick="document.getElementById('zip').submit()") Скачать
-              form#zip(action='/createZip/' method='POST')
-                input(type='text', name='discUrl', value=discipline.allias, hidden)
-                ul.list-group.list-group-flush
-                  each file in files
-                    li.list-group-item
-                      .row.align-items-center
-                        .col-auto
-                          -let fileJSON = JSON.stringify({fullPath : file.fullPath, fullName : file.fullName});
-                          input(type='checkbox', name='files', value=fileJSON, onClick="showOrHideButton('files')" )
-                        .col.ml-n2
-                          a(href=file.fullPath download=discipline.mnemo+'_'+file.fullName)
-                            h6.text-sm.mb-0 #{file.name}
-                          p.card-text.small.text-muted #{file.comment}
-                        .col-md.d-none.d-md-block
-                          span.text-muted Изменено:
-                          |  #{file.formatedDate}
-                        .col-auto
-                          .actions.text-right.ml-3
-                            a.action-item.mr-2(href=file.fullPath download=discipline.mnemo+'_'+file.fullName)
-                              i(data-feather='download')
-                            if (userInfo.securityRole.includes("superadmin") || (userInfo.securityRole.includes("teacher") && discipline.editors.includes(userInfo._id.toString())))
-                              a.action-item.mr-2(href="/file/edit/"+discipline.allias+"/"+file._id+"/")
-                                i(data-feather='edit')
-                              a.action-item.mr-2(href="/file/delete/"+discipline.allias+"/"+file._id+"/")
-                                i(data-feather='trash-2')
-                  else 
-                    br
-                    li.list-group-item
-                      .row.align-items-center
-                        .col-auto
-                         p Документов пока нет      
+            .col-lg-7.text-center
+              h1.mb-4 #{discipline.name}
+              p.lead.lh-190 #{discipline.description}
+          if (userInfo.securityRole.includes("superadmin") || (userInfo.securityRole.includes("teacher") && discipline.editors.includes(userInfo._id.toString())))
+            .row.justify-content-center.mb-3
+              a.mr-1(href="/disciplines/edit/"+discipline.allias+"/")
+                button.btn.btn-outline-primary(type='button') Редактировать
+              a.ml-1(href="/disciplines/delete/"+discipline.allias+"/")
+                button.btn.btn-outline-danger(type='button') Удалить
+          if (!userInfo.securityRole.includes("guest"))
+            .mb-5.wrapper.card
+              .container-list
+                
+                .row.ml-0.fixed-rows-head
+                  .col.col-lg.px-2.ml-2
+                    h5.h6 Документы для дисциплины
+                  if (userInfo.securityRole.includes("superadmin") || (userInfo.securityRole.includes("teacher") && discipline.editors.includes(userInfo._id.toString())))
+                    .col-auto.px-2
+                      a(href="/file/upload/"+discipline.allias+"/")
+                        button.btn.btn-sm.btn-primary.btn-icon-only.rounded-circle(type='button')
+                          span.btn-inner--icon
+                            i.fas.fa-plus
+                .row.ml-0.align-items-center.fixed-rows-footer
+                  .col-auto.ml-2
+                    input#allFiles(type='checkbox', name='allFiles', value='', onClick="selectAllCheckboxes('files'); showOrHideButton('files')" )
+                  .col.ml-n2
+                    p.text-sm.mb-0 Выбрать все
+                  .col-md.d-none.d-md-block
+                    
+                  .col-auto
+                    button#submit.btn.btn-sm.btn-primary(type='submit', disabled, onClick="document.getElementById('zip').submit()") Скачать
+                form#zip(action='/createZip/' method='POST')
+                  input(type='text', name='discUrl', value=discipline.allias, hidden)
+                  ul.list-group.list-group-flush
+                    each file in files
+                      li.list-group-item
+                        .row.align-items-center
+                          .col-auto
+                            -let fileJSON = JSON.stringify({fullPath : file.fullPath, fullName : file.fullName});
+                            input(type='checkbox', name='files', value=fileJSON, onClick="showOrHideButton('files')" )
+                          .col.ml-n2
+                            a(href=file.fullPath download=discipline.mnemo+'_'+file.fullName)
+                              h6.text-sm.mb-0 #{file.name}
+                            p.card-text.small.text-muted #{file.comment}
+                          .col-md.d-none.d-md-block
+                            span.text-muted Изменено:
+                            |  #{file.formatedDate}
+                          .col-auto
+                            .actions.text-right.ml-3
+                              a.action-item.mr-2(href=file.fullPath download=discipline.mnemo+'_'+file.fullName)
+                                i(data-feather='download')
+                              if (userInfo.securityRole.includes("superadmin") || (userInfo.securityRole.includes("teacher") && discipline.editors.includes(userInfo._id.toString())))
+                                a.action-item.mr-2(href="/file/edit/"+discipline.allias+"/"+file._id+"/")
+                                  i(data-feather='edit')
+                                a.action-item.mr-2(href="/file/delete/"+discipline.allias+"/"+file._id+"/")
+                                  i(data-feather='trash-2')
+                    else 
+                      br
+                      li.list-group-item
+                        .row.align-items-center
+                          .col-auto
+                           p Документов пока нет      
+      .push
     include includes/footer.pug 
     script(src="../../checkbox_hide_button.js" type="text/javascript")
     script(src="../../checkbox_select_all.js" type="text/javascript")

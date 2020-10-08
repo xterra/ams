@@ -10,44 +10,46 @@ html
     .preloader
       .spinner-border.text-primary(role='status')
         span.sr-only Loading...
-    if userInfo == null
-      include includes/header_public.pug
-    else
-      include includes/header_private.pug
-    section.slice.slice-lg.pt-10.pb-0.bg-cover.bg-primary.bg-size--cover
-      .container
-        .row.justify-content-center
-          .col-xl-9.col-lg-10
-            .card.mb-n7.position-relative.zindex-100
-              .card-body.p-md-5
-                .text-center
-                  h1.h2.lh-150.mt-3.mb-0 #{news_detail.title}
-                  if userInfo !== null && (userInfo.securityRole.includes('superadmin') || userInfo._id.toString() == news_detail.author)
-                    a(href="/news/delete/"+news_detail.url+"/")
-                      button.btn.btn-sm.btn-outline-primary(type="button") Удалить новость
-                .row.align-items-center.mt-5.pt-5.delimiter-top
-                  .col.mb-3.mb-lg-0
-                    .media.align-items-center
-                      if userInfo == null
-                        div
-                          span.avatar.avatar-sm.bg-primary.rounded-circle ПС
-                        .media-body.ml-2
-                          span.d-block.h6.mb-0 Пользователь сайта
-                          span.text-sm.text-muted Опубликовано: #{news_detail.formatedDate}
-                      else
-                        -let authorInfo = news_detail.authorInfo[0]
-                        -let authorInitials = `${authorInfo.lastName.substr(0,1)}${authorInfo.name.substr(0,1)}`
-                        div
-                          span.avatar.avatar-sm.bg-primary.rounded-circle #{authorInitials}
-                        .media-body.ml-2
-                          span.d-block.h6.mb-0 #{authorInfo.lastName} #{authorInfo.name}
-                          span.text-sm.text-muted Опубликовано: #{news_detail.formatedDate}
-    section.slice.slice-lg.pt-10.pb-5
-      .container.pb-6
-        .row.row-grid.align-items-center
-          .col-xl-8.col-lg-10.offset-xl-2.offset-lg-1
-            article
-              p #{news_detail.text}
+    .footer-wrapper
+      if userInfo == null
+        include includes/header_public.pug
+      else
+        include includes/header_private.pug
+      section.slice.slice-lg.pt-10.pb-0.bg-cover.bg-primary.bg-size--cover
+        .container
+          .row.justify-content-center
+            .col-xl-9.col-lg-10
+              .card.mb-n7.position-relative.zindex-100
+                .card-body.p-md-5
+                  .text-center
+                    h1.h2.lh-150.mt-3.mb-0 #{news_detail.title}
+                    if userInfo !== null && (userInfo.securityRole.includes('superadmin') || userInfo._id.toString() == news_detail.author)
+                      a(href="/news/delete/"+news_detail.url+"/")
+                        button.btn.btn-sm.btn-outline-primary(type="button") Удалить новость
+                  .row.align-items-center.mt-5.pt-5.delimiter-top
+                    .col.mb-3.mb-lg-0
+                      .media.align-items-center
+                        if userInfo == null
+                          div
+                            span.avatar.avatar-sm.bg-primary.rounded-circle ПС
+                          .media-body.ml-2
+                            span.d-block.h6.mb-0 Пользователь сайта
+                            span.text-sm.text-muted Опубликовано: #{news_detail.formatedDate}
+                        else
+                          -let authorInfo = news_detail.authorInfo[0]
+                          -let authorInitials = `${authorInfo.lastName.substr(0,1)}${authorInfo.name.substr(0,1)}`
+                          div
+                            span.avatar.avatar-sm.bg-primary.rounded-circle #{authorInitials}
+                          .media-body.ml-2
+                            span.d-block.h6.mb-0 #{authorInfo.lastName} #{authorInfo.name}
+                            span.text-sm.text-muted Опубликовано: #{news_detail.formatedDate}
+      section.slice.slice-lg.pt-10.pb-5
+        .container.pb-6
+          .row.row-grid.align-items-center
+            .col-xl-8.col-lg-10.offset-xl-2.offset-lg-1
+              article
+                p #{news_detail.text}
+      .push
     include includes/footer.pug                
     script(src='../../assets/libs/jquery/dist/jquery.min.js')
     script(src='../../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js')

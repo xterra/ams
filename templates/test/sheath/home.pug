@@ -9,79 +9,81 @@ html
     .preloader
       .spinner-border.text-primary(role='status')
         span.sr-only Loading...
-    if !userAthorized
-      include includes/header_public.pug
-    else
-      include includes/header_private.pug
-    section.slice.slice-lg.bg-primary.pb-6
-      div(data-offset-top='#navbar-main')
-        .container.pb-lg-9.pb-9
-          .row.align-items-center.justify-content-center
-            .col-lg-7.text-center
-              h1.text-white Автоматизированные системы управления
-              p.lead.text-white.opacity-8 Все, что нужно знать о кафедре в одном месте.
-        .shape-container.shape-position-bottom
-          svg(xmlns='http://www.w3.org/2000/svg', viewBox='0 0 1000 100', preserveAspectRatio='none')
-            path(d='M 0 0 c 0 0 200 50 500 50 s 500 -50 500 -50 v 101 h -1000 v -100 z')
-    section.slice.pt-0
-      .container.position-relative.zindex-100
-        .row
-          .col-lg-3.col-sm-6.mt-n10
-            .card.hover-translate-y-n10.hover-shadow-lg(style="min-height: 150px")
-              a(href="/about/")
-                .card-body
-                  .pb-4
-                    .icon.bg-dark.text-white.rounded-circle.icon-shape.shadow
-                      i(data-feather='info')
-                  .pt-2.pb-3
-                    h5 О нас
-          .col-lg-3.col-sm-6.mt-sm-n10
-            .card.hover-translate-y-n10.hover-shadow-lg(style="min-height: 150px")
-              a(href="/news/")
-                .card-body
-                  .pb-4
-                    .icon.bg-dark.text-white.rounded-circle.icon-shape.shadow
-                      i(data-feather='list')
-                  .pt-2.pb-3
-                    h5 Новости
-          .col-lg-3.col-sm-6.mt-lg-n10
-            .card.hover-translate-y-n10.hover-shadow-lg(style="min-height: 150px")
-              a(href="/for-abiturients/")
-                .card-body
-                  .pb-4
-                    .icon.bg-dark.text-white.rounded-circle.icon-shape.shadow
-                      i(data-feather='users')
-                  .pt-2.pb-3
-                    h5 Абитуриентам
-          .col-lg-3.col-sm-6.mt-lg-n10
-            .card.hover-translate-y-n10.hover-shadow-lg(style="min-height: 150px")
-              a(href="/contacts/")
-                .card-body
-                  .pb-4
-                    .icon.bg-dark.text-white.rounded-circle.icon-shape.shadow
-                      i(data-feather='at-sign')
-                  .pt-2.pb-3
-                    h5 Контакты
-    section.slice.slice-lg
-      .container
-        .row.mb-6.justify-content-center.text-center
-          .col-lg-8.col-md-10
-            h3.mt-4 Последние новости
-        .row
-          each pieceOfNews in news
-            .col-lg-4
-              .card.hover-translate-y-n3.hover-shadow-lg.overflow-hidden(style="min-height: 300px")
-                .card-body.py-4
-                  small.d-block.text-sm.mb-2 #{pieceOfNews.formatedDate}
-                  a.h5.stretched-link.lh-150(href='/news/'+pieceOfNews.url+"/") #{pieceOfNews.title}
-                  p.mt-3.mb-0.lh-170 #{pieceOfNews.short}
-                .card-footer.border-0.delimiter-top
-                  .row.align-items-center
-                    .col-auto
-                      span.avatar.avatar-sm.bg-primary.rounded-circle ПС
-                      span.text-sm.mb-0.avatar-content Пользователь сайта
-          else
-            p.text-center Новостей пока нет.
+    .footer-wrapper
+      if !userAthorized
+        include includes/header_public.pug
+      else
+        include includes/header_private.pug
+      section.slice.slice-lg.bg-primary.pb-6
+        div(data-offset-top='#navbar-main')
+          .container.pb-lg-9.pb-9
+            .row.align-items-center.justify-content-center
+              .col-lg-7.text-center
+                h1.text-white Автоматизированные системы управления
+                p.lead.text-white.opacity-8 Все, что нужно знать о кафедре в одном месте.
+          .shape-container.shape-position-bottom
+            svg(xmlns='http://www.w3.org/2000/svg', viewBox='0 0 1000 100', preserveAspectRatio='none')
+              path(d='M 0 0 c 0 0 200 50 500 50 s 500 -50 500 -50 v 101 h -1000 v -100 z')
+      section.slice.pt-0
+        .container.position-relative.zindex-100
+          .row
+            .col-lg-3.col-sm-6.mt-n10
+              .card.hover-translate-y-n10.hover-shadow-lg(style="min-height: 150px")
+                a(href="/about/")
+                  .card-body
+                    .pb-4
+                      .icon.bg-dark.text-white.rounded-circle.icon-shape.shadow
+                        i(data-feather='info')
+                    .pt-2.pb-3
+                      h5 О нас
+            .col-lg-3.col-sm-6.mt-sm-n10
+              .card.hover-translate-y-n10.hover-shadow-lg(style="min-height: 150px")
+                a(href="/news/")
+                  .card-body
+                    .pb-4
+                      .icon.bg-dark.text-white.rounded-circle.icon-shape.shadow
+                        i(data-feather='list')
+                    .pt-2.pb-3
+                      h5 Новости
+            .col-lg-3.col-sm-6.mt-lg-n10
+              .card.hover-translate-y-n10.hover-shadow-lg(style="min-height: 150px")
+                a(href="/for-abiturients/")
+                  .card-body
+                    .pb-4
+                      .icon.bg-dark.text-white.rounded-circle.icon-shape.shadow
+                        i(data-feather='users')
+                    .pt-2.pb-3
+                      h5 Абитуриентам
+            .col-lg-3.col-sm-6.mt-lg-n10
+              .card.hover-translate-y-n10.hover-shadow-lg(style="min-height: 150px")
+                a(href="/contacts/")
+                  .card-body
+                    .pb-4
+                      .icon.bg-dark.text-white.rounded-circle.icon-shape.shadow
+                        i(data-feather='at-sign')
+                    .pt-2.pb-3
+                      h5 Контакты
+      section
+        .container
+          .row.mb-6.justify-content-center.text-center
+            .col-lg-8.col-md-10
+              h3.mt-4 Последние новости
+          .row
+            each pieceOfNews in news
+              .col-lg-4
+                .card.hover-translate-y-n3.hover-shadow-lg.overflow-hidden(style="min-height: 300px")
+                  .card-body.py-4
+                    small.d-block.text-sm.mb-2 #{pieceOfNews.formatedDate}
+                    a.h5.stretched-link.lh-150(href='/news/'+pieceOfNews.url+"/") #{pieceOfNews.title}
+                    p.mt-3.mb-0.lh-170 #{pieceOfNews.short}
+                  .card-footer.border-0.delimiter-top
+                    .row.align-items-center
+                      .col-auto
+                        span.avatar.avatar-sm.bg-primary.rounded-circle ПС
+                        span.text-sm.mb-0.avatar-content Пользователь сайта
+            else
+              p.text-center Новостей пока нет.
+      .push
     include includes/footer.pug
     script(src='../assets/libs/jquery/dist/jquery.min.js')
     script(src='../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js')
