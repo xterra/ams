@@ -39,7 +39,7 @@ html
                   .card-footer.border-0.delimiter-top
                     .row.align-items-center
                       .col-auto
-                        if userInfo == null
+                        if userInfo == null || pieceOfNews.authorInfo[0] == undefined
                           span.avatar.avatar-sm.bg-primary.rounded-circle ПС
                           span.text-sm.mb-0.avatar-content Пользователь сайта
                         else

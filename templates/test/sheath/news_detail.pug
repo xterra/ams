@@ -29,7 +29,7 @@ html
                   .row.align-items-center.mt-5.pt-5.delimiter-top
                     .col.mb-3.mb-lg-0
                       .media.align-items-center
-                        if userInfo == null
+                        if userInfo == null || news_detail.authorInfo[0] == undefined
                           div
                             span.avatar.avatar-sm.bg-primary.rounded-circle ПС
                           .media-body.ml-2
