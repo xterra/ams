@@ -69,7 +69,7 @@ html
                             i.fas.fa-plus
                 .row.ml-0.align-items-center.fixed-rows-footer
                   .col-auto.ml-2
-                    input#allFiles(type='checkbox', name='allFiles', value='', onClick="selectAllCheckboxes('files'); showOrHideButton('files')" )
+                    input#allFiles(type='checkbox', name='allFiles', value='')
                   .col.ml-n2
                     p.text-sm.mb-0 Выбрать все
                   .col-md.d-none.d-md-block
@@ -84,7 +84,7 @@ html
                         .row.align-items-center
                           .col-auto
                             -let fileJSON = JSON.stringify({fullPath : file.fullPath, fullName : file.fullName});
-                            input(type='checkbox', name='files', value=fileJSON, onClick="showOrHideButton('files')" )
+                            input(type='checkbox', name='files', value=fileJSON)
                           .col.ml-n2
                             a(href=file.fullPath download=discipline.mnemo+'_'+file.fullName)
                               h6.text-sm.mb-0 #{file.name}
