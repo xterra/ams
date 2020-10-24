@@ -38,4 +38,9 @@ function selectAllCheckboxes(checkboxName){
   for (let element of checkboxList) {
     element.checked = allFilesCheckbox.checked;
   }
+  if(allFilesCheckbox.checked) {
+    showOrHideSubmit(2);
+  } else {
+    showOrHideSubmit(0);
+  }
 }
