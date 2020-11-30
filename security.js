@@ -15,7 +15,7 @@ let sessionCookieName = 'SESSID',
   passwordCaseSensitive = true,
   randomstringLength = 64,
   randomstringType = 'alphanumeric', // alphanumeric, numeric, alphabetic, hex
-  sessionLifetime = 7 * 24 * 60 * 60,
+  sessionLifetime = 4 * 24 * 60 * 60,
   sessionTokenInMemoryLifetime = 43200,
   sessionTokenInMemoryMaxSize = 10000,
   contextCleanerInterval = 60,
@@ -156,7 +156,7 @@ function storeSessionInDB(token, sessionData, userID, callback) {
   return dbConnect.getDB().collection('sessions').insertOne({
     _id: token,
     data: sessionData,
-    freshness: new Date(),
+    freshness: new Date((new Date()).getTime() + sessionLifetime * 1000),
     ownerID: userID
   }, null, (error, result) => {
     if (error) {
@@ -386,11 +386,9 @@ function runCleaner() {
     cleanerTicker = setInterval(() => {
       console.log('Cleaning security context...');
       // TODO: clear context!
-      const TWO_DAYS_IN_MS = 1728000;
       const currentTime = new Date();
-      const expiresTime = currentTime - TWO_DAYS_IN_MS;
       dbConnect.getDB().collection('sessions').remove({
-        freshness: { $lte: new Date(expiresTime) }
+        freshness: { $lte: currentTime }
       }, (err, result) => {
         if (err) console.log(err);
         console.log(`Sessions deleted:\n ${JSON.stringify(result)}`);
