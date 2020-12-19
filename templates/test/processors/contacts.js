@@ -7,7 +7,7 @@ module.exports = {
       callback({
         title: 'Контакты',
         userAthorized: isUserAuthed(sessionContext, sessionToken)
-      }, 'contacts', 5, 5);
+      }, 'contacts', 0, 5);
     });
   }
 };

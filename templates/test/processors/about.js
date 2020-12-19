@@ -3,10 +3,12 @@
 module.exports = {
   path: new RegExp('^/about/$'),
   processor(request, response, callback, sessionContext, sessionToken, db) {
-    callback({
-      title: 'О нас',
-      userAthorized: isUserAuthed(sessionContext, sessionToken)
-    }, 'about', 5, 5);
+    setImmediate( () => {
+      callback({
+        title: 'О нас',
+        userAthorized: isUserAuthed(sessionContext, sessionToken)
+      }, 'about', 0, 5);
+    });
   }
 };
 
