@@ -1,0 +1,94 @@
+doctype html
+html
+  head
+    title #{title}
+    include includes/head_html.pug
+    link(rel='stylesheet', href='../../../assets/libs/fortawesome/fontawesome-free/css/all.min.css')
+    link(rel='stylesheet' href='../../../assets/libs/trix/trix.css')
+    style.
+      blockquote {
+      border: 0 solid #ccc;
+      border-left-width: 0.3em;
+      margin-left: 0.3em;
+      padding-left: 0.6em; }
+      pre {
+      display: inline-block;
+      width: 100%;
+      vertical-align: top;
+      font-family: monospace;
+      font-size: 0.9em;
+      padding: 0.5em;
+      white-space: pre;
+      background-color: #eee;
+      overflow-x: auto; }
+  body
+    .footer-wrapper
+      include includes/header_private.pug
+      section.slice.slice-lg.delimiter-bottom
+        a.btn.btn-neutral.btn-icon-only.rounded-circle.position-absolute.left-4.top-90.d-none.d-lg-inline-flex(href=(title=='Создание новости' ? '/news/' : '/news/'+newsDetail.url+'/'))
+          span.btn-inner--icon
+            i(data-feather='arrow-left')
+        .container.d-flex.flex-column
+          .row.align-items-center.justify-content-center
+            .col-lg-8.col-xl-7.py-6.py-md-0
+              div
+                .mb-3.text-center
+                  h6.h3.mb-1 #{title}
+                span.clearfix
+                if errorMessage.length
+                  .alert.alert-danger(role='alert')
+                    | #{errorMessage}
+                form#news(action='.', method='POST')
+                  .form-group
+                    label.form-control-label Заголовок
+                      span.text-danger *
+                    .input-group.input-group-merge
+                      input#title.form-control.form-control-prepend(type='text', placeholder='Заголовок новости', name='title', value=(newsDetail===undefined ? "" : newsDetail.title) required, maxlength=80)
+                      .input-group-prepend
+                        span.input-group-text
+                          i(data-feather='align-left')
+                  .form-group.my-3
+                    label.form-control-label Имя для ссылки
+                      span.text-danger *  
+                    .input-group.input-group-merge
+                      input#url.form-control.form-control-prepend(type='text', placeholder='Короткое имя для URL', name='url', value=(newsDetail===undefined ? "" : newsDetail.url), required, maxlength=60)
+                      .input-group-prepend
+                        span.input-group-text
+                          i(data-feather='at-sign')
+                  .form-group.my-3
+                    label.form-control-label Краткое описание
+                      span.text-danger *  
+                    .input-group.input-group-merge
+                      textarea#short.form-control.form-control-prepend(type='textarea', placeholder='Краткое описание новости', name='short', rows="3", value=newsDetail===undefined ? "" : newsDetail.short, required, maxlength=130) #{newsDetail===undefined ? "" : newsDetail.short}
+                      .input-group-prepend
+                        span.input-group-text
+                          i(data-feather='align-justify')
+                  .form-group.my-3
+                    label.form-control-label Основной текст
+                      span.text-danger *
+                    .input-group
+                      input#text(type='hidden', name='text', value=(newsDetail===undefined ? "" : newsDetail.text), rows="4" required, maxlength=1000)
+                    trix-editor(input="text" style='min-height:150px;')
+                  .row.mt-4
+                    .col.form-group.mb-0
+                      button#submit.btn.btn-block.btn-primary(type='submit') #{title=='Создание новости' ? 'Создать' : 'Изменить' } 
+                    .col.form-group.mb-0
+                      a(href=(title=='Создание новости' ? '/news/' : '/news/'+newsDetail.url+'/'))
+                        button.btn.btn-block.btn-secondary(type='button') Отмена
+      .push
+    include includes/footer.pug
+    script(src='../../../assets/libs/jquery/dist/jquery.min.js')
+    script(src='../../../assets/libs/trix/trix.js')
+    script(src='../../../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js')
+    script(src='../../../assets/libs/svg-injector/dist/svg-injector.min.js')
+    script(src='../../../assets/libs/feather-icons/dist/feather.min.js')
+    script(src='../../../assets/libs/in-view/dist/in-view.min.js')
+    script(src='../../../assets/libs/sticky-kit/dist/sticky-kit.min.js')
+    script(src='../../../assets/libs/imagesloaded/imagesloaded.pkgd.min.js')
+    script(src='../../../assets/js/quick-website.js')
+    script.
+      feather.replace({
+      width: "1em",
+      height: "1em"
+      })
+    include includes/yandex_metrika.pug
