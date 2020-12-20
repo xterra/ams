@@ -4,14 +4,14 @@ const router = require('../../../router'),
 module.exports = {
   path: new RegExp('^\/$'),
   processor: function (request, response, callback, sessionContext, sessionToken, db) {
-    db.collection('news').find().sort({dateUpdate: -1}).limit(3).toArray( (err, result) => {
+    db.collection('news').find().sort({dateCreate: -1}).limit(3).toArray( (err, result) => {
       if(err){
         callback();
         return router.bleed(500, null, response)
       }
       let news = result;
       for (let pieceOfNews of news){
-        pieceOfNews.formatedDate = beautyDate(pieceOfNews.dateUpdate);
+        pieceOfNews.formatedDate = beautyDate(pieceOfNews.dateCreate);
       }
       callback({
         title: 'Главная',
