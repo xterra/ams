@@ -3,12 +3,8 @@ html
   head
     title #{title}
     include includes/head_html.pug
-    link(rel='stylesheet', href='../assets/libs/fancyapps/fancybox/dist/jquery.fancybox.min.css')
     link(rel='stylesheet', href='../assets/libs/fortawesome/fontawesome-free/css/all.min.css')
   body
-    .preloader
-      .spinner-border.text-primary(role='status')
-        span.sr-only Loading...
     .footer-wrapper
       if !userAthorized
         include includes/header_public.pug
@@ -65,7 +61,7 @@ html
                       h5 Контакты
       section
         .container
-          .row.mb-6.justify-content-center.text-center
+          .row.mb-4.justify-content-center.text-center
             .col-lg-8.col-md-10
               h3.mt-4 Последние новости
           .row
@@ -89,10 +85,6 @@ html
     script(src='../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js')
     script(src='../assets/libs/svg-injector/dist/svg-injector.min.js')
     script(src='../assets/libs/feather-icons/dist/feather.min.js')
-    script(src='../assets/libs/in-view/dist/in-view.min.js')
-    script(src='../assets/libs/sticky-kit/dist/sticky-kit.min.js')
-    script(src='../assets/libs/imagesloaded/imagesloaded.pkgd.min.js')
-    script(src='../assets/libs/fancyapps/fancybox/dist/jquery.fancybox.min.js')
     script(src='../assets/js/quick-website.js')
     script.
       feather.replace({
