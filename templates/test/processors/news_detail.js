@@ -1,69 +1,95 @@
 const router = require('../../../router'),
+      ObjectID = require('mongodb').ObjectID,
       beautyDate = require('../../../beautyDate');
 
 module.exports = {
-  path: new RegExp("^\/news\/[^\/]+\/$"),
-  processor: function(request, response, callback, sessionContext, sessionToken, db){
-    const requsetedURL = decodeURI(request.url);
-    const delimeteredURL = requsetedURL.split("/");
-    const newsUrl = delimeteredURL[delimeteredURL.length - 2];
+  path: new RegExp('^\/news\/[^\/]+\/$'),
+  processor(request, response, callback, sessionContext, sessionToken, db) {
+    const newsUrl = getUrlForNewsFromClientRequest(request.url);
 
-    db.collection("news").aggregate([
-       {
-         $match: {url : newsUrl}
-       },
-       {
-         $lookup:
-           {
-             from: "users",
-             let: { author: "$author"},
-             pipeline: [
-               { $match:
-                  {$expr:
-                   { $eq: [{$toString: "$_id"}, "$$author"]  }
-                  }
-               },
-               { $project: {_id: 0, lastName: 1, name: 1, fatherName: 1, securityRole: 1}},
-             ],
-             as: "authorInfo"
-           }
-        },
-    ]).toArray(function(err, result){
-      if(err){
-        callback();
-        return router.bleed(500, null, response, err);
-      }
-      if(result == null){
-        callback();
-        return router.bleed(404, requsetedURL, response);
-      }
-      let news_detail = result[0];
-            news_detail.formatedDate = beautyDate(news_detail.dateUpdate);
-      if(sessionToken == null || sessionContext == undefined || sessionContext == null){
-        callback({
-          title: "Новость",
-          news_detail: news_detail,
-          userInfo: null
-        }, "news_detail", 5, 5);
-      } else{
-        db.collection("users").findOne({_id: sessionContext.id}, {username:1, securityRole: 1}, function(err, result){
-          if(err){
-            callback();
-            return router.bleed(500, null, response);
-          }
-          if(result == null){
-            callback();
-            return router.bleed(404, null, response);
-          }
-          let userInfo = result;
+    findNewsWithAuthorByUrl(newsUrl, db, (err, result) => {
+      if(err) return redirectTo500Page(response, err, callback);
+
+      if(result == null) return redirectTo404Page(response, request.url, callback);
+
+      let newsDetail = result[0];
+      newsDetail.formatedDate = beautyDate(newsDetail.dateCreate);
+
+      const userAuthed = isUserAuthed(sessionContext, sessionToken);
+      if(userAuthed) {
+        getRoleForAuthedUser(sessionContext.id, db, (err, result) => {
+          if(err) return redirectTo500Page(response, err, callback);
+          if(result == null) return redirectTo404Page(response, request.url, callback);
+
+          const userInfo = result;
           return callback({
-            title: "Новость",
-            news_detail: news_detail,
+            title: 'Новость',
+            newsDetail: newsDetail,
             userInfo: userInfo
-          }, "news_detail", 0, 0);
+          }, 'news_detail', 0, 0);
         });
+      } else {
+        callback({
+          title: 'Новость',
+          newsDetail: newsDetail,
+          userInfo: null
+        }, 'news_detail', 0, 0);
       }
     });
-
   }
+}
+
+function getUrlForNewsFromClientRequest(clientUrl) {
+  let requestedURL = decodeURI(clientUrl);
+  let delimeteredURL = requestedURL.split('/');
+  return delimeteredURL[delimeteredURL.length - 2];
+}
+
+function findNewsWithAuthorByUrl(newsUrl, db, callback){
+  db.collection('news').aggregate([
+     {
+       $match: {url : newsUrl}
+     },
+     {
+       $lookup:
+         {
+           from: 'users',
+           let: { author: '$author' },
+           pipeline: [
+             { $match:
+                {$expr:
+                 { $eq: [ {$toString: '$_id'}, '$$author' ] }
+                }
+             },
+             { $project:
+               {_id: 0, lastName: 1, name: 1, fatherName: 1, securityRole: 1}
+             },
+           ],
+           as: 'authorInfo'
+         }
+      },
+  ]).toArray(callback);
+}
+
+function redirectTo500Page(response, err, callback){
+  callback();
+  return router.bleed(500, null, response, err);
+}
+
+function redirectTo404Page(response, requestedURL, callback){
+  callback();
+  return router.bleed(404, requestedURL, response);
+}
+
+function isUserAuthed(sessionContext, sessionToken) {
+  return (typeof sessionToken === 'string' &&
+    sessionContext instanceof Object &&
+    sessionContext['id'] !== undefined);
+}
+
+function getRoleForAuthedUser(userID, db, callback){
+  db.collection('users').findOne(
+    { _id : new ObjectID(userID) },
+    { _id : 1, securityRole : 1 },
+  callback);
 }
