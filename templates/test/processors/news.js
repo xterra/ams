@@ -21,14 +21,14 @@ module.exports = {
              as: "authorInfo"
            }
         },
-    ]).sort({dateUpdate: -1}).toArray(function(err, result){
+    ]).sort({dateCreate: -1}).toArray(function(err, result){
       if(err) {
         callback();
         return bleed(500, null, response, err);
       }
       const news = result;
       for (let pieceOfNews of news){
-        pieceOfNews.formatedDate = beautyDate(pieceOfNews.dateUpdate);
+        pieceOfNews.formatedDate = beautyDate(pieceOfNews.dateCreate);
       }
       if(sessionToken == null || sessionContext == undefined || sessionContext == null){
       callback({
