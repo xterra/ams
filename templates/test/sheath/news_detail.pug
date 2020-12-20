@@ -3,13 +3,25 @@ html
   head
     title #{title}
     include includes/head_html.pug
-    link(rel='stylesheet', href='../../assets/libs/swiper/dist/css/swiper.min.css')
-    link(rel='stylesheet', href='../../assets/libs/fancyapps/fancybox/dist/jquery.fancybox.min.css')
     link(rel='stylesheet', href='../../assets/libs/fortawesome/fontawesome-free/css/all.min.css')
+    link(rel='stylesheet' href='../../../assets/libs/trix/trix.css')
+    style.
+      blockquote {
+      border: 0 solid #ccc;
+      border-left-width: 0.3em;
+      margin-left: 0.3em;
+      padding-left: 0.6em; }
+      pre {
+      display: inline-block;
+      width: 100%;
+      vertical-align: top;
+      font-family: monospace;
+      font-size: 0.9em;
+      padding: 0.5em;
+      white-space: pre;
+      background-color: #eee;
+      overflow-x: auto; }
   body
-    .preloader
-      .spinner-border.text-primary(role='status')
-        span.sr-only Loading...
     .footer-wrapper
       if userInfo == null
         include includes/header_public.pug
@@ -22,33 +34,34 @@ html
               .card.mb-n7.position-relative.zindex-100
                 .card-body.p-md-5
                   .text-center
-                    h1.h2.lh-150.mt-3.mb-0 #{news_detail.title}
-                    if userInfo !== null && (userInfo.securityRole.includes('superadmin') || userInfo._id.toString() == news_detail.author)
-                      a(href="/news/delete/"+news_detail.url+"/")
-                        button.btn.btn-sm.btn-outline-primary(type="button") Удалить новость
+                    h1.h2.lh-150.mt-3.mb-0 #{newsDetail.title}
+                    if userInfo !== null && (userInfo.securityRole.includes('superadmin') || userInfo._id.toString() == newsDetail.author)
+                      a(href="/news/edit/"+newsDetail.url+"/")
+                        button.btn.btn-sm.btn-outline-primary(type="button") Редактировать
+                      a(href="/news/delete/"+newsDetail.url+"/")
+                        button.btn.btn-sm.btn-outline-danger(type="button") Удалить
                   .row.align-items-center.mt-5.pt-5.delimiter-top
                     .col.mb-3.mb-lg-0
                       .media.align-items-center
-                        if userInfo == null || news_detail.authorInfo[0] == undefined
+                        if userInfo == null || newsDetail.authorInfo[0] == undefined
                           div
                             span.avatar.avatar-sm.bg-primary.rounded-circle ПС
                           .media-body.ml-2
                             span.d-block.h6.mb-0 Пользователь сайта
-                            span.text-sm.text-muted Опубликовано: #{news_detail.formatedDate}
+                            span.text-sm.text-muted Опубликовано: #{newsDetail.formatedDate}
                         else
-                          -let authorInfo = news_detail.authorInfo[0]
+                          -let authorInfo = newsDetail.authorInfo[0]
                           -let authorInitials = `${authorInfo.lastName.substr(0,1)}${authorInfo.name.substr(0,1)}`
                           div
                             span.avatar.avatar-sm.bg-primary.rounded-circle #{authorInitials}
                           .media-body.ml-2
                             span.d-block.h6.mb-0 #{authorInfo.lastName} #{authorInfo.name}
-                            span.text-sm.text-muted Опубликовано: #{news_detail.formatedDate}
+                            span.text-sm.text-muted Опубликовано: #{newsDetail.formatedDate}
       section.slice.slice-lg.pt-10.pb-5
         .container.pb-6
           .row.row-grid.align-items-center
             .col-xl-8.col-lg-10.offset-xl-2.offset-lg-1
-              article
-                p #{news_detail.text}
+              |!{newsDetail.text}
       .push
     include includes/footer.pug                
     script(src='../../assets/libs/jquery/dist/jquery.min.js')
@@ -58,8 +71,6 @@ html
     script(src='../../assets/libs/in-view/dist/in-view.min.js')
     script(src='../../assets/libs/sticky-kit/dist/sticky-kit.min.js')
     script(src='../../assets/libs/imagesloaded/imagesloaded.pkgd.min.js')
-    script(src='../../assets/libs/swiper/dist/js/swiper.min.js')
-    script(src='../../assets/libs/fancyapps/fancybox/dist/jquery.fancybox.min.js')
     script(src='../../assets/js/quick-website.js')
     script.
       feather.replace({
