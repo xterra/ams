@@ -35,8 +35,9 @@ module.exports = {
                   if(newsDescription.length > 120){
                     return callback({
                       title: "Создание новости",
+                      newsDetail: postData,
                       errorMessage: "Краткое описание не должно превышать 120 символов!"
-                    }, "news_create", 0, 0);
+                    }, "news_form", 0, 0);
                   }
                   db.collection("news").insertOne({
                     title: titleNews,
@@ -63,7 +64,7 @@ module.exports = {
           callback({
             title: "Создание новости",
             errorMessage: ""
-          }, "news_create", 0, 0);
+          }, "news_form", 0, 0);
         }
     });
   }
