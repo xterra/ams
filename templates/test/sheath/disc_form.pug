@@ -73,7 +73,7 @@ html
                             -selectedGroups.push(group.fullname);
                           else
                             option(value=group._id.toString()) #{group.fullname}
-                    #selectedgroups Выбранные значения: #{selectedGroups.join("; ")}  
+                    #selectedgroups Выбранные группы: #{selectedGroups.join("; ")}  
                   if(userInfo.securityRole.includes("superadmin"))
                     .form-group.my-3
                       label.form-control-label Редакторы дисциплины  
@@ -91,7 +91,7 @@ html
                               -selectedEditors.push(`${teacher.lastName} ${teacher.name}`);
                             else
                               option(value=teacher._id.toString()) #{teacher.lastName} #{teacher.name}
-                      #selectededitors Выбранные значения: #{selectedEditors.join("; ")}  
+                      #selectededitors Выбранные преподаватели: #{selectedEditors.join("; ")}  
                   .row.mt-4
                     .col.form-group.mb-0
                       button.btn.btn-block.btn-primary(type='submit') #{title==="Новая дисциплина" ? "Создать" : "Изменить"}
