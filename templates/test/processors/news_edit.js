@@ -15,21 +15,27 @@ module.exports = {
       const userInfo = result;
 
       const userAdminOrTeacher = isUserAdminOrTeacher(userInfo);
-      if(!userAdminOrTeacher) redirectWithErrorCode(response, 403, callback);
+      if(!userAdminOrTeacher) {
+        const err = new Error('User role not admin or teacher');
+        return redirectWithErrorCode(response, 403, err, callback);
+      }
 
       const urlForNews = getUrlForNewsFromClientRequest(request.url);
       findNewsByUrl(urlForNews, db, (err, result) => {
-        if(err) redirectTo500Page(response, err, callback);
-        if(result == null) redirectWithErrorCode(response, 404, callback);
+        if(err) return redirectTo500Page(response, err, callback);
+        if(result == null) return redirectTo404Page(response, request.url, callback);
 
         const newsDetail = result;
 
         const editPermission = checkEditPermissions(userInfo, newsDetail.author);
-        if(!editPermission) redirectWithErrorCode(response, 403, callback);
+        if(!editPermission) {
+          const err = new Error('For this user permissions not enough');
+          return redirectWithErrorCode(response, 403, err, callback);
+        }
 
         if(request.method == 'POST') {
           return router.downloadClientPostData(request, (err, data) => {
-            if(err) redirectTo500Page(response, err, callback);
+            if(err) return redirectWithErrorCode(response, 400, err, callback);
 
             try{
               const postData = qs.parse(data);
@@ -87,6 +93,11 @@ function redirectTo500Page(response, err, callback){
   return router.bleed(500, null, response, err);
 }
 
+function redirectTo404Page(response, requestedURL, callback){
+  callback();
+  return router.bleed(404, requestedURL, response);
+}
+
 function isUserAdminOrTeacher(userInfo){
   const userRoles = userInfo.securityRole;
   if(userRoles.length !== 0){
@@ -95,9 +106,9 @@ function isUserAdminOrTeacher(userInfo){
   return false;
 }
 
-function redirectWithErrorCode(response, code, callback){
+function redirectWithErrorCode(response, code, err, callback){
   callback();
-  return router.bleed(code, null, response);
+  return router.bleed(code, null, response, err);
 }
 
 function getUrlForNewsFromClientRequest(clientUrl){
