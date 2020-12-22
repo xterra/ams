@@ -92,7 +92,9 @@ module.exports = {
             if(firstPartContentType == "multipart/form-data"){
               const storageConfigurations = ini.parse(fs.readFileSync(path.join(__dirname, "../../../" , "configurations", "storage.ini"), "utf-8"));
               console.log(storageConfigurations['data']['location']);
-              const PATH_TO_FILES = storageConfigurations['data']['location'] || path.join(__dirname, "../../../", "/data/private");
+              const STORAGE_DATA_LOCATION = process.env['STORAGE_DATA_LOCATION'] ? `${process.env['STORAGE_DATA_LOCATION']}/private` : '';
+              console.log(`STORAGE_DATA_LOCATION: ${STORAGE_DATA_LOCATION}`);
+              const PATH_TO_FILES = STORAGE_DATA_LOCATION || storageConfigurations['data']['location'] || path.join(__dirname, "../../../", "/data/private");
               let form = new formidable.IncomingForm();
               let dirName = requestFileName.substr(0,2);
               let pathToCurrentFile = `${PATH_TO_FILES}/${dirName}`;
