@@ -11,7 +11,7 @@ module.exports = {
 
     if(request.method == 'POST'){
       router.downloadClientPostData(request, (err, data) => {
-        if(err) return edirectTo400Page(response, callback);
+        if(err) return redirectTo400Page(response, callback);
         try {
           const STORAGE_DATA_LOCATION = process.env['STORAGE_DATA_LOCATION'] ? `${process.env['STORAGE_DATA_LOCATION']}/private` : '';
           const PATH_TO_FILES = STORAGE_DATA_LOCATION || '/Users/ksndr/Projects/ams/data/private';
