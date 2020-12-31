@@ -34,13 +34,22 @@ module.exports = {
               }, 'news_form', 0, 0);
             }
 
-            createNews(postData, userInfo, db, (err) => {
-              if(err) return redirectTo500Page(response, err, callback);
-              console.log('News created!');
-              callback();
-              return router.bleed(301, '/news/', response);
+            checkRepeatingUrlNews(postData, {}, db, (err, result) => {
+              if(err) redirectTo500Page(response, err, callback);
+              if(result) {
+                return callback({
+                  title: 'Редактирование новости',
+                  errorMessage: 'Новость с таким URL уже существует.',
+                  newsDetail: postData
+                }, 'news_form', 0, 0);
+              }
+              createNews(postData, userInfo, db, (err) => {
+                if(err) return redirectTo500Page(response, err, callback);
+                console.log('News created!');
+                callback();
+                return router.bleed(301, '/news/', response);
+              });
             });
-
           } catch(err) {
             console.log(`Processor error create_news: ${err}`);
             redirectTo500Page(response, err, callback);
@@ -92,6 +101,18 @@ function isUserAdminOrTeacher(userInfo) {
 function redirectWithErrorCode(response, code, err, callback) {
   callback();
   return router.bleed(code, null, response, err);
+}
+
+function checkRepeatingUrlNews(newData, oldNewsDetail, db, callback){
+  if(newData.url == oldNewsDetail.url) return callback(null, false);
+  return findNewsIdByUrl(newData.url, db, callback);
+}
+
+function findNewsIdByUrl(urlForNews, db, callback){
+  db.collection('news').findOne(
+    { url: urlForNews },
+    { _id: 1 },
+    callback);
 }
 
 function createNews(news, userInfo, db, callback) {

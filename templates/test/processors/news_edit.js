@@ -20,7 +20,7 @@ module.exports = {
         return redirectWithErrorCode(response, 403, err, callback);
       }
 
-      const urlForNews = getUrlForNewsFromClientRequest(request.url);
+      const urlForNews = getNewsUrlFromRequest(request.url);
       findNewsByUrl(urlForNews, db, (err, result) => {
         if(err) return redirectTo500Page(response, err, callback);
         if(result == null) return redirectTo404Page(response, request.url, callback);
@@ -37,7 +37,7 @@ module.exports = {
           return router.downloadClientPostData(request, (err, data) => {
             if(err) return redirectWithErrorCode(response, 400, err, callback);
 
-            try{
+            try {
               const postData = qs.parse(data);
 
               if(postData.short.length == 0) {
@@ -47,13 +47,24 @@ module.exports = {
                   newsDetail: postData
                 }, 'news_form', 0, 0);
               }
-              updateCurrentNews(postData, newsDetail, db, (err) => {
-                if(err) redirectTo500Page(response, err, callback);
-                console.log('News edited!');
-                callback();
-                return router.bleed(301, `/news/${postData.url}/`, response);
-              });
 
+              checkRepeatingUrlNews(postData, newsDetail, db, (err, result) => {
+                if(err) redirectTo500Page(response, err, callback);
+                if(result) {
+                  return callback({
+                    title: 'Редактирование новости',
+                    errorMessage: 'Новость с таким URL уже существует.',
+                    newsDetail: postData
+                  }, 'news_form', 0, 0);
+                }
+
+                updateCurrentNews(postData, newsDetail, db, (err) => {
+                  if(err) redirectTo500Page(response, err, callback);
+                  console.log('News edited!');
+                  callback();
+                  return router.bleed(301, `/news/${postData.url}/`, response);
+                });
+              });
             } catch(err) {
               console.log(`Error in proccesor news_edit when POST: ${err}`);
               return redirectTo500Page(response, err, callback);
@@ -111,7 +122,7 @@ function redirectWithErrorCode(response, code, err, callback){
   return router.bleed(code, null, response, err);
 }
 
-function getUrlForNewsFromClientRequest(clientUrl){
+function getNewsUrlFromRequest(clientUrl){
   let requestedURL = decodeURI(clientUrl);
   let delimeteredURL = requestedURL.split('/');
   return delimeteredURL[delimeteredURL.length - 2];
@@ -125,7 +136,21 @@ function checkEditPermissions(userInfo, newsAuthorID){
   const userRoles = userInfo.securityRole;
   const userID = userInfo._id.toString();
 
-  return userRoles.includes('superadmin') || userRoles.includes('admin') || (userID == newsAuthorID);
+  return userRoles.includes('superadmin') ||
+    userRoles.includes('admin') ||
+    (userID == newsAuthorID);
+}
+
+function checkRepeatingUrlNews(newData, oldNewsDetail, db, callback){
+  if(newData.url == oldNewsDetail.url) return callback(null, false);
+  return findNewsIdByUrl(newData.url, db, callback);
+}
+
+function findNewsIdByUrl(urlForNews, db, callback){
+  db.collection('news').findOne(
+    { url: urlForNews },
+    { _id: 1 },
+    callback);
 }
 
 function updateCurrentNews(newData, oldNewsDetail, db, callback){
