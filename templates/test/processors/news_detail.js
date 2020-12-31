@@ -5,7 +5,7 @@ const router = require('../../../router'),
 module.exports = {
   path: new RegExp('^\/news\/[^\/]+\/$'),
   processor(request, response, callback, sessionContext, sessionToken, db) {
-    const newsUrl = getUrlForNewsFromClientRequest(request.url);
+    const newsUrl = getNewsUrlFromRequest(request.url);
 
     findNewsWithAuthorByUrl(newsUrl, db, (err, result) => {
       if(err) return redirectTo500Page(response, err, callback);
@@ -39,7 +39,7 @@ module.exports = {
   }
 }
 
-function getUrlForNewsFromClientRequest(clientUrl) {
+function getNewsUrlFromRequest(clientUrl) {
   let requestedURL = decodeURI(clientUrl);
   let delimeteredURL = requestedURL.split('/');
   return delimeteredURL[delimeteredURL.length - 2];
