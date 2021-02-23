@@ -53,7 +53,7 @@ const pugCompilerOptions = {
   pretty: false
 };
 
-let renderTimeout = 500000;
+let renderTimeout = 60000;
 let bleedStacktraceAllowed = false;
 let currentTemplateName = 'test';
 
