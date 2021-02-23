@@ -73,7 +73,7 @@ function isUserAuthed(sessionContext, sessionToken) {
 
 function redirectToLoginPage(response, callback) {
   callback();
-  return router.bleed(301, null, response);
+  return router.bleed(301, '/login/', response);
 }
 
 function getRoleForAuthedUser(userID, db, callback) {
