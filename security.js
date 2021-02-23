@@ -18,7 +18,8 @@ let sessionCookieName = 'SESSID',
   sessionLifetime = 4 * 24 * 60 * 60,
   sessionTokenInMemoryLifetime = 43200,
   sessionTokenInMemoryMaxSize = 10000,
-  contextCleanerInterval = 60,
+  sessionCleanerInterval = 60,
+  tmpFileCleanerInterval = 7200,
   context = {};
 
 function generateToken(callback) {
@@ -369,9 +370,13 @@ function reloadConfigurations() {
     sessionTokenInMemoryMaxSize = parseInt(securityConfigurations['server']['sessionTokenInMemoryMaxSize']);
   console.log('Configs, sessions amount in RAM:', sessionTokenInMemoryMaxSize);
 
-  if (typeof securityConfigurations['server']['contextCleanerInterval'] === 'string')
-    contextCleanerInterval = parseInt(securityConfigurations['server']['contextCleanerInterval']);
-  console.log('Configs, context cleaning secs:\t', contextCleanerInterval);
+  if (typeof securityConfigurations['server']['sessionCleanerInterval'] === 'string')
+    sessionCleanerInterval = parseInt(securityConfigurations['server']['sessionCleanerInterval']);
+  console.log('Configs, session cleaning secs:\t', sessionCleanerInterval);
+
+  if (typeof securityConfigurations['server']['tmpFileCleanerInterval'] === 'string')
+    tmpFileCleanerInterval = parseInt(securityConfigurations['server']['tmpFileCleanerInterval']);
+  console.log('Configs, temporary files cleaning secs:\t', tmpFileCleanerInterval);
 }
 
 function resetContext() {
@@ -379,11 +384,11 @@ function resetContext() {
   console.log('Context reset done');
 }
 
-let cleanerTicker = null;
+let sessionCleanerTicker = null;
 
-function runCleaner() {
-  if (cleanerTicker === null) {
-    cleanerTicker = setInterval(() => {
+function runSessionCleaner() {
+  if (sessionCleanerTicker === null) {
+    sessionCleanerTicker = setInterval(() => {
       console.log('Cleaning security context...');
       // TODO: clear context!
       const currentTime = new Date();
@@ -393,14 +398,52 @@ function runCleaner() {
         if (err) console.log(err);
         console.log(`Sessions deleted:\n ${JSON.stringify(result)}`);
       });
-    }, contextCleanerInterval * 1000);
+    }, sessionCleanerInterval * 1000);
   }
 }
 
-function stopCleaner() {
-  if (cleanerTicker !== null) {
-    clearInterval(cleanerTicker);
-    cleanerTicker = null;
+function stopSessionCleaner() {
+  if (sessionCleanerTicker !== null) {
+    clearInterval(sessionCleanerTicker);
+    sessionCleanerTicker = null;
+  }
+}
+
+let tmpFileCleanerTicker = null;
+
+function runTmpFileCleaner(){
+  if(tmpFileCleanerTicker === null) {
+    tmpFileCleanerTicker = setInterval( () => {
+      console.log('Deleting tmp files!!!');
+      const PATH_TO_TMP = `${__dirname}/tmp`;
+      const TWO_HOURS_IN_MS = 2 * 60 * 60 * 1000;
+      const timeForDelete = Date.now() - TWO_HOURS_IN_MS;
+      fs.readdir(PATH_TO_TMP, (err, files) => {
+        if(err) console.error(err);
+        console.log(`FILES LIST:\n ${files}\n`);
+        if( Array.isArray(files) && files.length ) {
+          files.forEach( (fileName) => {
+            let fileFullPath = `${PATH_TO_TMP}/${fileName}`;
+            fs.stat(fileFullPath, (err, fileStats) => {
+              const modeFileTime = fileStats.mtimeMs;
+              if(modeFileTime < timeForDelete) {
+                fs.unlink(fileFullPath, (err) => {
+                  if(err) console.log(err);
+                  console.log(`File ${fileName} deleted from TMP!\n`)
+                });
+              }
+            });
+          });
+        }
+      });
+    }, tmpFileCleanerInterval * 1000)
+  }
+}
+
+function stopTmpFileCleaner() {
+  if (tmpFileCleanerTicker !== null) {
+    clearInterval(tmpFileCleanerTicker);
+    tmpFileCleanerTicker = null;
   }
 }
 
@@ -409,7 +452,8 @@ module.exports = {
   prepare(callback) {
     resetContext();
     reloadConfigurations();
-    runCleaner();
+    runSessionCleaner();
+    runTmpFileCleaner();
     callback();
   },
   resetContext,
@@ -426,7 +470,9 @@ module.exports = {
   updateSessionFromRequest,
   updateSessionFromCookies,
   updateSession,
-  runCleaner,
-  stopCleaner,
+  runSessionCleaner,
+  stopSessionCleaner,
+  runTmpFileCleaner,
+  stopTmpFileCleaner,
   checkUserPasswordReset,
 };
