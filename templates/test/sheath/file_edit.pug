@@ -2,7 +2,6 @@ doctype html
 html
   head
     title #{title}
-    script(src="../../../../upload_script.js" type="text/javascript")
     include includes/head_html.pug
     link(rel='stylesheet', href='../../../../assets/libs/fortawesome/fontawesome-free/css/all.min.css')
   body
@@ -22,19 +21,22 @@ html
                 if errorMessage.length
                   .alert.alert-danger(role='alert')
                     | #{message}
-                form#upload(action='', method='POST' enctype="")
-                  .form-group.mb-0
-                    p#discipline.text-sm.font-weight-bold(name="discipline")  Дисциплина: #{discipline.name}
+                .form-group.mb-0
+                  p#discipline.text-sm.font-weight-bold(name="discipline")  Дисциплина: #{discipline.name}  
+                form#upload(action='', method='POST')
                   .form-group.my-2
-                      .d-flex.align-items-center.justify-content-between
-                        div
-                          label.form-control-label Обновить файл
-                          input#myfile.custom-input-file(type='file', name='myfile', onchange="selectedFile();")
-                          label(for='myfile')
-                            i.ml-0.mr-2(data-feather='upload')
-                            span Выберите файл
-                  div#fileSize
-                  div#fileType.mb-2
+                    .d-flex.align-items-center.justify-content-between
+                      div
+                        label.form-control-label Обновить файл
+                        input#myfile.custom-input-file(type='file', name='myfile')
+                        label(for='myfile')
+                          i.ml-0.mr-2(data-feather='upload')
+                          span Выберите файл
+                  input#fileSize(type='text' name='fileSize' hidden)
+                  input#fileType(type='text' name='fileType' hidden)
+                  input#fileExt(type='text' name='fileExt' hidden)
+                  input#fileID.mb-2(type='text' name='fileID' hidden)
+                  div#uploadMessage(role='alert')
                   .form-group.my-3
                       label.form-control-label Имя файла
                         span.text-danger *
@@ -58,14 +60,10 @@ html
                         button.btn.btn-block.btn-secondary(type='button') Отмена
       .push
     include includes/footer.pug 
+    script(src='../../../../send_file_for_disc.js')
     script(src='../../../../assets/libs/jquery/dist/jquery.min.js')
     script(src='../../../../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js')
     script(src='../../../../assets/libs/svg-injector/dist/svg-injector.min.js')
-    script(src='../../../../assets/libs/feather-icons/dist/feather.min.js')
-    script(src='../../../../assets/libs/in-view/dist/in-view.min.js')
-    script(src='../../../../assets/libs/sticky-kit/dist/sticky-kit.min.js')
-    script(src='../../../../assets/libs/imagesloaded/imagesloaded.pkgd.min.js')
-    script(src='../../../../assets/js/quick-website.js')
     script.
       feather.replace({
       width: "1em",
