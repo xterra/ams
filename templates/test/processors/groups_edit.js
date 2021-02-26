@@ -53,6 +53,7 @@ module.exports = {
                   return callback({
                     title: 'Изменение группы',
                     groupInfo: postData,
+                    groupList,
                     errorMessage: 'Имя группы для ссылки должно быть на английском!'
                   }, 'groups_form', 0, 0);
                 }
@@ -67,10 +68,11 @@ module.exports = {
                       return callback({
                         title: 'Изменение группы',
                         groupInfo: postData,
+                        groupList,
                         errorMessage: 'Группа с таким URL уже существует!'
                       }, 'groups_form', 0, 0);
                     } else {
-                      db.collection('groups').findOneAndUpdate({ url: postData.url },
+                      db.collection('groups').findOneAndUpdate({ url: groupURL },
                         { $set: {
                         name: postData.name,
                         course: postData.course,
@@ -90,7 +92,7 @@ module.exports = {
                     }
                   });
                 } else {
-                  db.collection('groups').findOneAndUpdate({ url: postData.url },
+                  db.collection('groups').findOneAndUpdate({ url: groupURL },
                     { $set: {
                     name: postData.name,
                     course: postData.course,
