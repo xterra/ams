@@ -1,6 +1,6 @@
 {
   "name": "amsp",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Server of web-application for MIIT AMS Portal",
   "private": false,
   "main": "boot.js",
