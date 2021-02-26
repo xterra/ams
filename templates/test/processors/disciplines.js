@@ -4,7 +4,7 @@ const qs = require('querystring'),
 module.exports = {
   path: new RegExp('^\/disciplines\/$'),
   processor(request, response, callback, sessionContext, sessionToken, db){
-    if( sessionContext == undefined || sessionContext == null || sessionContext['id'] !== undefined) {
+    if( sessionContext == undefined || sessionContext == null || sessionContext['id'] == undefined) {
       callback();
       return router.bleed(301, '/login/', response);
     }
