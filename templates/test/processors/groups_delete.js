@@ -42,7 +42,7 @@ module.exports = {
               return router.bleed(500, null, response, err);
             }
             console.log(`Group '${groupURL}' deleted!`);
-            db.collection('users').update({ group: new ObjectID(groupInfo._id) }, { $unset: { group: '' } }, err => {
+            db.collection('users').update({ group: new ObjectID(groupInfo._id) }, { $set: { group: ' ' } }, err => {
               if (err) {
                 console.log(`\n ERROR delete group from users \n error message: ${err}`);
               }
