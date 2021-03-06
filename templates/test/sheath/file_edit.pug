@@ -20,7 +20,7 @@ html
                 span.clearfix
                 if errorMessage.length
                   .alert.alert-danger(role='alert')
-                    | #{message}
+                    | #{errorMessage}
                 .form-group.mb-0
                   p#discipline.text-sm.font-weight-bold(name="discipline")  Дисциплина: #{discipline.name}  
                 form#upload(action='', method='POST')
@@ -64,6 +64,7 @@ html
     script(src='../../../../assets/libs/jquery/dist/jquery.min.js')
     script(src='../../../../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js')
     script(src='../../../../assets/libs/svg-injector/dist/svg-injector.min.js')
+    script(src='../../../../assets/libs/feather-icons/dist/feather.min.js')
     script.
       feather.replace({
       width: "1em",

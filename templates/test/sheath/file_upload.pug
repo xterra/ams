@@ -18,6 +18,9 @@ html
                 .mb-3.text-center
                   h6.h3.mb-1 #{title}
                 span.clearfix
+                if errorMessage.length
+                  .alert.alert-danger(role='alert')
+                    | #{errorMessage}
                 if message.length
                   .d-flex.justify-content-between
                     .alert.alert-success(role='alert')

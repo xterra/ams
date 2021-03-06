@@ -58,7 +58,13 @@ module.exports = {
                   return funcs.replaceFileFromTmpStorage(tmpFileID, fileID, err => {
                     if (err) {
                       console.log(`Something wrong with replace ${tmpFileID}: ${err}`);
-                      return bw.redirectTo500Page(response, err, callback);
+                      return callback({
+                        title: 'Редактирование файла',
+                        fileInfo,
+                        discipline,
+                        userInfo,
+                        errorMessage: 'Проблемы с обновлением файла. Попробуйте загрузить файл повторно.'
+                      }, 'file_edit', 0, 0);
                     }
                     console.log(`File ${tmpFileID} replaced for - ${fileID}`);
                     dbMethods.updateFileInfoById(fileID, editedFileInfo, userInfo, db, err => {

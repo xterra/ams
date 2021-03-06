@@ -43,7 +43,13 @@ module.exports = {
               funcs.moveFileFromTmpStorage(fileID, err => {
                 if (err) {
                   console.log(`Something wrong with move ${fileID}: ${err}`);
-                  return bw.redirectTo500Page(response, err, callback);
+                  return callback({
+                    title: 'Загрузка файла',
+                    discipline,
+                    userInfo,
+                    errorMessage: 'Проблема с загрузкой файла. Попробуйте снова.',
+                    message: ''
+                  }, 'file_upload', 0, 0);
                 }
                 console.log(`File ${fileID} moved to - /data/private/`);
 
@@ -59,6 +65,7 @@ module.exports = {
                     title: 'Загрузка файла',
                     discipline,
                     userInfo,
+                    errorMessage: '',
                     message: `Файл загружен. Добавлен к '${discipline.name}'`,
                   }, 'file_upload', 0, 0);
                 });
@@ -73,6 +80,7 @@ module.exports = {
             title: 'Загрузка файла',
             discipline,
             userInfo,
+            errorMessage: '',
             message: ''
           }, 'file_upload', 0, 0);
         }
