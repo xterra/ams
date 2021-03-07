@@ -12,7 +12,8 @@ module.exports = {
       return response.end();
     }
     if (request.method === 'POST') {
-      const PATH_TO_TMP = path.join(__dirname, '../../../tmp');
+      const STORAGE_TMP_LOCATION = process.env['STORAGE_TMP_LOCATION'];
+      const PATH_TO_TMP = STORAGE_TMP_LOCATION || path.join(__dirname, '../../../tmp');
       const randomFileName = generateRandomString();
       const fullFilePath = `${PATH_TO_TMP}/${randomFileName}`;
       request.pipe(fs.createWriteStream(fullFilePath))

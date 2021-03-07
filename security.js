@@ -415,7 +415,8 @@ function runTmpFileCleaner(){
   if(tmpFileCleanerTicker === null) {
     tmpFileCleanerTicker = setInterval( () => {
       console.log('Deleting tmp files...');
-      const PATH_TO_TMP = `${__dirname}/tmp`;
+      const STORAGE_TMP_LOCATION = process.env['STORAGE_TMP_LOCATION'];
+      const PATH_TO_TMP = STORAGE_TMP_LOCATION || `${__dirname}/tmp`;
       const TWO_HOURS_IN_MS = 2 * 60 * 60 * 1000;
       const timeForDelete = Date.now() - TWO_HOURS_IN_MS;
       fs.readdir(PATH_TO_TMP, (err, files) => {
