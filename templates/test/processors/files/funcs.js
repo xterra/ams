@@ -4,7 +4,8 @@ const fs = require('fs'),
 /*CONST VARS*/
 const STORAGE_DATA_LOCATION = process.env['STORAGE_DATA_LOCATION'] ? `${process.env['STORAGE_DATA_LOCATION']}/private` : '',
       PATH_TO_FILES_DIR = STORAGE_DATA_LOCATION || path.join(__dirname, '../../../../', '/data/private'),
-      PATH_TO_TMP = path.join(__dirname, '../../../../', '/tmp');
+      STORAGE_TMP_LOCATION = process.env['STORAGE_TMP_LOCATION'];
+      PATH_TO_TMP = STORAGE_TMP_LOCATION || path.join(__dirname, '../../../../', '/tmp');
 
 module.exports = {
   getDiscAlliasFromUrl,
@@ -56,7 +57,9 @@ function moveFileFromTmpStorage(fileID, callback) {
       const err = new Error('File not exist in TMP storage');
       return callback(err);
     }
-    fs.rename(checkedPath, `${pathToCurrentFile}/${fileID}`, callback);
+    fs.copyFile(checkedPath, `${pathToCurrentFile}/${fileID}`, err => {
+      fs.unlink(checkedPath, callback);
+    });
   });
 }
 /*EDIT FUNCS*/
@@ -69,7 +72,9 @@ function replaceFileFromTmpStorage(tmpFileID, fileID, callback) {
       const err = new Error('File not exist in TMP storage');
       return callback(err);
     }
-    fs.rename(checkedPath, pathToCurrentFile, callback);
+    fs.copyFile(checkedPath, pathToCurrentFile, err => {
+      fs.unlink(checkedPath, callback);
+    });
   });
 }
 
