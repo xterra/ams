@@ -1,12 +1,13 @@
-const router = require('../../../router'),
-      ObjectID = require('mongodb').ObjectID,
-      beautyDate = require('../../../beautyDate');
+const beautyDate = require('../../../beautyDate'),
+      isUserAuthed = require('./common/permission_check.js').isUserAuthed,
+      dbMethods = require('./common/dbMethods.js'),
+      bw = require('./common/bleed_wrapper.js');
 
 module.exports = {
   path: new RegExp('^\/news\/$'),
   processor(request, response, callback, sessionContext, sessionToken, db) {
-    findAllNewsWithAuthor(db, (err, result) => {
-      if(err) return redirectTo500Page(response, err, callback);
+    dbMethods.findAllNewsWithAuthor(db, (err, result) => {
+      if(err) return bw.redirectTo500Page(response, err, callback);
 
       const news = result.map(pieceOfNews => {
         pieceOfNews.formatedDate = beautyDate(pieceOfNews.dateCreate);
@@ -15,10 +16,10 @@ module.exports = {
 
       const userAuthed = isUserAuthed(sessionContext, sessionToken);
       if(userAuthed) {
-        getRoleForAuthedUser(sessionContext.id, db, (err, result) => {
-          if(err) return redirectTo500Page(response, err, callback);
-          const userInfo = result;
+        dbMethods.getRoleForAuthedUser(sessionContext.id, db, (err, result) => {
+          if(err) return bw.redirectTo500Page(response, err, callback);
 
+          const userInfo = result;
           return callback({
             title: 'Новости',
             news: news,
@@ -34,45 +35,4 @@ module.exports = {
       }
     });
   }
-}
-
-function findAllNewsWithAuthor(db, callback) {
-  db.collection('news').aggregate([
-     {
-       $lookup:
-         {
-           from: 'users',
-           let: { author: '$author' },
-           pipeline: [
-             { $match:
-                {$expr:
-                 { $eq: [{ $toString: '$_id' }, '$$author']  }
-                }
-             },
-             { $project:
-               { _id: 0, lastName: 1, name: 1, fatherName: 1, securityRole: 1 }
-             },
-           ],
-           as: 'authorInfo'
-         }
-      },
-  ]).sort({ dateCreate: -1 }).toArray(callback);
-}
-
-function redirectTo500Page(response, err, callback){
-  callback();
-  return router.bleed(500, null, response, err);
-}
-
-function isUserAuthed(sessionContext, sessionToken) {
-  return( typeof sessionToken === 'string' &&
-    sessionContext instanceof Object &&
-    sessionContext['id'] !== undefined)
-}
-
-function getRoleForAuthedUser(userID, db, callback){
-  db.collection('users').findOne(
-    { _id: new ObjectID(userID) },
-    { _id: 1, securityRole: 1 },
-    callback);
 }

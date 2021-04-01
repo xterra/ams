@@ -1,4 +1,4 @@
-'use strict';
+const isUserAuthed = require('./common/permission_check.js').isUserAuthed;
 
 module.exports = {
   path: new RegExp('^/for-abiturients/$'),
@@ -6,14 +6,8 @@ module.exports = {
     setImmediate( () => {
       callback({
         title: 'Абитуриентам',
-        userAthorized: isUserAuthed(sessionContext, sessionToken)
+        userAthorized: check.isUserAuthed(sessionContext, sessionToken)
       }, 'abiturients', 0, 5);
     });
   }
 };
-
-function isUserAuthed(sessionContext, sessionToken) {
-  return (typeof sessionToken === 'string' &&
-    sessionContext instanceof Object &&
-    sessionContext['id'] !== undefined);
-}

@@ -1,14 +1,14 @@
-const router = require('../../../router'),
-      beautyDate = require('../../../beautyDate');
+const beautyDate = require('../../../beautyDate'),
+      isUserAuthed = require('./common/permission_check.js').isUserAuthed,
+      dbMethods = require('./common/dbMethods.js'),
+      bw = require('./common/bleed_wrapper.js');
 
 module.exports = {
   path: new RegExp('^\/$'),
-  processor: function (request, response, callback, sessionContext, sessionToken, db) {
-    db.collection('news').find().sort({dateCreate: -1}).limit(3).toArray( (err, result) => {
-      if(err){
-        callback();
-        return router.bleed(500, null, response)
-      }
+  processor(request, response, callback, sessionContext, sessionToken, db) {
+    dbMethods.getLastThreeNews(db, (err, result) => {
+      if(err) return bw.redirectTo500Page(response, err, callback);
+
       let news = result;
       for (let pieceOfNews of news){
         pieceOfNews.formatedDate = beautyDate(pieceOfNews.dateCreate);
@@ -20,10 +20,4 @@ module.exports = {
       }, 'home', 0, 0);
     });
   }
-}
-
-function isUserAuthed(sessionContext, sessionToken) {
-  return (typeof sessionToken === 'string' &&
-    sessionContext instanceof Object &&
-    sessionContext['id'] !== undefined);
 }

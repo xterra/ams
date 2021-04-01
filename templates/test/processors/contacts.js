@@ -1,4 +1,4 @@
-'use strict';
+const isUserAuthed = require('./common/permission_check.js').isUserAuthed;
 
 module.exports = {
   path: new RegExp('^/contacts/$'),
@@ -11,9 +11,3 @@ module.exports = {
     });
   }
 };
-
-function isUserAuthed(sessionContext, sessionToken) {
-  return (typeof sessionToken === 'string' &&
-    sessionContext instanceof Object &&
-    sessionContext['id'] !== undefined);
-}
