@@ -1,4 +1,4 @@
-const router = require('../../../../router.js');
+const bleed = require('../../../../router.js').bleed;
 
 module.exports = {
   redirectToLoginPage,
@@ -10,26 +10,26 @@ module.exports = {
 
 function redirectToLoginPage(response, callback) {
   callback();
-  return router.bleed(301, '/login/', response);
+  return bleed(301, '/login/', response);
 }
 
 function redirectToDiscByAllias(response, disciplineAllias, callback) {
   callback()
-  return router.bleed(301, `/disciplines/${disciplineAllias}/`, response);
+  return bleed(301, `/disciplines/${disciplineAllias}/`, response);
 }
 
 /* ERRORS */
 function redirectTo404Page(response, clientUrl, callback) {
   callback();
-  return router.bleed(404, clientUrl, response);
+  return bleed(404, clientUrl, response);
 }
 
 function redirectTo500Page(response, err, callback) {
   callback();
-  return router.bleed(500, null, response, err);
+  return bleed(500, null, response, err);
 }
 
 function redirectWithErrorCode(response, code, err, callback) {
   callback();
-  return router.bleed(code, null, response, err);
+  return bleed(code, null, response, err);
 }
