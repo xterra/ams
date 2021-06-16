@@ -22,63 +22,28 @@ module.exports = {
       }
 
       const disciplineAllias = funcs.getDiscAlliasFromUrl(request.url);
-      return dbMethods.findDisciplineByAllias(disciplineAllias, db, (err, result) => {
+
+      dbMethods.findDisciplineByAllias(disciplineAllias, db, (err, result) => {
         if (err) return bw.redirectTo500Page(response, err, callback);
-        if (result === null) return bw.redirectTo404Page(response, request.url, callback);
+        if (result === null)
+            return bw.redirectTo404Page(response, request.url, callback);
         const discipline = result;
 
-        const teacherEditor = check.isTeacherDisciplineEditor(userInfo, discipline);
+        const teacherEditor = check.isTeacherDiscEditor(userInfo, discipline);
         if (!teacherEditor) {
-          const err = new Error('Teacher is not discipline edirot');
+          const err = new Error('Teacher is not discipline editor');
           return bw.redirectWithErrorCode(response, 403, err, callback);
         }
 
         const fileID = funcs.getFileIDFromUrl(request.url);
-        return dbMethods.getFileInfoById(fileID, db, (err, result) => {
+
+        dbMethods.getFileInfoById(fileID, db, (err, result) => {
           if (err) return bw.redirectTo500Page(response, err, callback);
-          if (result === null) return bw.redirectTo404Page(response, request.url, callback);
+          if (result === null)
+              return bw.redirectTo404Page(response, request.url, callback);
           const fileInfo = result;
 
-          if (request.method === 'POST') {
-            return router.downloadClientPostData(request, (err, data) => {
-              if (err) return bw.redirectTo500Page(response, err, callback);
-              try {
-                const editedFileInfo = qs.parse(data);
-                const tmpFileID = editedFileInfo.fileID;
-                if (tmpFileID == null || tmpFileID == '') {
-                  console.log(`Update without overwriting the file.... ${fileID}`);
-                  return dbMethods.updateFileNameAndComment(fileID, editedFileInfo, userInfo, db, err => {
-                    if (err) return bw.redirectTo500Page(response, err, callback);
-
-                    console.log(`File info ${fileID} updated!`);
-                    return bw.redirectToDiscByAllias(response, disciplineAllias, callback);
-                  });
-                } else {
-                  console.log(`Update WITH overwriting the file.... ${fileID}`);
-                  return funcs.replaceFileFromTmpStorage(tmpFileID, fileID, err => {
-                    if (err) {
-                      console.log(`Something wrong with replace ${tmpFileID}: ${err}`);
-                      return callback({
-                        title: 'Редактирование файла',
-                        fileInfo,
-                        discipline,
-                        userInfo,
-                        errorMessage: 'Проблемы с обновлением файла. Попробуйте загрузить файл повторно.'
-                      }, 'file_edit', 0, 0);
-                    }
-                    console.log(`File ${tmpFileID} replaced for - ${fileID}`);
-                    dbMethods.updateFileInfoById(fileID, editedFileInfo, userInfo, db, err => {
-                      if (err) return bw.redirectTo500Page(response, err, callback);
-                      console.log(`Info for file ${fileID} updated in DB`);
-                      return bw.redirectToDiscByAllias(response, disciplineAllias, callback);
-                    });
-                  });
-                }
-              } catch (err) {
-                return bw.redirectTo500Page(response, err, callback);
-              }
-            });
-          } else {
+          if (request.method !== 'POST') {
             return callback({
               title: 'Редактирование файла',
               fileInfo,
@@ -87,8 +52,51 @@ module.exports = {
               errorMessage: ''
             }, 'file_edit', 0, 0);
           }
-        });
-      });
-    });
+
+          return router.downloadClientPostData(request, (err, data) => {
+            if (err) return bw.redirectTo500Page(response, err, callback);
+
+            try {
+              const editedFileInfo = qs.parse(data);
+              const tmpFileID = editedFileInfo.fileID;
+
+              if (tmpFileID == null || tmpFileID == '') {
+                console.log(`Update without overwriting the file.... ${fileID}`);
+                return dbMethods.updateFileNameAndComment(fileID, editedFileInfo, userInfo, db, err => {
+                  if (err) return bw.redirectTo500Page(response, err, callback);
+
+                  console.log(`File info ${fileID} updated!`);
+                  return bw.redirectToDiscByAllias(response, disciplineAllias, callback);
+                });//updateFileNameAndComment
+              } else {
+                console.log(`Update WITH overwriting the file.... ${fileID}`);
+
+                return funcs.replaceFileFromTmpStorage(tmpFileID, fileID, err => {
+                  if (err) {
+                    console.log(`Something wrong with replace ${tmpFileID}: ${err}`);
+                    return callback({
+                      title: 'Редактирование файла',
+                      fileInfo,
+                      discipline,
+                      userInfo,
+                      errorMessage: 'Проблемы с обновлением файла. Попробуйте загрузить файл повторно.'
+                    }, 'file_edit', 0, 0);
+                  }
+                  console.log(`File ${tmpFileID} replaced for - ${fileID}`);
+
+                  dbMethods.updateFileInfoById(fileID, editedFileInfo, userInfo, db, err => {
+                    if (err) return bw.redirectTo500Page(response, err, callback);
+                    console.log(`Info for file ${fileID} updated in DB`);
+                    return bw.redirectToDiscByAllias(response, disciplineAllias, callback);
+                  }); //updateFileInfoById
+                }); //replaceFileFromTmpStorage
+              }
+            } catch (err) {
+              return bw.redirectTo500Page(response, err, callback);
+            }
+          });//downloadClientPostData
+        });//getFileInfoById
+      }); //findDisciplineByAllias
+    }); //getRoleForAuthedUser
   }
 };
