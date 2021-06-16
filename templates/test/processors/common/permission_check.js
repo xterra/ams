@@ -1,7 +1,9 @@
 module.exports = {
   isUserAuthed,
   isUserAdminOrTeacher,
-  isTeacherDisciplineEditor
+  isTeacherDiscEditor,
+  isUserTeacher,
+  isUserStudentWithGroup
 }
 
 function isUserAuthed(sessionContext, sessionToken) {
@@ -12,7 +14,7 @@ function isUserAuthed(sessionContext, sessionToken) {
 
 function isUserAdminOrTeacher(userInfo) {
   const userRoles = userInfo.securityRole;
-  if(userRoles.length !== 0){
+  if (userRoles.length !== 0) {
     return ( userRoles.includes('superadmin') ||
       userRoles.includes('admin') ||
       userRoles.includes('teacher') );
@@ -20,9 +22,24 @@ function isUserAdminOrTeacher(userInfo) {
   return false;
 }
 
-function isTeacherDisciplineEditor(userInfo, discipline) {
-  if( userInfo.securityRole == 'teacher' ) {
-    return discipline.editors.includes( userInfo._id.toString() );
+function isTeacherDiscEditor(userInfo, discipline) {
+  if (userInfo.securityRole == 'teacher') {
+    return discipline.editors.includes(userInfo._id.toString());
   }
   return true;
+}
+
+function isUserTeacher(userInfo) {
+  const roles = userInfo.securityRole;
+
+  if (roles.length > 0) return roles.includes('teacher');
+  return false;
+}
+
+function isUserStudentWithGroup(userInfo) {
+  const roles = userInfo.securityRole;
+
+  if (roles.length > 0 &&
+      userInfo.group !== undefined) return roles.includes('student');
+  return false;
 }
