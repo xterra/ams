@@ -411,31 +411,37 @@ function stopSessionCleaner() {
 
 let tmpFileCleanerTicker = null;
 
-function runTmpFileCleaner(){
-  if(tmpFileCleanerTicker === null) {
-    tmpFileCleanerTicker = setInterval( () => {
+function runTmpFileCleaner() {
+  if (tmpFileCleanerTicker === null) {
+
+    tmpFileCleanerTicker = setInterval(() => {
+
       console.log('Deleting tmp files...');
       const STORAGE_TMP_LOCATION = process.env['STORAGE_TMP_LOCATION'];
       const PATH_TO_TMP = STORAGE_TMP_LOCATION || `${__dirname}/tmp`;
       const TWO_HOURS_IN_MS = 2 * 60 * 60 * 1000;
       const timeForDelete = Date.now() - TWO_HOURS_IN_MS;
+
       fs.readdir(PATH_TO_TMP, (err, files) => {
-        if(err) console.error(err);
-        if( Array.isArray(files) && files.length ) {
-          files.forEach( (fileName) => {
+        if (err) console.error(err);
+
+        if (Array.isArray(files) && files.length) {
+
+          files.forEach(fileName => {
             let fileFullPath = `${PATH_TO_TMP}/${fileName}`;
+
             fs.stat(fileFullPath, (err, fileStats) => {
               const modeFileTime = fileStats.mtimeMs;
-              if(modeFileTime < timeForDelete) {
-                fs.unlink(fileFullPath, (err) => {
-                  if(err) console.log(err);
+              if (modeFileTime < timeForDelete) {
+                fs.unlink(fileFullPath, err => {
+                  if (err) console.log(err);
                   console.log(`File ${fileName} deleted from TMP!\n`)
                 });
               }
-            });
-          });
+            });//fs.stat
+          }); // files.forEach
         }
-      });
+      }); //fs.readdir
     }, tmpFileCleanerInterval * 1000)
   }
 }
