@@ -6,7 +6,7 @@ module.exports = {
     setImmediate( () => {
       callback({
         title: 'Абитуриентам',
-        userAthorized: check.isUserAuthed(sessionContext, sessionToken)
+        userAthorized: isUserAuthed(sessionContext, sessionToken)
       }, 'abiturients', 0, 5);
     });
   }
