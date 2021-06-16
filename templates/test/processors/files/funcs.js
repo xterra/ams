@@ -2,10 +2,13 @@ const fs = require('fs'),
       path = require('path');
 
 /*CONST VARS*/
-const STORAGE_DATA_LOCATION = process.env['STORAGE_DATA_LOCATION'] ? `${process.env['STORAGE_DATA_LOCATION']}/private` : '',
-      PATH_TO_FILES_DIR = STORAGE_DATA_LOCATION || path.join(__dirname, '../../../../', '/data/private'),
-      STORAGE_TMP_LOCATION = process.env['STORAGE_TMP_LOCATION'];
-      PATH_TO_TMP = STORAGE_TMP_LOCATION || path.join(__dirname, '../../../../', '/tmp');
+const STORAGE_DATA_LOCATION = process.env['STORAGE_DATA_LOCATION'] ?
+                        `${process.env['STORAGE_DATA_LOCATION']}/private` : '',
+      PATH_TO_FILES_DIR = STORAGE_DATA_LOCATION ||
+                          path.join(__dirname, '../../../../', '/data/private'),
+      STORAGE_TMP_LOCATION = process.env['STORAGE_TMP_LOCATION'],
+      PATH_TO_TMP = STORAGE_TMP_LOCATION ||
+                    path.join(__dirname, '../../../../', '/tmp');
 
 module.exports = {
   getDiscAlliasFromUrl,
@@ -15,8 +18,9 @@ module.exports = {
   moveFileFromTmpStorage,
   replaceFileFromTmpStorage,
   deleteFileFromServer,
-  deleteDirFromServer
+  deleteDirIfEmpty
 }
+
 /* COMMON FUNCS*/
 function getDiscAlliasFromUrl(clientUrl) {
   let requestedURL = decodeURI(clientUrl);
@@ -37,8 +41,8 @@ function checkExistPath(pathForCheck, callback) {
   }
   return callback(pathForCheck);
 }
-/*CREATE FUNCS*/
 
+/*CREATE FUNCS*/
 function getDiscAlliasForCreate(clientUrl) {
   let requestedURL = decodeURI(clientUrl);
   let delimeteredURL = requestedURL.split('/');
@@ -62,13 +66,14 @@ function moveFileFromTmpStorage(fileID, callback) {
     });
   });
 }
+
 /*EDIT FUNCS*/
 function replaceFileFromTmpStorage(tmpFileID, fileID, callback) {
   let dirName = fileID.substr(0,2);
   let pathToCurrentFile = `${PATH_TO_FILES_DIR}/${dirName}/${fileID}`;
   let tempPathToFile = `${PATH_TO_TMP}/${tmpFileID}`;
   checkExistPath(tempPathToFile, (checkedPath) => {
-    if(checkedPath == null) {
+    if (checkedPath == null) {
       const err = new Error('File not exist in TMP storage');
       return callback(err);
     }
@@ -79,21 +84,23 @@ function replaceFileFromTmpStorage(tmpFileID, fileID, callback) {
 }
 
 /* DELETE FUNCS */
-function deleteFileFromServer(pathToCurrentFile, callback) {
+function deleteFileFromServer(fileID, callback) {
+  const dirName = fileID.substr(0, 2);
+  const pathToCurrentFile = `${PATH_TO_FILES_DIR}/${dirName}/${fileID}`;
   checkExistPath(pathToCurrentFile, (checkedPath) => {
-    if(checkedPath == null) return callback(null);
+    if (checkedPath == null) return callback(null);
     return fs.unlink(checkedPath, callback);
   });
 }
 
-function deleteDirFromServer(pathToCurrentDir, callback) {
+function deleteDirIfEmpty(dirName, callback) {
+  const pathToCurrentDir = `${PATH_TO_FILES_DIR}/${dirName}`;
   fs.readdir(pathToCurrentDir, (err, files) => {
-    if(err) return callback(err);
-    if( !files.length ){
-      fs.rmdir(pathToCurrentDir, (err) => {
-        if(err) return callback(err);
-        return callback(null);
-      });
-    }
+    if (err) return callback(err);
+    if (files.length) return callback(null);
+    fs.rmdir(pathToCurrentDir, (err) => {
+      if (err) return callback(err);
+      return callback(null);
+    });
   });
 }
