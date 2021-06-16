@@ -22,20 +22,23 @@ module.exports = {
       }
 
       const disciplineAllias = funcs.getDiscAlliasForCreate(request.url);
+
       dbMethods.findDisciplineByAllias(disciplineAllias, db, (err, result) => {
         if (err) return bw.redirectTo500Page(response, err, callback);
         if (result === null) return bw.redirectTo404Page(response, request.url, callback);
         const discipline = result;
 
-        const teacherEditor = check.isTeacherDisciplineEditor(userInfo, discipline);
+        const teacherEditor = check.isTeacherDiscEditor(userInfo, discipline);
         if (!teacherEditor) {
-          const err = new Error('Teacher is not discipline edirot');
+          const err = new Error('Teacher is not discipline editor');
           return bw.redirectWithErrorCode(response, 403, err, callback);
         }
 
         if (request.method === 'POST') {
+
           return router.downloadClientPostData(request, (err, data) => {
             if (err) return bw.redirectTo500Page(response, err, callback);
+
             try {
               const postData = qs.parse(data);
               const fileID = postData.fileID;
@@ -56,25 +59,26 @@ module.exports = {
                 dbMethods.addFileInfoToDB(postData, userInfo, db, err => {
                   if (err) return bw.redirectTo500Page(response, err, callback);
                   console.log(`Info for file ${fileID} added to DB`);
-                });
-                dbMethods.addFileIdToDiscipline(disciplineAllias, fileID, db, err => {
-                  if (err) return bw.redirectTo500Page(response, err, callback);
-                  console.log(`File ${fileID} added to discipline ${disciplineAllias}`);
 
-                  return callback({
-                    title: 'Загрузка файла',
-                    discipline,
-                    userInfo,
-                    errorMessage: '',
-                    message: `Файл загружен. Добавлен к '${discipline.name}'`,
-                  }, 'file_upload', 0, 0);
-                });
-              });
+                  dbMethods.addFileIdToDiscipline(disciplineAllias, fileID, db, err => {
+                    if (err) return bw.redirectTo500Page(response, err, callback);
+                    console.log(`File ${fileID} added to discipline ${disciplineAllias}`);
+
+                    return callback({
+                      title: 'Загрузка файла',
+                      discipline,
+                      userInfo,
+                      errorMessage: '',
+                      message: `Файл загружен. Добавлен к '${discipline.name}'`,
+                    }, 'file_upload', 0, 0);
+                  }); //addFileIdToDiscipline
+                }); //addFileInfoToDB
+              }); //moveFileFromTmpStorage
             } catch (err) {
               console.log(err);
-              bw.redirectTo500Page(response, err, callback);
+              return bw.redirectTo500Page(response, err, callback);
             }
-          });
+          }); // downloadClientPostData
         } else {
           return callback({
             title: 'Загрузка файла',
@@ -84,7 +88,7 @@ module.exports = {
             message: ''
           }, 'file_upload', 0, 0);
         }
-      });
-    });
+      }); //findDisciplineByAllias
+    }); //getRoleForAuthedUser
   }
 };
