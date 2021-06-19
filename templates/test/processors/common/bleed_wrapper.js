@@ -3,6 +3,7 @@ const bleed = require('../../../../router.js').bleed;
 module.exports = {
   redirectToLoginPage,
   redirectToDiscPage,
+  redirectToGroupsPage,
   redirectToDiscByAllias,
   redirectTo400Page,
   redirectTo404Page,
@@ -18,6 +19,11 @@ function redirectToLoginPage(response, callback) {
 function redirectToDiscPage(response, callback) {
   callback();
   return bleed(301, '/disciplines/', response);
+}
+
+function redirectToGroupsPage(response, callback) {
+  callback();
+  return bleed(301, '/groups/', response);
 }
 
 function redirectToDiscByAllias(response, disciplineAllias, callback) {
