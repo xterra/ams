@@ -1,122 +1,42 @@
 const router = require('../../../router'),
   qs = require('querystring'),
-  ObjectID = require('mongodb').ObjectID;
+  bw = require('./common/bleed_wrapper.js'),
+  check = require('./common/permission_check.js'),
+  funcs = require('./groups/funcs.js'),
+  dbMethods = require('./groups/dbMethods.js');
 
 module.exports = {
   path: new RegExp('^/groups/edit/[^/]+/$'),
   processor(request, response, callback, sessionContext, sessionToken, db) {
-    if (sessionToken == null || sessionContext == undefined || sessionContext == null) {
-      callback();
-      return router.bleed(301, '/login/', response);
-    }
-    const requestedUrl = decodeURI(request.url);
-    const delimeteredUrl = requestedUrl.split('/');
-    const groupURL = delimeteredUrl[delimeteredUrl.length - 2];
-    db.collection('users').findOne({ _id: sessionContext.id }, { username: 1, securityRole: 1 }, (err, result) => {
-      if (err) {
-        callback();
-        return router.bleed(500, null, response, err);
-      }
+
+    const userAuthed = check.isUserAuthed(sessionContext, sessionToken);
+    if (!userAuthed) return bw.redirectToLoginPage(response, callback);
+
+    dbMethods.getRoleForAuthedUser(sessionContext.id, db, (err, result) => {
+      if (err) return bw.redirectTo500Page(response, err, callback);
       const userInfo = result;
-      if (userInfo.securityRole.length == 0 && !userInfo.securityRole.includes('superadmin') && !userInfo.securityRole.includes('admin')) {
-        callback();
-        return router.bleed(403, null, response);
+
+      const userAdmin = check.isUserAdmin(userInfo);
+      if (!userAdmin) {
+        const err = new Error('User role not admin');
+        return bw.redirectWithErrorCode(response, 403, err, callback);
       }
-      db.collection('groups').findOne({ url: groupURL }, (err, result) => {
-        if (err) {
-          callback();
-          return router.bleed(500, null, response, err);
-        }
-        if (result == null) {
-          callback();
-          return router.bleed(404, requestedUrl, response);
-        }
+
+      const groupURL = funcs.getGroupUrlFromUrl(request.url);
+
+      dbMethods.findGroupByUrl(groupURL, db, (err, result) => {
+
+        if (err) return bw.redirectTo500Page(response, err, callback);
+        if (result == null) return bw.redirectTo404Page(response, request.url, callback);
+
         const groupInfo = result;
 
-        db.collection('users').find({ group: groupInfo._id }, { lastName: 1, name: 1 }).toArray((err, result) => {
-          if (err) {
-            callback();
-            return router.bleed(500, null, response, err);
-          }
+        dbMethods.getUserListForGroup(groupInfo, db, (err, result) => {
+
+          if (err) return bw.redirectTo500Page(response, err, callback);
           const groupList = result;
 
-          if (request.method == 'POST') {
-            router.downloadClientPostData(request, (err, data) => {
-              if (err) {
-                callback();
-                return router.bleed(400, null, response);
-              }
-              try {
-                const postData = qs.parse(data);
-
-                if (/[А-яЁё]/gi.test(postData.url)) {
-                  return callback({
-                    title: 'Изменение группы',
-                    groupInfo: postData,
-                    groupList,
-                    errorMessage: 'Имя группы для ссылки должно быть на английском!'
-                  }, 'groups_form', 0, 0);
-                }
-
-                if (groupURL !== postData.url) {
-                  db.collection('groups').findOne({ url: postData.url }, { _id: 1 }, (err, foundGroup) => {
-                    if (err) {
-                      callback();
-                      return router.bleed(500, null, response, err);
-                    }
-                    if (foundGroup) {
-                      return callback({
-                        title: 'Изменение группы',
-                        groupInfo: postData,
-                        groupList,
-                        errorMessage: 'Группа с таким URL уже существует!'
-                      }, 'groups_form', 0, 0);
-                    } else {
-                      db.collection('groups').findOneAndUpdate({ url: groupURL },
-                        { $set: {
-                        name: postData.name,
-                        course: postData.course,
-                        fullname: postData.fullname,
-                        url: postData.url,
-                        typeEducation: postData.typeEducation,
-                        elder: new ObjectID(postData.elder)
-                      } }, err => {
-                        if (err) {
-                          callback();
-                          return router.bleed(500, null, response, err);
-                        }
-                        console.log(`Group ${groupURL} info changed!`);
-                        callback();
-                        return router.bleed(301, '/groups/', response);
-                      });
-                    }
-                  });
-                } else {
-                  db.collection('groups').findOneAndUpdate({ url: groupURL },
-                    { $set: {
-                    name: postData.name,
-                    course: postData.course,
-                    fullname: postData.fullname,
-                    url: postData.url,
-                    typeEducation: postData.typeEducation,
-                    elder: new ObjectID(postData.elder)
-                  } }, err => {
-                    if (err) {
-                      callback();
-                      return router.bleed(500, null, response, err);
-                    }
-                    console.log(`Group ${groupURL} info changed!`);
-                    callback();
-                    return router.bleed(301, '/groups/', response);
-                  });
-                }
-              } catch (err) {
-                console.log(`Processor error groups_edit: ${err}`);
-                callback();
-                return router.bleed(500, null, response, err);
-              }
-            });
-          } else {
+          if (request.method !== 'POST') {
             return callback({
               title: 'Изменение группы',
               groupInfo,
@@ -124,8 +44,60 @@ module.exports = {
               errorMessage: ''
             }, 'groups_form', 0, 0);
           }
-        });
-      });
-    });
+
+          router.downloadClientPostData(request, (err, data) => {
+
+            if (err) return redirectTo400Page(response, callback);
+
+            try {
+              const postData = qs.parse(data);
+
+              if (/[А-яЁё]/gi.test(postData.url)) {
+                return callback({
+                  title: 'Изменение группы',
+                  groupInfo: postData,
+                  groupList,
+                  errorMessage: 'Имя группы для ссылки должно быть на английском!'
+                }, 'groups_form', 0, 0);
+              }
+
+              if (groupURL == postData.url) {
+                return dbMethods.updateGroupInfoByUrl(groupURL, postData, db, err => {
+                    if (err)
+                        return bw.redirectTo500Page(response, err, callback);
+
+                    console.log(`Group ${groupURL} info changed!`);
+                    return bw.redirectToGroupsPage(response, callback);
+                });
+              }
+
+              dbMethods.findGroupByUrl(postData.url, db, (err, foundGroup) => {
+
+                if (err) return bw.redirectTo500Page(response, err, callback);
+                if (foundGroup) {
+                  return callback({
+                    title: 'Изменение группы',
+                    groupInfo: postData,
+                    groupList,
+                    errorMessage: 'Группа с таким URL уже существует!'
+                  }, 'groups_form', 0, 0);
+                }
+
+                dbMethods.updateGroupInfoByUrl(groupURL, postData, db, err => {
+                    if (err)
+                        return bw.redirectTo500Page(response, err, callback);
+
+                    console.log(`Group ${groupURL} info changed!`);
+                    return bw.redirectToGroupsPage(response, callback);
+                });//updateGroupInfoByUrl
+              });//findGroupByUrl
+            } catch (err) {
+              console.log(`Processor error groups_edit: ${err}`);
+              return redirectTo500Page(response, err, callback);
+            }
+          }); //router.downloadClientPostData
+        });//getUserListForGroup
+      }); //findGroupByUrl
+    }); //getRoleForAuthedUser
   }
-}
+};
