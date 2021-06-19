@@ -5,7 +5,8 @@ module.exports = {
   getGroupListWithElderInfo,
   findGroupByUrl,
   getUserListForGroup,
-  updateGroupInfoByUrl
+  updateGroupInfoByUrl,
+  createNewGroup
 }
 
 /*COMMON METHODS*/
@@ -65,4 +66,15 @@ function updateGroupInfoByUrl(groupURL, newData, db, callback) {
       }
     },
     callback);
+}
+
+function createNewGroup(groupInfo, db, callback) {
+  db.collection('groups').insertOne({
+    name: groupInfo.name,
+    course: groupInfo.course,
+    fullname: groupInfo.fullname,
+    url: groupInfo.url,
+    typeEducation: groupInfo.typeEducation
+  },
+  callback);
 }
