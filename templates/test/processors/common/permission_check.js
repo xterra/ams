@@ -2,6 +2,7 @@ module.exports = {
   isUserAuthed,
   isUserAdminOrTeacher,
   isTeacherDiscEditor,
+  isUserAdmin,
   isUserTeacher,
   isUserStudentWithGroup
 }
@@ -27,6 +28,15 @@ function isTeacherDiscEditor(userInfo, discipline) {
     return discipline.editors.includes(userInfo._id.toString());
   }
   return true;
+}
+
+function isUserAdmin(userInfo) {
+  const roles = userInfo.securityRole;
+
+  if (roles.length > 0)
+      return roles.includes('admin') || roles.includes('superadmin');
+
+  return false;
 }
 
 function isUserTeacher(userInfo) {
