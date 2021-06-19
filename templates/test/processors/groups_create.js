@@ -1,80 +1,73 @@
 const qs = require('querystring'),
-  router = require('../../../router');
+  router = require('../../../router'),
+  bw = require('./common/bleed_wrapper.js'),
+  check = require('./common/permission_check.js'),
+  funcs = require('./groups/funcs.js'),
+  dbMethods = require('./groups/dbMethods.js');
 
 module.exports = {
   path: new RegExp('^/groups/new/$'),
   processor(request, response, callback, sessionContext, sessionToken, db) {
-    if (sessionToken == null || sessionContext == undefined || sessionContext == null) {
-      callback();
-      return router.bleed(301, '/login/', response);
-    }
-    db.collection('users').findOne({ _id: sessionContext.id }, { username: 1, securityRole: 1 }, (err, result) => {
-      if (err) {
-        callback();
-        return router.bleed(500, null, response, err);
-      }
+
+    const userAuthed = check.isUserAuthed(sessionContext, sessionToken);
+    if (!userAuthed) return bw.redirectToLoginPage(response, callback);
+
+    dbMethods.getRoleForAuthedUser(sessionContext.id, db, (err, result) => {
+      if (err) return bw.redirectTo500Page(response, err, callback);
       const userInfo = result;
-      if (userInfo.securityRole.length == 0 && !userInfo.securityRole.includes('superadmin') && !userInfo.securityRole.includes('admin')) {
-        callback();
-        return router.bleed(403, null, response);
+
+      const userAdmin = check.isUserAdmin(userInfo);
+      if (!userAdmin) {
+        const err = new Error('User role not admin');
+        return bw.redirectWithErrorCode(response, 403, err, callback);
       }
 
-      if (request.method === 'POST') {
-        router.downloadClientPostData(request, (err, data) => {
-          if (err) {
-            callback();
-            return router.bleed(400, null, response);
-          }
-          try {
-            const postData = qs.parse(data);
-            if (/[А-яЁё]/gi.test(postData.url)) {
-              return callback({
-                title: 'Новая группа',
-                groupInfo: postData,
-                errorMessage: 'Имя группы для ссылки должно быть на английском!'
-              }, 'groups_form', 0, 0);
-            }
-            db.collection('groups').findOne({ url: postData.url }, { _id: 1 }, (err, foundGroup) => {
-              if (err) {
-                callback();
-                return router.bleed(500, null, response, err);
-              }
-              if (foundGroup) {
-                return callback({
-                  title: 'Новая группа',
-                  groupInfo: postData,
-                  errorMessage: 'Группа с таким URL уже существует!'
-                }, 'groups_form', 0, 0);
-              } else {
-                db.collection('groups').insertOne({
-                  name: postData.name,
-                  course: postData.course,
-                  fullname: postData.fullname,
-                  url: postData.url,
-                  typeEducation: postData.typeEducation
-                }, err => {
-                  if (err) {
-                    callback();
-                    return router.bleed(500, null, response, err);
-                  }
-                  console.log(`Group ${postData.name} created!`);
-                  callback();
-                  return router.bleed(301, '/groups/', response);
-                });
-              }
-            });
-          } catch (err) {
-            console.log(`Processor error groups_create: ${err}`);
-            callback();
-            return router.bleed(500, null, response, err);
-          }
-        });
-      } else {
+      if (request.method !== 'POST') {
         return callback({
           title: 'Новая группа',
           errorMessage: ''
         }, 'groups_form', 0, 0);
       }
-    });
+
+      router.downloadClientPostData(request, (err, data) => {
+
+        if (err) return redirectTo400Page(response, callback);
+
+        try {
+          const postData = qs.parse(data);
+
+          if (/[А-яЁё]/gi.test(postData.url)) {
+            return callback({
+              title: 'Новая группа',
+              groupInfo: postData,
+              errorMessage: 'Имя группы для ссылки должно быть на английском!'
+            }, 'groups_form', 0, 0);
+          }
+
+          dbMethods.findGroupByUrl(postData.url, db, (err, foundGroup) => {
+
+            if (err) return bw.redirectTo500Page(response, err, callback);
+            if (foundGroup) {
+              return callback({
+                title: 'Новая группа',
+                groupInfo: postData,
+                errorMessage: 'Группа с таким URL уже существует!'
+              }, 'groups_form', 0, 0);
+            }
+
+            dbMethods.createNewGroup(postData, db, err => {
+
+              if (err) return bw.redirectTo500Page(response, err, callback);
+              console.log(`Group ${postData.name} created!`);
+              return bw.redirectToGroupsPage(response, callback);
+
+            }); // createNewGroup
+          }); //findGroupByUrl
+        } catch (err) {
+          console.log(`Processor error groups_create: ${err}`);
+          return redirectTo500Page(response, err, callback);
+        }
+      }); //router.downloadClientPostData
+    }); //getRoleForAuthedUser
   }
-}
+};
