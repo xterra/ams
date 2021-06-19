@@ -6,7 +6,9 @@ module.exports = {
   findGroupByUrl,
   getUserListForGroup,
   updateGroupInfoByUrl,
-  createNewGroup
+  createNewGroup,
+  deleteGroup,
+  deleteGroupFromStudentsInfo
 }
 
 /*COMMON METHODS*/
@@ -77,4 +79,19 @@ function createNewGroup(groupInfo, db, callback) {
     typeEducation: groupInfo.typeEducation
   },
   callback);
+}
+
+function deleteGroup(groupInfo, db, callback) {
+  db.collection('groups').deleteOne(
+    { _id: new ObjectID(groupInfo._id) },
+    callback);
+}
+
+function deleteGroupFromStudentsInfo(groupInfo, db, callback) {
+  db.collection('users').update(
+    { group: new ObjectID(groupInfo._id) },
+    { $set:
+      { group: ' ' }
+    },
+    callback);
 }
