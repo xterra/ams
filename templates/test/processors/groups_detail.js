@@ -1,37 +1,31 @@
-const router = require('../../../router'),
-  ObjectID = require('mongodb').ObjectID;
+const bw = require('./common/bleed_wrapper.js'),
+  check = require('./common/permission_check.js'),
+  funcs = require('./groups/funcs.js'),
+  dbMethods = require('./groups/dbMethods.js');
 
 module.exports = {
   path: new RegExp('^/groups/[^/]+/$'),
   processor(request, response, callback, sessionContext, sessionToken, db) {
-    if (sessionToken == null || sessionContext == undefined || sessionContext == null) {
-      callback();
-      return router.bleed(301, '/login/', response);
-    }
-    const requestedUrl = decodeURI(request.url);
-    const delimeteredUrl = requestedUrl.split('/');
-    const groupURL = delimeteredUrl[delimeteredUrl.length-2];
-    db.collection('users').findOne({ _id: new ObjectID(sessionContext.id) }, { username: 1, securityRole: 1 }, (err, result) => {
-      if (err) {
-        callback();
-        return router.bleed(500, null, response, err);
-      }
+
+    const userAuthed = check.isUserAuthed(sessionContext, sessionToken);
+    if (!userAuthed) return bw.redirectToLoginPage(response, callback);
+
+    dbMethods.getRoleForAuthedUser(sessionContext.id, db, (err, result) => {
+
+      if (err) return bw.redirectTo500Page(response, err, callback);
       const userInfo = result;
-      db.collection('groups').findOne({ url: groupURL }, (err, result) => {
-        if (err) {
-          callback();
-          return router.bleed(500, null, response, err);
-        }
-        if (result == null) {
-          callback();
-          return router.bleed(404, requestedUrl, response);
-        }
+
+      const groupURL = funcs.getGroupUrlFromUrl(request.url);
+      dbMethods.findGroupByUrl(groupURL, db, (err, result) => {
+
+        if (err) return bw.redirectTo500Page(response, err, callback);
+        if (result == null)
+          return bw.redirectTo404Page(response, request.url, callback);
+
         const groupInfo = result;
-        db.collection('users').find({ group: groupInfo._id }, { lastName: 1, name: 1 }).toArray((err, result) => {
-          if (err) {
-            callback();
-            return router.bleed(500, null, response, err);
-          }
+
+        dbMethods.getUserListForGroup(groupInfo, db, (err, result) => {
+          if (err) return bw.redirectTo500Page(response, err, callback);
           const groupList = result;
           return callback({
             title: 'Инфо о группе',
