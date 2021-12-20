@@ -21,12 +21,10 @@ module.exports = {
         const err = new Error('User role not admin');
         return bw.redirectWithErrorCode(response, 403, err, callback);
       }
+      let errorMessage = '';
 
       if (request.method !== 'POST') {
-        return callback({
-          title: 'Новая группа',
-          errorMessage: ''
-        }, 'groups_form', 0, 0);
+        return renderPage(undefined, errorMessage, callback);
       }
 
       router.downloadClientPostData(request, (err, data) => {
@@ -35,24 +33,18 @@ module.exports = {
 
         try {
           const postData = qs.parse(data);
-
           if (/[А-яЁё]/gi.test(postData.url)) {
-            return callback({
-              title: 'Новая группа',
-              groupInfo: postData,
-              errorMessage: 'Имя группы для ссылки должно быть на английском!'
-            }, 'groups_form', 0, 0);
+            errorMessage = 'Имя группы для ссылки должно быть на английском!';
+            return renderPage(postData, errorMessage, callback);
           }
 
+          //check on existence group by URL
           dbMethods.findGroupByUrl(postData.url, db, (err, foundGroup) => {
 
             if (err) return bw.redirectTo500Page(response, err, callback);
             if (foundGroup) {
-              return callback({
-                title: 'Новая группа',
-                groupInfo: postData,
-                errorMessage: 'Группа с таким URL уже существует!'
-              }, 'groups_form', 0, 0);
+              errorMessage = 'Группа с таким URL уже существует!';
+              return renderPage(postData, errorMessage, callback);
             }
 
             dbMethods.createNewGroup(postData, db, err => {
@@ -61,13 +53,21 @@ module.exports = {
               console.log(`Group ${postData.name} created!`);
               return bw.redirectToGroupsPage(response, callback);
 
-            }); // createNewGroup
-          }); //findGroupByUrl
+            });
+          });
         } catch (err) {
           console.log(`Processor error groups_create: ${err}`);
           return redirectTo500Page(response, err, callback);
         }
-      }); //router.downloadClientPostData
-    }); //getRoleForAuthedUser
+      });
+    });
   }
 };
+
+function renderPage(groupInfo, errorMessage, callback) {
+  return callback({
+    title: 'Новая группа',
+    groupInfo,
+    errorMessage
+  }, 'groups_form', 0, 0);
+}

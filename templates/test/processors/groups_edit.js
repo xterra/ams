@@ -36,13 +36,9 @@ module.exports = {
           if (err) return bw.redirectTo500Page(response, err, callback);
           const groupList = result;
 
+          let errorMessage = '';
           if (request.method !== 'POST') {
-            return callback({
-              title: 'Изменение группы',
-              groupInfo,
-              groupList,
-              errorMessage: ''
-            }, 'groups_form', 0, 0);
+            return renderPage(groupInfo, groupList, errorMessage, callback);
           }
 
           router.downloadClientPostData(request, (err, data) => {
@@ -53,12 +49,8 @@ module.exports = {
               const postData = qs.parse(data);
 
               if (/[А-яЁё]/gi.test(postData.url)) {
-                return callback({
-                  title: 'Изменение группы',
-                  groupInfo: postData,
-                  groupList,
-                  errorMessage: 'Имя группы для ссылки должно быть на английском!'
-                }, 'groups_form', 0, 0);
+                errorMessage = 'Имя группы для ссылки должно быть на английском!';
+                return renderPage(groupInfo, groupList, errorMessage, callback);
               }
 
               if (groupURL == postData.url) {
@@ -75,12 +67,8 @@ module.exports = {
 
                 if (err) return bw.redirectTo500Page(response, err, callback);
                 if (foundGroup) {
-                  return callback({
-                    title: 'Изменение группы',
-                    groupInfo: postData,
-                    groupList,
-                    errorMessage: 'Группа с таким URL уже существует!'
-                  }, 'groups_form', 0, 0);
+                  errorMessage = 'Группа с таким URL уже существует!';
+                  return renderPage(groupInfo, groupList, errorMessage, callback);
                 }
 
                 dbMethods.updateGroupInfoByUrl(groupURL, postData, db, err => {
@@ -89,15 +77,24 @@ module.exports = {
 
                     console.log(`Group ${groupURL} info changed!`);
                     return bw.redirectToGroupsPage(response, callback);
-                });//updateGroupInfoByUrl
-              });//findGroupByUrl
+                });
+              });
             } catch (err) {
               console.log(`Processor error groups_edit: ${err}`);
               return redirectTo500Page(response, err, callback);
             }
-          }); //router.downloadClientPostData
-        });//getUserListForGroup
-      }); //findGroupByUrl
-    }); //getRoleForAuthedUser
+          });
+        });
+      });
+    });
   }
 };
+
+function renderPage(groupInfo, groupList, errorMessage, callback) {
+  return callback({
+    title: 'Изменение группы',
+    groupInfo,
+    groupList,
+    errorMessage
+  }, 'groups_form', 0, 0);
+}
