@@ -47,9 +47,9 @@ module.exports = {
             if (err) console.log(`\n ERROR delete group from users info: ${err}`);
             console.log('Group from users is deleted!');
             return bw.redirectToGroupsPage(response, callback);
-          });//deleteGroupFromStudentsInfo
-        });//deleteGroup
-      });//findGroupByUrl
-    });//getRoleForAuthedUser
+          });
+        });
+      });
+    });
   }
 };

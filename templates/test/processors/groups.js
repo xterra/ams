@@ -25,7 +25,7 @@ module.exports = {
           userInfo
         }, 'groups', 0, 0);
 
-      });//getGroupListWithElderInfo
-    });//getRoleForAuthedUser
+      });
+    });
   }
 };
